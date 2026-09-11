@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion - Gendarmerie Nationale</title>
+    <style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  color: #e0e0e0;
+  line-height: 1.6;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+header {
+  background: rgba(0, 0, 0, 0.5);
+  border-bottom: 3px solid #d4af37;
+  padding: 2rem;
+  backdrop-filter: blur(10px);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.logo {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 8px rgba(212, 175, 55, 0.5));
+}
+
+.brand h1 {
+  font-size: 2.5rem;
+  color: #d4af37;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+}
+
+.back-btn {
+  display: inline-block;
+  margin-left: auto;
+  background: rgba(212, 175, 55, 0.1);
+  color: #d4af37;
+  border: 2px solid #d4af37;
+  padding: 0.6rem 1.5rem;
+  border-radius: 6px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 600;
+}
+
+.back-btn:hover {
+  background: #d4af37;
+  color: #1a1a2e;
+  transform: translateY(-2px);
+}
+
+main {
+  flex: 1;
+  padding: 3rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.login-container {
+  background: rgba(0, 0, 0, 0.4);
+  border: 2px solid #d4af37;
+  border-radius: 12px;
+  padding: 3rem;
+  max-width: 400px;
+  width: 100%;
+  box-shadow: 0 8px 32px rgba(212, 175, 55, 0.2);
+}
+
+.login-container h2 {
+  color: #d4af37;
+  margin-bottom: 2rem;
+  text-align: center;
+  font-size: 1.8rem;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #d4af37;
+  font-weight: 600;
+}
+
+input {
+  width: 100%;
+  padding: 0.8rem;
+  border: 2px solid #d4af37;
+  border-radius: 6px;
+  background: rgba(212, 175, 55, 0.05);
+  color: #e0e0e0;
+  font-family: inherit;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+input:focus {
+  outline: none;
+  background: rgba(212, 175, 55, 0.15);
+  box-shadow: 0 0 8px rgba(212, 175, 55, 0.3);
+}
+
+.submit-btn {
+  background: linear-gradient(135deg, #d4af37 0%, #c9a227 100%);
+  color: #1a1a2e;
+  border: none;
+  padding: 0.8rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 100%;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  box-shadow: 0 8px 24px rgba(212, 175, 55, 0.3);
+}
+
+.submit-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 32px rgba(212, 175, 55, 0.4);
+}
+
+.success-message {
+  background: rgba(76, 175, 80, 0.2);
+  border: 2px solid #4CAF50;
+  color: #90EE90;
+  padding: 1rem;
+  border-radius: 6px;
+  margin-bottom: 2rem;
+  display: none;
+  text-align: center;
+}
+
+footer {
+  background: rgba(0, 0, 0, 0.7);
+  border-top: 2px solid #d4af37;
+  padding: 2rem;
+  text-align: center;
+  color: #b0b0b0;
+  font-size: 0.9rem;
+}
+
+@media (max-width: 768px) {
+  header {
+    padding: 1.5rem;
+  }
+
+  .brand {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .back-btn {
+    margin-left: 0;
+    margin-top: 1rem;
+  }
+
+  .brand h1 {
+    font-size: 1.8rem;
+  }
+
+  .login-container {
+    padding: 2rem;
+  }
+
+  main {
+    padding: 2rem 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  header {
+    padding: 1rem;
+  }
+
+  .brand h1 {
+    font-size: 1.5rem;
+  }
+
+  .logo {
+    width: 60px;
+    height: 60px;
+  }
+
+  .login-container {
+    padding: 1.5rem;
+  }
+
+  .login-container h2 {
+    font-size: 1.5rem;
+  }
+
+  main {
+    padding: 1.5rem 1rem;
+  }
+}
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="brand">
+        <img src="/assets/logo-gendarmerie.png" class="logo" alt="Logo Gendarmerie">
+        <h1>Gendarmerie Nationale</h1>
+        <a href="/" class="back-btn">← Retour</a>
+    </div>
+</header>
+
+<main>
+    <div class="login-container">
+        <h2>Connexion Gendarme</h2>
+        
+        <div class="success-message" id="successMessage">
+            ✓ Connexion réussie. Redirection...
+        </div>
+
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="matricule">Matricule *</label>
+                <input type="text" id="matricule" name="matricule" placeholder="Votre matricule" required>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Mot de passe *</label>
+                <input type="password" id="password" name="password" placeholder="Votre mot de passe" required>
+            </div>
+
+            <button type="submit" class="submit-btn">Se connecter</button>
+        </form>
+    </div>
+</main>
+
+<footer>
+    <p>© 2026 lexy_off1 — Tous droits réservés</p>
+</footer>
+
+<script>
+document.getElementById('loginForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const formData = {
+        matricule: document.getElementById('matricule').value,
+        password: document.getElementById('password').value
+    };
+
+    fetch("/api/login", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
+    })
+    .then(res => res.json())
+    .then(data => {
+        document.getElementById('successMessage').style.display = 'block';
+        localStorage.setItem('token', data.token);
+        
+        setTimeout(() => {
+            window.location.href = '/tableau-de-bord.html';
+        }, 2000);
+    })
+    .catch(err => {
+        console.error('Erreur:', err);
+        alert('Erreur de connexion. Veuillez réessayer.');
+    });
+});
+</script>
+
+</body>
+</html>

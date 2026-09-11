@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alphabet OTAN</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Outfit, Arial, sans-serif;
+      background: linear-gradient(135deg, #0d1321 0%, #151f36 100%);
+      color: #d8e2ff;
+      line-height: 1.6;
+    }
+
+    header {
+      background: #0d1321;
+      border-bottom: 3px solid #1f4ea8;
+      padding: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .logo {
+      width: 60px;
+      height: 60px;
+      border-radius: 8px;
+      object-fit: cover;
+    }
+
+    .brand h1 {
+      color: #fff;
+      font-size: 28px;
+      margin-bottom: 5px;
+    }
+
+    .brand p {
+      color: #8fa3c4;
+      font-size: 14px;
+    }
+
+    nav {
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+
+    nav a {
+      padding: 10px 20px;
+      background: #1f4ea8;
+      color: white;
+      text-decoration: none;
+      border-radius: 8px;
+      transition: background 0.3s, transform 0.2s;
+      font-weight: 500;
+    }
+
+    nav a:hover {
+      background: #163c84;
+      transform: translateY(-2px);
+    }
+
+    section {
+      max-width: 1200px;
+      margin: 40px auto;
+      padding: 20px;
+    }
+
+    .card {
+      background: #151f36;
+      border-left: 5px solid #1f4ea8;
+      padding: 30px;
+      margin-bottom: 25px;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .card h2 {
+      color: #fff;
+      margin-bottom: 15px;
+      font-size: 22px;
+    }
+
+    .card p {
+      color: #d8e2ff;
+      margin-bottom: 15px;
+    }
+
+    .card p strong {
+      color: #fff;
+    }
+
+    .course-image {
+      max-width: 100%;
+      height: auto;
+      border-radius: 8px;
+      margin-top: 15px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    footer {
+      background: #0d1321;
+      border-top: 3px solid #1f4ea8;
+      text-align: center;
+      padding: 30px 20px;
+      margin-top: 40px;
+      color: #8fa3c4;
+    }
+
+    footer p {
+      margin: 5px 0;
+    }
+
+    @media (max-width: 768px) {
+      header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      nav {
+        width: 100%;
+      }
+
+      .brand h1 {
+        font-size: 22px;
+      }
+
+      section {
+        margin: 20px auto;
+      }
+
+      .card {
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <img src="/assets/logo-gendarmerie.png" class="logo" alt="Logo Gendarmerie">
+    <div>
+      <h1>Alphabet OTAN</h1>
+    </div>
+  </div>
+
+  <nav>
+    <a href="/cours.php">Retour aux cours</a>
+    <a href="/dashboard.php">Dashboard</a>
+  </nav>
+</header>
+
+<section>
+
+  <div class="card">
+    <h2>Définition</h2>
+    <p>
+      L'alphabet OTAN est utilisé lors des communications radio afin de transmettre
+      clairement des informations sans risque de confusion entre les lettres.
+    </p>
+  </div>
+
+  <div class="card">
+    <h2>Alphabet OTAN</h2>
+    <img src="/assets/alphabet.png" alt="Alphabet OTAN" class="course-image">
+  </div>
+
+  <div class="card">
+    <h2>Exemple d'utilisation</h2>
+    <p>
+      La plaque <strong>AB-123-CD</strong> se transmet à la radio :
+    </p>
+    <p>
+      <strong>Alpha Bravo — 1 2 3 — Charlie Delta</strong>
+    </p>
+  </div>
+
+</section>
+
+<footer class="footer">
+  <p>© 2026 lexy_off1 — Tous droits réservés</p>
+</footer>
+
+</body>
+</html>

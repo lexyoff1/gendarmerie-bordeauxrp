@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Procédure</title>
+    <style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  color: #e0e0e0;
+  line-height: 1.6;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+header {
+  background: rgba(0, 0, 0, 0.5);
+  border-bottom: 3px solid #d4af37;
+  padding: 2rem;
+  backdrop-filter: blur(10px);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.logo {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 8px rgba(212, 175, 55, 0.5));
+}
+
+.brand h1 {
+  font-size: 2.5rem;
+  color: #d4af37;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+}
+
+.brand p {
+  font-size: 0.95rem;
+  color: #b0b0b0;
+}
+
+nav {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+nav a {
+  color: #d4af37;
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  border: 1px solid #d4af37;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+nav a:hover {
+  background: #d4af37;
+  color: #1a1a2e;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+}
+
+section {
+  flex: 1;
+  padding: 3rem 2rem;
+  max-width: 1000px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+section > :first-child {
+  margin-bottom: 2rem;
+}
+
+.card {
+  background: rgba(30, 30, 50, 0.8);
+  border: 2px solid #d4af37;
+  border-radius: 8px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  background: rgba(40, 40, 60, 0.9);
+  box-shadow: 0 12px 32px rgba(212, 175, 55, 0.2);
+}
+
+.card h2 {
+  font-size: 2rem;
+  color: #d4af37;
+  margin-bottom: 1rem;
+  text-align: center;
+  border-bottom: 2px solid #d4af37;
+  padding-bottom: 1rem;
+}
+
+.card h3 {
+  font-size: 1.4rem;
+  color: #d4af37;
+  margin-bottom: 1rem;
+  margin-top: 0;
+}
+
+.card p {
+  color: #d0d0d0;
+  margin-bottom: 1rem;
+  line-height: 1.8;
+}
+
+.card ul {
+  list-style: none;
+  margin: 1rem 0;
+  padding-left: 0;
+}
+
+.card li {
+  color: #d0d0d0;
+  margin-bottom: 0.8rem;
+  padding-left: 1.8rem;
+  position: relative;
+  line-height: 1.6;
+}
+
+.card li:before {
+  content: "▸";
+  color: #d4af37;
+  position: absolute;
+  left: 0;
+  font-weight: bold;
+}
+
+.quote {
+  background: rgba(212, 175, 55, 0.1);
+  border-left: 4px solid #d4af37;
+  padding: 1.5rem;
+  margin: 1.5rem 0;
+  border-radius: 4px;
+  font-style: italic;
+}
+
+.quote p {
+  color: #e0e0e0;
+  margin-bottom: 1rem;
+}
+
+.quote strong {
+  color: #d4af37;
+  font-style: normal;
+}
+
+.quote ul {
+  margin-top: 1rem;
+}
+
+footer {
+  background: rgba(0, 0, 0, 0.7);
+  border-top: 2px solid #d4af37;
+  padding: 2rem;
+  text-align: center;
+  color: #b0b0b0;
+  font-size: 0.9rem;
+  margin-top: auto;
+}
+
+footer p {
+  margin: 0.5rem 0;
+}
+
+@media (max-width: 768px) {
+  header {
+    padding: 1.5rem;
+  }
+
+  .brand {
+    flex-direction: column;
+    text-align: center;
+    margin-bottom: 1rem;
+  }
+
+  .brand h1 {
+    font-size: 1.8rem;
+  }
+
+  nav {
+    gap: 0.6rem;
+  }
+
+  nav a {
+    font-size: 0.8rem;
+    padding: 0.4rem 0.6rem;
+  }
+
+  section {
+    padding: 1.5rem 1rem;
+  }
+
+  .card {
+    padding: 1.5rem;
+  }
+
+  .card h2 {
+    font-size: 1.5rem;
+  }
+
+  .card h3 {
+    font-size: 1.1rem;
+  }
+
+  .quote {
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  header {
+    padding: 1rem;
+  }
+
+  .brand h1 {
+    font-size: 1.5rem;
+  }
+
+  .brand p {
+    font-size: 0.85rem;
+  }
+
+  nav a {
+    font-size: 0.7rem;
+    padding: 0.3rem 0.5rem;
+  }
+
+  section {
+    padding: 1rem 0.75rem;
+  }
+
+  .card {
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .card h2 {
+    font-size: 1.3rem;
+  }
+
+  .card h3 {
+    font-size: 1rem;
+  }
+
+  .card p,
+  .card li {
+    font-size: 0.9rem;
+  }
+}
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="brand">
+        <img src="/assets/logo-gendarmerie.png" class="logo" alt="Logo Gendarmerie">
+        <div>
+            <h1>Procédure</h1>
+            <p>Gendarmerie Nationale</p>
+        </div>
+    </div>
+
+    <nav>
+        <a href="/cours.html">Retour aux cours</a>
+        <a href="/dashboard.html">Dashboard</a>
+    </nav>
+</header>
+
+<section>
+
+<div class="card">
+    <h2>Procédure d'Interpellation et de Garde à Vue</h2>
+    <p>Ce cours explique les étapes à respecter lors d'une interpellation, d'un contrôle total ou d'un placement en garde à vue.</p>
+</div>
+
+<div class="card">
+    <h3>1 — Identification</h3>
+    <p>Le gendarme analyse la situation et vérifie si une arrestation ou un placement en garde à vue est nécessaire.</p>
+</div>
+
+<div class="card">
+    <h3>2 — Notification de la Garde à Vue</h3>
+
+    <p>Le gendarme doit notifier l'intégralité des droits de la personne placée en garde à vue avant toute audition.</p>
+
+    <div class="quote">
+
+        <p><strong>Monsieur / Madame [Nom, Prénom],</strong></p>
+
+        <p>
+            Je vous informe que vous êtes placé(e) en garde à vue pour les faits
+            <strong>[infraction]</strong>, prévus et réprimés par la législation en vigueur.
+        </p>
+
+        <p>
+            Les faits se seraient déroulés le <strong>[date]</strong> à
+            <strong>[heure]</strong> sur la commune de <strong>[lieu]</strong>.
+        </p>
+
+        <p>
+            La garde à vue est une mesure de contrainte prise à votre encontre par un
+            Officier de Police Judiciaire pour les nécessités de l'enquête.
+        </p>
+
+        <p>
+            La durée initiale de la garde à vue est de <strong>24 heures maximum</strong>.
+            Elle peut être prolongée dans les conditions prévues par la loi.
+        </p>
+
+        <ul>
+            <li>Le droit de faire prévenir un proche ou son employeur ;</li>
+            <li>Le droit de faire prévenir les autorités consulaires de votre pays si vous êtes de nationalité étrangère ;</li>
+            <li>Le droit d'être examiné par un médecin ;</li>
+            <li>Le droit d'être assisté par un avocat ;</li>
+            <li>Le droit d'être assisté par un interprète ;</li>
+            <li>Le droit de consulter les documents prévus par la procédure ;</li>
+            <li>Le droit de présenter des observations en cas de prolongation ;</li>
+            <li>Le droit de faire des déclarations, répondre aux questions ou garder le silence.</li>
+        </ul>
+
+        <p><strong>Avez-vous compris les droits qui viennent de vous être notifiés ?</strong></p>
+
+    </div>
+</div>
+
+<div class="card">
+    <h3>3 — Maîtrise et Menottage</h3>
+    <p>L'individu doit être maîtrisé, menotté et palpé pour des raisons de sécurité.</p>
+</div>
+
+<div class="card">
+    <h3>4 — Fouille / Inspection</h3>
+    <p>Le gendarme effectue une inspection sommaire afin de rechercher des armes, objets dangereux ou éléments utiles à l'enquête.</p>
+</div>
+
+<div class="card">
+    <h3>5 — Transport</h3>
+    <p>L'individu est transporté vers la brigade ou l'unité compétente pour la suite de la procédure.</p>
+</div>
+
+<div class="card">
+    <h3>6 — Placement en Garde à Vue</h3>
+
+    <p>La garde à vue est décidée par un Officier de Police Judiciaire lorsque les nécessités de l'enquête l'exigent.</p>
+
+    <ul>
+        <li>Durée initiale : 24 heures maximum ;</li>
+        <li>Prolongation possible selon la procédure en vigueur ;</li>
+        <li>Les droits doivent être notifiés avant toute audition ;</li>
+        <li>Un rapport doit être rédigé pour chaque placement en garde à vue.</li>
+    </ul>
+
+</div>
+
+<div class="card">
+    <h3>7 — Enregistrement</h3>
+    <p>Les informations doivent être enregistrées : identité, motifs, circonstances, procès-verbal, rapports et antécédents judiciaires.</p>
+</div>
+
+<div class="card">
+    <h3>8 — Fin de Procédure</h3>
+    <p>À l'issue de la mesure, l'individu peut être libéré, convoqué ultérieurement ou présenté à l'autorité judiciaire compétente selon les éléments du dossier.</p>
+</div>
+
+</section>
+
+<footer class="footer">
+    <p>© 2026 lexy_off1 — Tous droits réservés</p>
+</footer>
+
+</body>
+</html>

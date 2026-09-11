@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Tenues</title>
+    <style>
+        @import url("https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap");
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0d1321 0%, #141d2e 100%);
+            color: white;
+            font-family: "Outfit", Arial, sans-serif;
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background: linear-gradient(90deg, #0a0f1a 0%, #111a2e 100%);
+            border-bottom: 3px solid #d4af37;
+            padding: 1.5rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo {
+            width: 60px;
+            height: 60px;
+            object-fit: contain;
+            filter: drop-shadow(0 0 8px rgba(212, 175, 55, 0.4));
+        }
+
+        .brand h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #d4af37;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .brand p {
+            margin-top: 0.25rem;
+            color: #c9d6ff;
+            font-size: 0.85rem;
+        }
+
+        nav {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        nav a {
+            color: #d4af37;
+            text-decoration: none;
+            padding: 0.5rem 1.5rem;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            border: 1px solid #d4af37;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        nav a:hover {
+            background: #d4af37;
+            color: #0d1321;
+        }
+
+        section {
+            flex: 1;
+            padding: 2.5rem;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        section > h2 {
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            color: #d4af37;
+            border-bottom: 2px solid #d4af37;
+            padding-bottom: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        section > .card:first-of-type {
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background: linear-gradient(135deg, #0f1624 0%, #151f36 100%);
+            border-left: 4px solid #d4af37;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            background: linear-gradient(135deg, #141d2e 0%, #1a2847 100%);
+            box-shadow: 0 6px 16px rgba(212, 175, 55, 0.2);
+        }
+
+        .card h2 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: #d4af37;
+            border-bottom: 1px solid #d4af37;
+            padding-bottom: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .card h3 {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            color: #d4af37;
+        }
+
+        .card p {
+            margin-bottom: 0.5rem;
+            color: #d0d8f7;
+        }
+
+        .muted {
+            color: #c9d6ff;
+            font-size: 0.9rem;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .card.grid-item {
+            display: flex;
+            flex-direction: column;
+            min-height: 360px;
+        }
+
+        .course-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 6px;
+            margin: 1rem 0;
+            flex-grow: 1;
+        }
+
+        .tenue-admin {
+            margin-top: auto;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid #d4af37;
+            margin: 1rem 0;
+            opacity: 0.5;
+        }
+
+        label {
+            display: block;
+            margin-top: 0.8rem;
+            font-weight: 600;
+            color: #d4af37;
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        input[type="text"],
+        input[type="file"] {
+            width: 100%;
+            padding: 0.6rem;
+            margin-top: 0.4rem;
+            background: #0a0f1a;
+            color: white;
+            border: 1px solid #d4af37;
+            border-radius: 6px;
+            font-family: "Outfit", Arial, sans-serif;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+
+        input[type="text"]:focus,
+        input[type="file"]:focus {
+            outline: none;
+            border-color: #d4af37;
+            background: #141d2e;
+            box-shadow: 0 0 12px rgba(212, 175, 55, 0.3);
+        }
+
+        button {
+            background: #d4af37;
+            color: #0d1321;
+            border: none;
+            padding: 0.7rem 1.25rem;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 0.75rem;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        button:hover {
+            background: #e8c547;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(212, 175, 55, 0.3);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button.danger {
+            background: #ff6b6b;
+            color: white;
+            margin-left: 0.5rem;
+        }
+
+        button.danger:hover {
+            background: #ff8787;
+            box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+        }
+
+        .footer {
+            margin-top: auto;
+            padding: 2rem;
+            text-align: center;
+            background: linear-gradient(90deg, #0a0f1a 0%, #111a2e 100%);
+            border-top: 3px solid #d4af37;
+        }
+
+        .footer p {
+            margin: 0.5rem 0;
+            color: #c9d6ff;
+            font-size: 0.9rem;
+        }
+
+        .section-title {
+            font-size: 1.3rem;
+            color: #d4af37;
+            margin: 2rem 0 1rem 0;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #d4af37;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        @media (max-width: 1200px) {
+            .grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 900px) {
+            .grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+                padding: 1rem 1.5rem;
+            }
+
+            nav {
+                width: 100%;
+            }
+
+            nav a {
+                flex: 1;
+                text-align: center;
+                margin: 0;
+            }
+
+            section {
+                padding: 1.5rem 1rem;
+            }
+
+            section > h2 {
+                font-size: 1.5rem;
+            }
+
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            header {
+                padding: 0.75rem 1rem;
+            }
+
+            .brand h1 {
+                font-size: 1.25rem;
+            }
+
+            section {
+                padding: 1rem 0.75rem;
+            }
+
+            section > h2 {
+                font-size: 1.25rem;
+            }
+
+            button,
+            input {
+                font-size: 16px;
+            }
+
+            .card {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="brand">
+        <img src="/assets/logo-gendarmerie.png" class="logo" alt="Logo Gendarmerie">
+        <div>
+            <h1>Tenues</h1>
+            <p>© 2026 lexy_off1 — Tous droits réservés</p>
+        </div>
+    </div>
+
+    <nav>
+        <a href="/dashboard.html">Retour</a>
+        <a onclick="logout()">Déconnexion</a>
+    </nav>
+</header>
+
+<section>
+    <h2>Tenues réglementaires</h2>
+
+    <div class="card">
+        <p>Cette page regroupe les tenues autorisées par grade, qualification et spécialité.</p>
+        <p class="muted">Les tenues sont chargées depuis la base de données du site.</p>
+    </div>
+
+    <div id="adminBox" class="card" style="display:none;">
+        <h2>Administration des tenues</h2>
+        <button onclick="toggleAdmin()">Modifier les tenues</button>
+        <button onclick="showAddForm()">Ajouter une tenue</button>
+    </div>
+
+    <div id="addForm" class="card" style="display:none;">
+        <h2>Ajouter une tenue</h2>
+
+        <label for="addNom">Nom</label>
+        <input id="addNom" type="text">
+
+        <label for="addCategorie">Catégorie</label>
+        <input id="addCategorie" type="text" placeholder="GAV, SOB, OPJ, PSIG...">
+
+        <label for="addFile">Uploader une image</label>
+        <input type="file" id="addFile" accept="image/*">
+        <button onclick="uploadAddImage()">Uploader l'image</button>
+
+        <label for="addImage">Image</label>
+        <input id="addImage" type="text" placeholder="/assets/tenues/exemple.png">
+
+        <label for="addDescription">Description</label>
+        <input id="addDescription" type="text">
+
+        <button onclick="addTenue()">Ajouter</button>
+    </div>
+
+    <div id="tenuesContainer">Chargement...</div>
+
+</section>
+
+<footer class="footer">
+    <p>© 2026 lexy_off1 — Tous droits réservés</p>
+</footer>
+
+<script>
+let tenues = [];
+let isAdmin = false;
+let editMode = false;
+
+const order = [
+    "GAV", "SOB", "SOP", "OFB", "OFS",
+    "OPJ",
+    "GN", "GHV", "OFB+", "FORMATEUR",
+    "PSIG", "ERI", "BDR/PJGN", "PGHM", "GIC", "GIGN/AGIGN", "GM"
+];
+
+const titles = {
+    "GAV": "📂 GAV",
+    "SOB": "📂 SOB",
+    "SOP": "📂 SOP",
+    "OFB": "📂 OFB",
+    "OFS": "📂 OFS",
+    "OPJ": "⚖️ Tenues Judiciaires — OPJ",
+    "GN": "👕 Tenues Générales — GN",
+    "GHV": "👕 Tenues Générales — GHV",
+    "OFB+": "👕 Tenues Générales — OFB+",
+    "FORMATEUR": "👕 Tenue Formateur",
+    "PSIG": "🚔 PSIG",
+    "ERI": "🚔 EDCF / ERI",
+    "BDR/PJGN": "🚔 BDR / PJGN",
+    "PGHM": "🚔 PGHM",
+    "GIC": "🚔 GIC",
+    "GIGN/AGIGN": "🚔 GIGN / AGIGN",
+    "GM": "🚔 Gendarmerie Mobile"
+};
+
+async function checkAdmin() {
+    try {
+        const res = await fetch((window.API_BASE || "") + "/api/is-admin");
+        if (!res.ok) throw new Error("Erreur");
+        
+        const data = await res.json();
+        isAdmin = data.isAdmin;
+
+        if (isAdmin) {
+            document.getElementById("adminBox").style.display = "block";
+        }
+    } catch (error) {
+        console.error("Erreur checkAdmin:", error);
+    }
+}
+
+async function loadTenues() {
+    try {
+        const res = await fetch((window.API_BASE || "") + "/api/tenues");
+        if (!res.ok) throw new Error("Erreur");
+        
+        tenues = await res.json();
+        renderTenues();
+    } catch (error) {
+        console.error("Erreur loadTenues:", error);
+        document.getElementById("tenuesContainer").innerHTML = "<p>Erreur de chargement.</p>";
+    }
+}
+
+function renderTenues() {
+    const container = document.getElementById("tenuesContainer");
+    container.innerHTML = "";
+
+    order.forEach(cat => {
+        const items = tenues.filter(t => t.categorie === cat);
+        if (items.length === 0) return;
+
+        const catId = cat.replaceAll("/", "-").replaceAll("+", "plus");
+        container.innerHTML += `<div class="section-title">${titles[cat] || escapeHtml(cat)}</div>`;
+        container.innerHTML += `<div class="grid" id="cat-${catId}"></div>`;
+
+        const grid = document.getElementById(`cat-${catId}`);
+
+        items.forEach(t => {
+            grid.innerHTML += `
+                <div class="card grid-item">
+                    <h3>${escapeHtml(t.nom)}</h3>
+                    <p>${escapeHtml(t.description || "")}</p>
+                    <img src="${t.image}" alt="${escapeHtml(t.nom)}" class="course-image">
+
+                    <div class="tenue-admin" style="display:${editMode ? "block" : "none"};">
+                        <hr>
+
+                        <label for="nom-${t.id}">Nom</label>
+                        <input id="nom-${t.id}" type="text" value="${escapeHtml(t.nom)}">
+
+                        <label for="categorie-${t.id}">Catégorie</label>
+                        <input id="categorie-${t.id}" type="text" value="${escapeHtml(t.categorie)}">
+
+                        <label for="image-${t.id}">Image</label>
+                        <input id="image-${t.id}" type="text" value="${t.image}">
+
+                        <label for="description-${t.id}">Description</label>
+                        <input id="description-${t.id}" type="text" value="${escapeHtml(t.description || "")}">
+
+                        <button onclick="saveTenue(${t.id})">Sauvegarder</button>
+                        <button class="danger" onclick="deleteTenue(${t.id})">Supprimer</button>
+                    </div>
+                </div>
+            `;
+        });
+    });
+}
+
+function toggleAdmin() {
+    editMode = !editMode;
+    renderTenues();
+}
+
+function showAddForm() {
+    const form = document.getElementById("addForm");
+    form.style.display = form.style.display === "none" ? "block" : "none";
+}
+
+async function saveTenue(id) {
+    try {
+        const res = await fetch((window.API_BASE || "") + "/api/tenue/update", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                id,
+                nom: document.getElementById(`nom-${id}`).value,
+                categorie: document.getElementById(`categorie-${id}`).value.toUpperCase(),
+                image: document.getElementById(`image-${id}`).value,
+                description: document.getElementById(`description-${id}`).value
+            })
+        });
+
+        if (!res.ok) throw new Error("Erreur serveur");
+        
+        alert("Tenue sauvegardée.");
+        await loadTenues();
+    } catch (error) {
+        console.error("Erreur saveTenue:", error);
+        alert("Erreur lors de la sauvegarde.");
+    }
+}
+
+async function deleteTenue(id) {
+    if (!confirm("Supprimer cette tenue ?")) return;
+
+    try {
+        const res = await fetch((window.API_BASE || "") + "/api/tenue/delete", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ id })
+        });
+
+        if (!res.ok) throw new Error("Erreur serveur");
+        
+        alert("Tenue supprimée.");
+        await loadTenues();
+    } catch (error) {
+        console.error("Erreur deleteTenue:", error);
+        alert("Erreur lors de la suppression.");
+    }
+}
+
+async function uploadAddImage() {
+    const file = document.getElementById("addFile").files[0];
+
+    if (!file) {
+        alert("Choisis une image.");
+        return;
+    }
+
+    try {
+        const formData = new FormData();
+        formData.append("image", file);
+
+        const res = await fetch((window.API_BASE || "") + "/api/tenue/upload", {
+            method: "POST",
+            body: formData
+        });
+
+        if (!res.ok) throw new Error("Erreur serveur");
+        
+        const data = await res.json();
+
+        if (data.success) {
+            document.getElementById("addImage").value = data.imagePath;
+            alert("Image uploadée avec succès.");
+        } else {
+            alert(data.error || "Erreur lors de l'upload.");
+        }
+    } catch (error) {
+        console.error("Erreur uploadAddImage:", error);
+        alert("Erreur de connexion.");
+    }
+}
+
+async function addTenue() {
+    const nom = document.getElementById("addNom").value.trim();
+    const categorie = document.getElementById("addCategorie").value.trim().toUpperCase();
+    const image = document.getElementById("addImage").value.trim();
+    const description = document.getElementById("addDescription").value.trim();
+
+    if (!nom || !categorie || !image) {
+        alert("Remplis tous les champs obligatoires.");
+        return;
+    }
+
+    try {
+        const res = await fetch((window.API_BASE || "") + "/api/tenue/create", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ nom, categorie, image, description })
+        });
+
+        const data = await res.json();
+
+        if (!res.ok || !data.success) {
+            alert(data.error || "Erreur lors de l'ajout.");
+            return;
+        }
+
+        alert("Tenue ajoutée.");
+        document.getElementById("addForm").style.display = "none";
+        document.getElementById("addNom").value = "";
+        document.getElementById("addCategorie").value = "";
+        document.getElementById("addImage").value = "";
+        document.getElementById("addDescription").value = "";
+        document.getElementById("addFile").value = "";
+        
+        await loadTenues();
+    } catch (error) {
+        console.error("Erreur addTenue:", error);
+        alert("Erreur de connexion.");
+    }
+}
+
+function escapeHtml(text) {
+    const map = {
+        '&': '&',
+        '<': '<',
+        '>': '>',
+        '"': '"',
+        "'": '&#039;'
+    };
+    return text.replace(/[&<>"']/g, m => map[m]);
+}
+
+function logout() {
+    localStorage.removeItem("adminToken");
+    localStorage.removeItem("adminUserId");
+    window.location.href = "/dashboard.html";
+}
+
+async function init() {
+    await checkAdmin();
+    await loadTenues();
+}
+
+init();
+</script>
+
+</body>
+</html>

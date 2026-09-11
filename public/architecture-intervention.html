@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Architecture de l'Intervention</title>
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  color: #e0e0e0;
+  line-height: 1.6;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+header {
+  background: rgba(0, 0, 0, 0.5);
+  border-bottom: 3px solid #d4af37;
+  padding: 2rem;
+  backdrop-filter: blur(10px);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.logo {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 8px rgba(212, 175, 55, 0.5));
+}
+
+.brand h1 {
+  font-size: 2.5rem;
+  color: #d4af37;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+}
+
+.brand p {
+  font-size: 0.95rem;
+  color: #b0b0b0;
+}
+
+nav {
+  display: flex;
+  gap: 1.5rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+nav a {
+  color: #d4af37;
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  border: 1px solid #d4af37;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+nav a:hover {
+  background: #d4af37;
+  color: #1a1a2e;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+}
+
+section {
+  flex: 1;
+  padding: 3rem 2rem;
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.card {
+  background: rgba(30, 30, 50, 0.8);
+  border-left: 4px solid #d4af37;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+  transform: translateX(5px);
+  box-shadow: 0 12px 40px rgba(212, 175, 55, 0.2);
+}
+
+.card h2 {
+  font-size: 1.8rem;
+  color: #d4af37;
+  margin-bottom: 1rem;
+}
+
+.card h3 {
+  font-size: 1.3rem;
+  color: #d4af37;
+  margin-bottom: 1rem;
+  margin-top: 1.5rem;
+}
+
+.card h3:first-child {
+  margin-top: 0;
+}
+
+.card p {
+  color: #d0d0d0;
+  line-height: 1.8;
+  margin-bottom: 1rem;
+}
+
+.card ul {
+  list-style: none;
+  padding-left: 0;
+  margin-bottom: 1rem;
+}
+
+.card li {
+  padding: 0.6rem 0;
+  padding-left: 1.5rem;
+  position: relative;
+  color: #d0d0d0;
+}
+
+.card li:before {
+  content: "▸";
+  position: absolute;
+  left: 0;
+  color: #d4af37;
+  font-weight: bold;
+}
+
+footer {
+  background: rgba(0, 0, 0, 0.7);
+  border-top: 2px solid #d4af37;
+  padding: 2rem;
+  text-align: center;
+  color: #b0b0b0;
+  font-size: 0.9rem;
+}
+
+footer p {
+  margin: 0.5rem 0;
+}
+
+@media (max-width: 768px) {
+  .brand {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .brand h1 {
+    font-size: 1.8rem;
+  }
+
+  nav {
+    gap: 0.8rem;
+  }
+
+  nav a {
+    font-size: 0.9rem;
+    padding: 0.4rem 0.8rem;
+  }
+
+  section {
+    padding: 1.5rem 1rem;
+  }
+
+  .card {
+    padding: 1rem;
+  }
+}
+</style>
+</head>
+<body>
+
+<header>
+<div class="brand">
+<img src="/assets/logo-gendarmerie.png" class="logo" alt="Logo Gendarmerie">
+<div>
+<h1>Architecture de l'Intervention</h1>
+</div>
+</div>
+
+<nav>
+<a href="/cours.html">Retour aux cours</a>
+<a href="/dashboard.html">Dashboard</a>
+</nav>
+</header>
+
+<section>
+
+<div class="card">
+<h2>Présentation</h2>
+
+<p>
+L'architecture des interventions permet aux militaires de la Gendarmerie d'adopter la bonne réaction selon la situation rencontrée.
+</p>
+
+<p>
+Elle repose sur deux principes essentiels :
+</p>
+
+<ul>
+<li>L'intervention graduée ;</li>
+<li>La répartition des rôles lors des contrôles et interventions.</li>
+</ul>
+
+</div>
+
+<div class="card">
+<h2>Intervention Graduée</h2>
+
+<p>
+L'intervention graduée consiste à adapter le niveau de force utilisé à la situation rencontrée.
+</p>
+
+<p>
+Le recours à la force doit toujours être proportionné à la menace et respecter les principes de nécessité.
+</p>
+
+<p>
+Par exemple, lors d'un simple contrôle routier, le dialogue est privilégié. À l'inverse, face à un individu armé mettant des vies en danger, l'usage de la force peut être immédiatement nécessaire.
+</p>
+
+<h3>1er Niveau — Contact par la parole</h3>
+
+<p>
+Dialogue, négociation, contrôle verbal et injonctions.
+</p>
+
+<h3>2ème Niveau — Arme non létale</h3>
+
+<p>
+Utilisation des moyens intermédiaires :
+</p>
+
+<ul>
+<li>Taser ;</li>
+<li>Bâton de défense ;</li>
+<li>Spray au poivre.</li>
+</ul>
+
+<h3>3ème Niveau — Arme létale</h3>
+
+<p>
+Utilisation de l'arme de service ou d'une arme longue dans les conditions prévues par la loi.
+</p>
+
+</div>
+
+<div class="card">
+<h2>Contrôle de Gendarmerie et Interventions</h2>
+
+<p>
+Lors d'un contrôle ou d'une intervention, chaque militaire possède un rôle précis afin d'assurer la sécurité de tous.
+</p>
+
+<h3>1 — Élément d'Action</h3>
+
+<p>
+L'élément d'action est au contact direct de la personne contrôlée ou interpellée.
+</p>
+
+<p>
+Il effectue les vérifications, pose les questions et conduit les échanges.
+</p>
+
+</div>
+
+<div class="card">
+<h3>2 — Élément d'Appui</h3>
+
+<p>
+L'élément d'appui assiste l'élément d'action.
+</p>
+
+<p>
+Il réalise les vérifications complémentaires, les contrôles de fichiers et apporte son soutien lors de l'intervention.
+</p>
+
+</div>
+
+<div class="card">
+<h3>3 — Élément de Couverture</h3>
+
+<p>
+L'élément de couverture assure la sécurité générale du dispositif.
+</p>
+
+<p>
+Il surveille les alentours, les occupants éventuels et toute menace pouvant perturber le contrôle ou l'intervention.
+</p>
+
+</div>
+
+<div class="card">
+<h2>Objectif</h2>
+
+<p>
+Une intervention réussie repose sur une bonne communication, une répartition claire des rôles et une utilisation proportionnée de la force.
+</p>
+
+<p>
+Chaque militaire doit connaître sa mission et rester attentif à son environnement tout au long de l'intervention.
+</p>
+
+</div>
+
+</section>
+
+<footer class="footer">
+<p>© 2026 lexy_off1 — Tous droits réservés</p>
+</footer>
+
+</body>
+</html>

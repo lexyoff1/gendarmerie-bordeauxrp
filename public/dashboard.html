@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard</title>
+    <style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  color: #e0e0e0;
+  line-height: 1.6;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+header {
+  background: rgba(0, 0, 0, 0.5);
+  border-bottom: 3px solid #d4af37;
+  padding: 2rem;
+  backdrop-filter: blur(10px);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.logo {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 8px rgba(212, 175, 55, 0.5));
+}
+
+.brand h1 {
+  font-size: 2.5rem;
+  color: #d4af37;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+}
+
+.brand p {
+  font-size: 0.95rem;
+  color: #b0b0b0;
+}
+
+nav {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+nav a {
+  color: #d4af37;
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  border: 1px solid #d4af37;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+nav a:hover {
+  background: #d4af37;
+  color: #1a1a2e;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+}
+
+section {
+  padding: 2rem;
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.card {
+  background: rgba(30, 30, 50, 0.8);
+  border-left: 4px solid #d4af37;
+  border-radius: 8px;
+  padding: 2rem;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+  margin-bottom: 2rem;
+}
+
+.card h2 {
+  font-size: 1.8rem;
+  color: #d4af37;
+  margin-bottom: 1.5rem;
+  border-bottom: 2px solid #d4af37;
+  padding-bottom: 0.8rem;
+}
+
+.card h3 {
+  font-size: 1.2rem;
+  color: #d4af37;
+  margin-bottom: 0.8rem;
+}
+
+.card p {
+  color: #d0d0d0;
+  margin-bottom: 0.5rem;
+  font-size: 0.95rem;
+}
+
+.id-card {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.avatar {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  border: 3px solid #d4af37;
+  object-fit: cover;
+  box-shadow: 0 4px 16px rgba(212, 175, 55, 0.3);
+}
+
+.id-card h2 {
+  font-size: 2rem;
+  margin: 0.5rem 0;
+  border: none;
+  padding: 0;
+}
+
+.id-card p {
+  padding: 0.4rem 0;
+  line-height: 1.8;
+}
+
+.id-card b {
+  color: #d4af37;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 2rem;
+}
+
+.grid .card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  margin-bottom: 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.grid .card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.1), transparent);
+  transition: left 0.5s ease;
+}
+
+.grid .card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 16px 48px rgba(212, 175, 55, 0.25);
+  border-left-color: #e0d050;
+}
+
+.grid .card:hover::before {
+  left: 100%;
+}
+
+.grid .card h3 {
+  position: relative;
+  z-index: 1;
+}
+
+.grid .card p {
+  flex: 1;
+  position: relative;
+  z-index: 1;
+}
+
+.grid .card a {
+  text-decoration: none;
+  position: relative;
+  z-index: 1;
+}
+
+.grid .card button {
+  background: linear-gradient(135deg, #d4af37 0%, #c9a227 100%);
+  color: #1a1a2e;
+  border: none;
+  padding: 0.8rem 1.5rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+  width: 100%;
+  margin-top: auto;
+}
+
+.grid .card button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(212, 175, 55, 0.5);
+  letter-spacing: 1px;
+}
+
+.grid .card button:active {
+  transform: translateY(-1px);
+}
+
+footer {
+  background: rgba(0, 0, 0, 0.7);
+  border-top: 2px solid #d4af37;
+  padding: 2rem;
+  text-align: center;
+  color: #b0b0b0;
+  font-size: 0.9rem;
+  margin-top: auto;
+}
+
+footer p {
+  margin: 0.5rem 0;
+}
+
+@media (max-width: 768px) {
+  header {
+    padding: 1.5rem;
+  }
+
+  .brand {
+    flex-direction: column;
+    text-align: center;
+    margin-bottom: 1rem;
+  }
+
+  .brand h1 {
+    font-size: 1.8rem;
+  }
+
+  .brand p {
+    font-size: 0.85rem;
+  }
+
+  nav {
+    gap: 0.6rem;
+  }
+
+  nav a {
+    font-size: 0.8rem;
+    padding: 0.4rem 0.6rem;
+  }
+
+  section {
+    padding: 1rem;
+  }
+
+  .card {
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .avatar {
+    width: 100px;
+    height: 100px;
+  }
+
+  .id-card h2 {
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  header {
+    padding: 1rem;
+  }
+
+  .brand h1 {
+    font-size: 1.5rem;
+  }
+
+  nav a {
+    font-size: 0.75rem;
+    padding: 0.35rem 0.5rem;
+  }
+
+  .card h2 {
+    font-size: 1.3rem;
+  }
+
+  .card h3 {
+    font-size: 1rem;
+  }
+
+  .avatar {
+    width: 80px;
+    height: 80px;
+  }
+}
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="brand">
+        <img src="/assets/logo-gendarmerie.png" class="logo" alt="Logo Gendarmerie">
+        <div>
+            <h1>Dashboard</h1>
+            <p>Gendarmerie Nationale</p>
+        </div>
+    </div>
+
+    <nav>
+        <a href="/">Accueil</a>
+        <a href="/tickets-commandement.html">Tickets Commandement</a>
+        <a href="/cours.html">Cours</a>
+        <a href="/specialites.html">Spécialités</a>
+        <a href="/admin.html">Gestion Brigade</a>
+        <a href="/logout">Déconnexion</a>
+    </nav>
+
+</header>
+
+<section class="card">
+    <h2>Carte professionnelle</h2>
+    <div id="profile">Chargement...</div>
+</section>
+
+<section>
+    <div class="grid">
+
+        <div class="card">
+            <h3>📚 Centre de Formation</h3>
+            <p>Accéder à l'ensemble des cours, procédures, règlements et documents officiels.</p>
+            <a href="/cours.html"><button>Ouvrir</button></a>
+        </div>
+
+        <div class="card">
+            <h3>📋 Document des Patrouilles</h3>
+            <p>Gestion des patrouilles, équipages, véhicules et statuts.</p>
+            <a href="/patrouilles.html"><button>Ouvrir</button></a>
+        </div>
+
+        <div class="card">
+            <h3>🚔 Spécialités</h3>
+            <p>Consulter les spécialités disponibles et déposer une candidature.</p>
+            <a href="/specialites.html"><button>Ouvrir</button></a>
+        </div>
+
+        <div class="card">
+            <h3>⚖️ Code Pénal</h3>
+            <p>Consulter les infractions, sanctions et procédures judiciaires.</p>
+            <a href="/code-penal.html"><button>Ouvrir</button></a>
+        </div>
+
+        <div class="card">
+            <h3>👥 Effectifs</h3>
+            <p>Consulter l'annuaire des effectifs par grade.</p>
+            <a href="/effectifs.html"><button>Ouvrir</button></a>
+        </div>
+
+        <div class="card">
+            <h3>📡 Demande de Renfort</h3>
+            <p>Transmettre une demande de renfort aux unités spécialisées.</p>
+            <a href="/renfort.html"><button>Ouvrir</button></a>
+        </div>
+
+    </div>
+</section>
+
+<script>
+    function cleanNomPrenom(nom) {
+        if (!nom) return "";
+
+        return nom
+            .replace(/^(COL|LCL|CEN|CNE|LTN|SLT|ASP|MAJ|ADC|ADJ|MDC|GDC|GDS|ELG|MDL|BRC|BRI|GAV)\s*・\s*/i, "")
+            .replace(/^(COL|LCL|CEN|CNE|LTN|SLT|ASP|MAJ|ADC|ADJ|MDC|GDC|GDS|ELG|MDL|BRC|BRI|GAV)\s*-\s*\d+\s*[•·]\s*/i, "");
+    }
+
+    fetch((window.API_BASE || "") + "/api/me")
+        .then(res => res.json())
+        .then(user => {
+            const box = document.getElementById("profile");
+
+            if (!user) {
+                box.innerHTML = `
+                    <p>Tu n'es pas connecté.</p>
+                    <a href="/auth/discord"><button>Connexion Discord</button></a>
+                `;
+                return;
+            }
+
+            const avatar = user.avatar
+                ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`
+                : "https://cdn.discordapp.com/embed/avatars/0.png";
+
+            const dateServeur = user.dateArriveeServeur
+                ? new Date(user.dateArriveeServeur).toLocaleDateString("fr-FR")
+                : "Inconnue";
+
+            box.innerHTML = `
+                <div class="id-card">
+                    <img src="${avatar}" class="avatar" alt="Avatar">
+
+                    <h2>${cleanNomPrenom(user.nomPrenom || user.username)}</h2>
+
+                    <p><b>NIGEND :</b> ${user.NIGEND || "Non attribué"}</p>
+                    <p><b>Grade :</b> ${user.grade || "Non attribué"}</p>
+                    <p><b>Qualification Judiciaire :</b> ${user.qualificationJudiciaire || "Non attribuée"}</p>
+                    <p><b>Statut :</b> ${user.statut || "Actif"}</p>
+                    <p><b>Date d'arrivée serveur :</b> ${dateServeur}</p>
+                    <p><b>Discord :</b> ${user.username}</p>
+                </div>
+            `;
+        })
+        .catch(err => {
+            document.getElementById("profile").innerHTML = `<p>Erreur lors du chargement du profil.</p>`;
+        });
+</script>
+
+<footer class="footer">
+    <p>© 2026 lexy_off1 — Tous droits réservés</p>
+</footer>
+
+</body>
+</html>

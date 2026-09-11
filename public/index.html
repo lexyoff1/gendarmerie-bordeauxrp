@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gendarmerie Nationale</title>
+    <style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  color: #e0e0e0;
+  line-height: 1.6;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+header {
+  background: rgba(0, 0, 0, 0.5);
+  border-bottom: 3px solid #d4af37;
+  padding: 2rem;
+  backdrop-filter: blur(10px);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.brand-left {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.logo {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 8px rgba(212, 175, 55, 0.5));
+}
+
+.brand h1 {
+  font-size: 2.5rem;
+  color: #d4af37;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+}
+
+.login-btn {
+  background: linear-gradient(135deg, #d4af37 0%, #c9a227 100%);
+  color: #1a1a2e;
+  border: none;
+  padding: 0.7rem 1.5rem;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.login-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(212, 175, 55, 0.4);
+}
+
+main {
+  flex: 1;
+  padding: 3rem 2rem;
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.hero {
+  text-align: center;
+  margin-bottom: 4rem;
+}
+
+.hero h1 {
+  font-size: 3rem;
+  color: #d4af37;
+  margin-bottom: 1rem;
+  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+.hero p {
+  font-size: 1.2rem;
+  color: #b0b0b0;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.sections {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  margin-top: 3rem;
+}
+
+.card {
+  background: rgba(212, 175, 55, 0.05);
+  border: 2px solid #d4af37;
+  border-radius: 8px;
+  padding: 2rem;
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  background: rgba(212, 175, 55, 0.15);
+  transform: translateY(-5px);
+  box-shadow: 0 12px 32px rgba(212, 175, 55, 0.2);
+}
+
+.card h2 {
+  color: #d4af37;
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+}
+
+.card p {
+  color: #b0b0b0;
+  margin-bottom: 1.5rem;
+}
+
+/* La carte Informations est retirée de l'accueil. */
+.sections .card:nth-child(2) {
+  display: none;
+}
+
+.contact-list {
+  list-style: none;
+  color: #e0e0e0;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.contact-list strong {
+  color: #d4af37;
+}
+
+.card-btn {
+  display: inline-block;
+  background: linear-gradient(135deg, #d4af37 0%, #c9a227 100%);
+  color: #1a1a2e;
+  padding: 0.7rem 1.5rem;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.card-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(212, 175, 55, 0.4);
+}
+
+.info-section {
+  background: rgba(0, 0, 0, 0.3);
+  border-left: 4px solid #d4af37;
+  padding: 2rem;
+  border-radius: 6px;
+  margin-top: 3rem;
+}
+
+.info-section h2 {
+  color: #d4af37;
+  margin-bottom: 1rem;
+}
+
+.info-section p {
+  color: #b0b0b0;
+  margin-bottom: 0.5rem;
+}
+
+footer {
+  background: rgba(0, 0, 0, 0.7);
+  border-top: 2px solid #d4af37;
+  padding: 2rem;
+  text-align: center;
+  color: #b0b0b0;
+  font-size: 0.9rem;
+  margin-top: auto;
+}
+
+footer p {
+  margin: 0.5rem 0;
+}
+
+@media (max-width: 768px) {
+  header {
+    padding: 1.5rem;
+  }
+
+  .brand {
+    flex-direction: column;
+  }
+
+  .brand-left {
+    flex-direction: column;
+    text-align: center;
+    width: 100%;
+  }
+
+  .brand h1 {
+    font-size: 1.8rem;
+  }
+
+  .logo {
+    width: 60px;
+    height: 60px;
+  }
+
+  .login-btn {
+    width: 100%;
+  }
+
+  main {
+    padding: 2rem 1.5rem;
+  }
+
+  .hero h1 {
+    font-size: 2rem;
+  }
+
+  .sections {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  header {
+    padding: 1rem;
+  }
+
+  .brand h1 {
+    font-size: 1.5rem;
+  }
+
+  .logo {
+    width: 50px;
+    height: 50px;
+  }
+
+  main {
+    padding: 1.5rem 1rem;
+  }
+
+  .hero h1 {
+    font-size: 1.5rem;
+  }
+
+  .hero p {
+    font-size: 1rem;
+  }
+
+  .card {
+    padding: 1.5rem;
+  }
+
+  .card h2 {
+    font-size: 1.3rem;
+  }
+
+  footer {
+    padding: 1.5rem;
+  }
+
+  footer p {
+    font-size: 0.85rem;
+  }
+}
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="brand">
+        <div class="brand-left">
+            <img src="/assets/logo-gendarmerie.png" class="logo" alt="Logo Gendarmerie">
+            <h1>Gendarmerie Nationale</h1>
+        </div>
+        <a href="/auth/discord" class="login-btn">Connexion Discord</a>
+    </div>
+</header>
+
+<main>
+    <section class="hero">
+        <h1>Bienvenue</h1>
+        <p>Rejoignez la Gendarmerie Nationale et servez votre pays avec honneur et dévouement.</p>
+    </section>
+
+    <section class="sections">
+        <div class="card">
+            <h2>📋 Candidatures</h2>
+            <p>Postulez pour rejoindre nos rangs et participez à la sécurité publique.</p>
+            <a href="/gn-candidature.html" class="card-btn">Candidater</a>
+        </div>
+
+        <div class="card">
+            <h2>ℹ️ Informations</h2>
+            <p>En savoir plus sur la Gendarmerie Nationale et nos missions.</p>
+            <button class="card-btn" onclick="alert('Section en cours de développement')">En savoir plus</button>
+        </div>
+
+        <div class="card">
+            <h2>📞 Contact</h2>
+            <p>Nous sommes là pour répondre à vos questions et préoccupations.</p>
+            <ul class="contact-list">
+                <li><strong>COL :</strong> <span id="contact-colonel">Chargement...</span></li>
+                <li><strong>LCL :</strong> <span id="contact-lcl">Chargement...</span></li>
+                <li><strong>CEN :</strong> <span id="contact-cen">Chargement...</span></li>
+                <li><strong>Responsable CIR :</strong> LTN | KING lexi</li>
+            </ul>
+        </div>
+    </section>
+
+    <section class="info-section">
+        <h2>Notre Mission</h2>
+        <p>La Gendarmerie Nationale est au service de la population pour garantir la sécurité, l'ordre public et protéger les citoyens.</p>
+        <p>Nous recrutons des candidats motivés et engagés à servir leur communauté.</p>
+    </section>
+</main>
+
+<script>
+fetch("/api/contact")
+    .then(response => response.ok ? response.json() : Promise.reject())
+    .then(contacts => {
+        document.getElementById("contact-colonel").textContent = contacts.colonel || "Non renseigné";
+        document.getElementById("contact-lcl").textContent = contacts.lieutenantColonel || "Non renseigné";
+        document.getElementById("contact-cen").textContent = contacts.chefEscadron || "Non renseigné";
+    })
+    .catch(() => {
+        document.getElementById("contact-colonel").textContent = "Non renseigné";
+        document.getElementById("contact-lcl").textContent = "Non renseigné";
+        document.getElementById("contact-cen").textContent = "Non renseigné";
+    });
+</script>
+
+<footer>
+    <p>© 2026 lexy_off1 — Tous droits réservés</p>
+</footer>
+
+</body>
+</html>

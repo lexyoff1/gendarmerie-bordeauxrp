@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>La Gendarmerie</title>
+    <style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  color: #e0e0e0;
+  line-height: 1.6;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+header {
+  background: rgba(0, 0, 0, 0.5);
+  border-bottom: 3px solid #d4af37;
+  padding: 2rem;
+  backdrop-filter: blur(10px);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.logo {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 8px rgba(212, 175, 55, 0.5));
+}
+
+.brand h1 {
+  font-size: 2.5rem;
+  color: #d4af37;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+}
+
+.brand p {
+  font-size: 0.95rem;
+  color: #b0b0b0;
+}
+
+nav {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+nav a {
+  color: #d4af37;
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  border: 1px solid #d4af37;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+nav a:hover {
+  background: #d4af37;
+  color: #1a1a2e;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+}
+
+section {
+  flex: 1;
+  padding: 3rem 2rem;
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.card {
+  background: rgba(30, 30, 50, 0.8);
+  border-left: 4px solid #d4af37;
+  border-radius: 8px;
+  padding: 2rem;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  margin-bottom: 2rem;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(212, 175, 55, 0.2);
+}
+
+.card h2 {
+  font-size: 1.5rem;
+  color: #d4af37;
+  margin-bottom: 1.5rem;
+  border-bottom: 2px solid #d4af37;
+  padding-bottom: 0.8rem;
+}
+
+.card h3 {
+  font-size: 1.1rem;
+  color: #e0d050;
+  margin-top: 1.5rem;
+  margin-bottom: 0.8rem;
+}
+
+.card h3:first-of-type {
+  margin-top: 0;
+}
+
+.card p {
+  color: #d0d0d0;
+  margin-bottom: 1rem;
+  line-height: 1.8;
+}
+
+.card ul {
+  list-style: none;
+  margin-left: 0;
+}
+
+.card li {
+  background: rgba(212, 175, 55, 0.05);
+  border-left: 3px solid #d4af37;
+  padding: 0.8rem 1rem;
+  margin-bottom: 0.8rem;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+  color: #e0e0e0;
+}
+
+.card li:hover {
+  background: rgba(212, 175, 55, 0.15);
+  transform: translateX(4px);
+  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.1);
+}
+
+footer {
+  background: rgba(0, 0, 0, 0.7);
+  border-top: 2px solid #d4af37;
+  padding: 2rem;
+  text-align: center;
+  color: #b0b0b0;
+  font-size: 0.9rem;
+  margin-top: auto;
+}
+
+footer p {
+  margin: 0.5rem 0;
+}
+
+@media (max-width: 768px) {
+  header {
+    padding: 1.5rem;
+  }
+
+  .brand {
+    flex-direction: column;
+    text-align: center;
+    margin-bottom: 1rem;
+  }
+
+  .brand h1 {
+    font-size: 1.8rem;
+  }
+
+  nav {
+    gap: 0.6rem;
+  }
+
+  nav a {
+    font-size: 0.8rem;
+    padding: 0.4rem 0.6rem;
+  }
+
+  section {
+    padding: 1.5rem 1rem;
+  }
+
+  .card {
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .card h2 {
+    font-size: 1.3rem;
+  }
+
+  .card h3 {
+    font-size: 1rem;
+  }
+
+  .card p {
+    font-size: 0.95rem;
+  }
+
+  .card li {
+    padding: 0.7rem 0.8rem;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  header {
+    padding: 1rem;
+  }
+
+  .brand h1 {
+    font-size: 1.5rem;
+  }
+
+  nav a {
+    font-size: 0.7rem;
+    padding: 0.3rem 0.5rem;
+  }
+
+  section {
+    padding: 1rem 0.75rem;
+  }
+
+  .card {
+    padding: 1rem;
+  }
+
+  .card h2 {
+    font-size: 1.2rem;
+  }
+
+  .card h3 {
+    font-size: 0.95rem;
+  }
+
+  .card p {
+    font-size: 0.9rem;
+  }
+
+  .card li {
+    padding: 0.6rem 0.8rem;
+    font-size: 0.85rem;
+  }
+}
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="brand">
+        <img src="/assets/logo-gendarmerie.png" class="logo" alt="Logo Gendarmerie">
+        <div>
+            <h1>La Gendarmerie</h1>
+            <p>Gendarmerie Nationale</p>
+        </div>
+    </div>
+
+    <nav>
+        <a href="/cours.html">Retour aux cours</a>
+        <a href="/dashboard.html">Dashboard</a>
+    </nav>
+</header>
+
+<section>
+
+    <div class="card">
+        <h2>La Gendarmerie, ses devoirs et ses obligations</h2>
+
+        <p>
+            La Gendarmerie Nationale est soumise à de nombreux devoirs et obligations définis par la Charte du Gendarme, le Code de déontologie de la Police Nationale et de la Gendarmerie Nationale ainsi que par les différents règlements en vigueur.
+        </p>
+
+        <p>
+            Chaque militaire doit respecter ces principes afin de garantir le professionnalisme, l'exemplarité et la confiance de la population envers les forces de l'ordre.
+        </p>
+
+    </div>
+
+    <div class="card">
+        <h2>Les devoirs du Gendarme</h2>
+
+        <h3>Secret professionnel</h3>
+
+        <p>
+            Le gendarme est tenu au secret professionnel. Il lui est interdit de divulguer à des personnes extérieures à l'institution les informations obtenues dans le cadre de ses fonctions.
+        </p>
+
+        <h3>Probité</h3>
+
+        <p>
+            Le gendarme ne doit tirer aucun avantage personnel de sa fonction ou de son uniforme. Il lui est interdit d'exercer une quelconque pression sur une personne en raison de son statut ou de son grade.
+        </p>
+
+    </div>
+
+    <div class="card">
+        <h2>Les obligations du Gendarme</h2>
+
+        <h3>Respect de la hiérarchie</h3>
+
+        <p>
+            Le respect de la hiérarchie constitue une règle fondamentale de la Gendarmerie Nationale.
+        </p>
+
+        <p>
+            Les grades doivent être respectés en toutes circonstances. Les salutations réglementaires doivent être effectuées lorsqu'un Brigadier ou un gradé supérieur est présent dans une brigade, lors d'une annonce de patrouille ou d'une réunion de service.
+        </p>
+
+        <p>
+            Toutefois, il est recommandé d'éviter les formalités de respect durant une intervention ou une situation d'urgence, sauf nécessité particulière.
+        </p>
+
+        <p>
+            Le militaire doit obéir aux ordres de ses supérieurs hiérarchiques, sauf lorsque ceux-ci sont manifestement illégaux, injustifiés ou susceptibles de porter atteinte à la vie d'autrui.
+        </p>
+
+    </div>
+
+    <div class="card">
+        <h2>Les Patrouilles</h2>
+
+        <p>
+            Les patrouilles individuelles sont interdites, sauf autorisation particulière ou dans certaines spécialités spécifiques.
+        </p>
+
+        <p>
+            Une patrouille doit normalement être composée d'au moins un Sous-Officier afin de garantir le bon déroulement des interventions et des procédures.
+        </p>
+
+        <p>
+            Lorsque aucun Sous-Officier n'est disponible, une patrouille composée de deux militaires peut être autorisée exceptionnellement.
+        </p>
+
+        <p>
+            Dans ce cas, les militaires titulaires uniquement de la qualification APJA ne sont pas autorisés à procéder à des arrestations ou à certaines procédures judiciaires nécessitant une qualification supérieure.
+        </p>
+
+    </div>
+
+    <div class="card">
+        <h2>Valeurs du Gendarme</h2>
+
+        <ul>
+            <li>Respect de la loi ;</li>
+            <li>Respect de la population ;</li>
+            <li>Neutralité ;</li>
+            <li>Discipline ;</li>
+            <li>Professionnalisme ;</li>
+            <li>Esprit d'équipe ;</li>
+            <li>Sens du service public.</li>
+        </ul>
+
+    </div>
+
+</section>
+
+<footer class="footer">
+    <p>© 2026 lexy_off1 — Tous droits réservés</p>
+</footer>
+
+</body>
+</html>

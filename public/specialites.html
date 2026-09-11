@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Spécialités GN</title>
+    <style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  color: #e0e0e0;
+  line-height: 1.6;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+header {
+  background: rgba(0, 0, 0, 0.5);
+  border-bottom: 3px solid #d4af37;
+  padding: 2rem;
+  backdrop-filter: blur(10px);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.logo {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 8px rgba(212, 175, 55, 0.5));
+}
+
+.brand h1 {
+  font-size: 2.5rem;
+  color: #d4af37;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+}
+
+.brand p {
+  font-size: 0.95rem;
+  color: #b0b0b0;
+}
+
+nav {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+nav a {
+  color: #d4af37;
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  border: 1px solid #d4af37;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+nav a:hover {
+  background: #d4af37;
+  color: #1a1a2e;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+}
+
+section {
+  flex: 1;
+  padding: 3rem 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+section h2 {
+  font-size: 2rem;
+  color: #d4af37;
+  margin-bottom: 2rem;
+  text-align: center;
+  border-bottom: 2px solid #d4af37;
+  padding-bottom: 1rem;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+}
+
+.card {
+  background: rgba(30, 30, 50, 0.8);
+  border: 2px solid #d4af37;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.card:hover {
+  background: rgba(40, 40, 60, 0.9);
+  box-shadow: 0 12px 32px rgba(212, 175, 55, 0.2);
+}
+
+.card h3 {
+  font-size: 1.4rem;
+  color: #d4af37;
+  margin-bottom: 0.8rem;
+  border-bottom: 1px solid #d4af37;
+  padding-bottom: 0.6rem;
+}
+
+.card h2 {
+  font-size: 1.8rem;
+  color: #d4af37;
+  margin-bottom: 1.5rem;
+  border-bottom: 2px solid #d4af37;
+  padding-bottom: 1rem;
+  text-align: left;
+}
+
+.card p {
+  color: #d0d0d0;
+  margin-bottom: 0.8rem;
+  line-height: 1.6;
+}
+
+.card p b {
+  color: #fff9e6;
+}
+
+.card p:first-of-type {
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+label {
+  color: #d0d0d0;
+  font-weight: 500;
+  display: block;
+  margin: 1rem 0 0.5rem 0;
+}
+
+.card label {
+  margin-top: 1rem;
+}
+
+textarea,
+input[type="text"],
+input[type="number"] {
+  width: 100%;
+  padding: 0.8rem;
+  background: rgba(20, 20, 40, 0.8);
+  border: 1px solid #d4af37;
+  border-radius: 4px;
+  color: #e0e0e0;
+  font-family: inherit;
+  font-size: 1rem;
+  margin-top: 0.5rem;
+  transition: all 0.3s ease;
+}
+
+textarea:focus,
+input[type="text"]:focus,
+input[type="number"]:focus {
+  outline: none;
+  background: rgba(30, 30, 50, 0.9);
+  border-color: #fff9e6;
+  box-shadow: 0 0 8px rgba(212, 175, 55, 0.3);
+}
+
+textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.radio-line {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin: 0.8rem 0 0 0;
+}
+
+.radio-line input[type="radio"] {
+  width: auto;
+  margin: 0;
+  accent-color: #d4af37;
+  cursor: pointer;
+}
+
+.radio-line label {
+  margin: 0;
+  font-weight: normal;
+}
+
+button {
+  padding: 0.8rem 1.2rem;
+  background: linear-gradient(135deg, #d4af37 0%, #b8941f 100%);
+  color: #1a1a2e;
+  border: none;
+  border-radius: 4px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  margin-top: 0.8rem;
+}
+
+button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(212, 175, 55, 0.4);
+}
+
+button:active {
+  transform: translateY(0);
+}
+
+button.danger {
+  background: linear-gradient(135deg, #d64545 0%, #a83030 100%);
+  color: #fff;
+}
+
+button.danger:hover {
+  box-shadow: 0 8px 16px rgba(214, 69, 69, 0.4);
+}
+
+hr {
+  border: none;
+  border-top: 1px solid #d4af37;
+  margin: 1rem 0;
+  opacity: 0.3;
+}
+
+footer {
+  background: rgba(0, 0, 0, 0.7);
+  border-top: 2px solid #d4af37;
+  padding: 2rem;
+  text-align: center;
+  color: #b0b0b0;
+  font-size: 0.9rem;
+  margin-top: auto;
+}
+
+footer p {
+  margin: 0.5rem 0;
+}
+
+@media (max-width: 1200px) {
+  .grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 900px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  header {
+    padding: 1.5rem;
+  }
+
+  .brand {
+    flex-direction: column;
+    text-align: center;
+    margin-bottom: 1rem;
+  }
+
+  .brand h1 {
+    font-size: 1.8rem;
+  }
+
+  nav {
+    gap: 0.6rem;
+  }
+
+  nav a {
+    font-size: 0.8rem;
+    padding: 0.4rem 0.6rem;
+  }
+
+  section {
+    padding: 1.5rem 1rem;
+  }
+
+  section h2 {
+    font-size: 1.5rem;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .card {
+    padding: 1.2rem;
+  }
+
+  .card h3 {
+    font-size: 1.2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  header {
+    padding: 1rem;
+  }
+
+  .brand h1 {
+    font-size: 1.5rem;
+  }
+
+  .brand p {
+    font-size: 0.85rem;
+  }
+
+  nav a {
+    font-size: 0.7rem;
+    padding: 0.3rem 0.5rem;
+  }
+
+  section {
+    padding: 1rem 0.75rem;
+  }
+
+  section h2 {
+    font-size: 1.2rem;
+  }
+
+  .card {
+    padding: 1rem;
+  }
+
+  .card h3 {
+    font-size: 1rem;
+  }
+
+  button,
+  textarea,
+  input {
+    font-size: 16px;
+  }
+}
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="brand">
+        <img src="/assets/logo-gendarmerie.png" class="logo" alt="Logo Gendarmerie">
+        <div>
+            <h1>Spécialités</h1>
+            <p>Gendarmerie Nationale</p>
+        </div>
+    </div>
+
+    <nav>
+        <a href="/dashboard.html">Dashboard</a>
+        <a href="/cours.html">Cours</a>
+        <a href="/logout">Déconnexion</a>
+    </nav>
+</header>
+
+<section>
+    <h2>Spécialités disponibles</h2>
+    <div id="specialites" class="grid">Chargement...</div>
+</section>
+
+<section id="panel-section" style="display:none;">
+    <h2>Candidatures en attente de traitement</h2>
+    <div id="apps">Chargement...</div>
+</section>
+
+<footer class="footer">
+    <p>© 2026 lexy_off1 — Tous droits réservés</p>
+</footer>
+
+<script>
+let specialites = [];
+
+async function loadSpecialites() {
+    try {
+        const res = await fetch((window.API_BASE || "") + "/api/specialites");
+        if (!res.ok) throw new Error("Erreur lors du chargement");
+        
+        specialites = await res.json();
+        const box = document.getElementById("specialites");
+        box.innerHTML = "";
+
+        let canManageAny = false;
+
+        specialites.forEach(spe => {
+            if (spe.canManage) canManageAny = true;
+
+            box.innerHTML += `
+                <div class="card">
+                    <h3>${escapeHtml(spe.nom)}</h3>
+                    <p><b>${escapeHtml(spe.titre)}</b></p>
+                    <p>${escapeHtml(spe.description)}</p>
+
+                    <button onclick="openApply('${spe.id}')">
+                        Déposer une candidature
+                    </button>
+
+                    ${spe.canManage ? `
+                        <button onclick="loadApplications()">
+                            Voir les candidatures en attente
+                        </button>
+                    ` : ""}
+                </div>
+            `;
+        });
+
+        if (canManageAny) {
+            document.getElementById("panel-section").style.display = "block";
+        }
+    } catch (error) {
+        console.error("Erreur:", error);
+        document.getElementById("specialites").innerHTML = "<p>Erreur de chargement.</p>";
+    }
+}
+
+function openApply(id) {
+    const oldForm = document.getElementById("apply-section");
+    if (oldForm) oldForm.remove();
+
+    const spe = specialites.find(s => s.id === id);
+    if (!spe) return;
+
+    let html = `
+        <section id="apply-section">
+        <div class="card">
+        <h2>Candidature — ${escapeHtml(spe.nom)}</h2>
+        <form id="applyForm">
+        <input type="hidden" id="specialiteId" value="${spe.id}">
+    `;
+
+    spe.questions.forEach((q, index) => {
+        if (typeof q === "string") {
+            html += `
+                <label for="q-${index}">${escapeHtml(q)}</label>
+                <textarea id="q-${index}" required></textarea>
+            `;
+            return;
+        }
+
+        if (q.type === "radio") {
+            html += `<label>${escapeHtml(q.question)}</label>`;
+
+            q.options.forEach((opt, optIndex) => {
+                html += `
+                    <div class="radio-line">
+                        <input
+                            type="radio"
+                            name="q-${index}"
+                            id="q-${index}-${optIndex}"
+                            value="${escapeHtml(opt)}"
+                            required
+                        >
+                        <label for="q-${index}-${optIndex}">${escapeHtml(opt)}</label>
+                    </div>
+                `;
+            });
+
+            return;
+        }
+
+        html += `
+            <label for="q-${index}">${escapeHtml(q.question)}</label>
+            <textarea id="q-${index}" required></textarea>
+        `;
+    });
+
+    html += `
+        <button type="submit">Envoyer la candidature</button>
+        </form>
+        </div>
+        </section>
+    `;
+
+    document.body.insertAdjacentHTML("beforeend", html);
+    document.getElementById("applyForm").addEventListener("submit", submitApply);
+    window.scrollTo(0, document.body.scrollHeight);
+}
+
+async function submitApply(e) {
+    e.preventDefault();
+
+    try {
+        const specialiteId = document.getElementById("specialiteId").value;
+        const spe = specialites.find(s => s.id === specialiteId);
+        if (!spe) return;
+
+        const answers = {};
+
+        spe.questions.forEach((q, index) => {
+            const questionText = typeof q === "string" ? q : q.question;
+
+            if (typeof q === "object" && q.type === "radio") {
+                const selected = document.querySelector(`input[name="q-${index}"]:checked`);
+                answers[questionText] = selected ? selected.value : "";
+            } else {
+                answers[questionText] = document.getElementById(`q-${index}`).value;
+            }
+        });
+
+        const res = await fetch((window.API_BASE || "") + "/api/specialites/apply", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ specialiteId, answers })
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+            alert(data.error || "Erreur lors de l'envoi.");
+            return;
+        }
+
+        alert("Candidature envoyée avec succès.");
+        location.reload();
+    } catch (error) {
+        console.error("Erreur:", error);
+        alert("Erreur de connexion.");
+    }
+}
+
+async function loadApplications() {
+    try {
+        const res = await fetch((window.API_BASE || "") + "/api/specialites/applications");
+        if (!res.ok) throw new Error("Erreur");
+        
+        const apps = await res.json();
+        const box = document.getElementById("apps");
+        const pending = apps.filter(a => a.status === "En attente");
+
+        if (pending.length === 0) {
+            box.innerHTML = "<p>Aucune candidature en attente.</p>";
+            return;
+        }
+
+        box.innerHTML = "";
+
+        pending.forEach(app => {
+            let answersHtml = "";
+
+            for (const [q, a] of Object.entries(app.answers)) {
+                answersHtml += `
+                    <p><b>${escapeHtml(q)}</b></p>
+                    <p>${escapeHtml(a)}</p>
+                    <hr>
+                `;
+            }
+
+            box.innerHTML += `
+                <div class="card">
+                    <h3>${escapeHtml(app.specialiteNom)} — ${escapeHtml(app.nomPrenom)}</h3>
+                    <p><b>Discord :</b> ${escapeHtml(app.username)}</p>
+                    <p><b>ID :</b> ${escapeHtml(app.discordId)}</p>
+
+                    ${answersHtml}
+
+                    <label for="msg-${app.id}">Message au candidat</label>
+                    <textarea id="msg-${app.id}" placeholder="Message qui sera envoyé en MP Discord"></textarea>
+
+                    <button onclick="acceptApp(${app.id})">Accepter</button>
+                    <button class="danger" onclick="rejectApp(${app.id})">Refuser</button>
+                </div>
+            `;
+        });
+    } catch (error) {
+        console.error("Erreur:", error);
+        document.getElementById("apps").innerHTML = "<p>Erreur de chargement.</p>";
+    }
+}
+
+async function acceptApp(id) {
+    try {
+        const message = document.getElementById(`msg-${id}`).value;
+
+        const res = await fetch(`${window.API_BASE || ""}/api/specialites/applications/${id}/accept`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ message })
+        });
+
+        if (!res.ok) throw new Error("Erreur");
+
+        alert("Candidature acceptée. MP envoyé si possible.");
+        loadApplications();
+    } catch (error) {
+        console.error("Erreur:", error);
+        alert("Erreur lors du traitement.");
+    }
+}
+
+async function rejectApp(id) {
+    try {
+        const message = document.getElementById(`msg-${id}`).value;
+
+        const res = await fetch(`${window.API_BASE || ""}/api/specialites/applications/${id}/reject`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ message })
+        });
+
+        if (!res.ok) throw new Error("Erreur");
+
+        alert("Candidature refusée. MP envoyé si possible.");
+        loadApplications();
+    } catch (error) {
+        console.error("Erreur:", error);
+        alert("Erreur lors du traitement.");
+    }
+}
+
+function escapeHtml(text) {
+    const map = {
+        '&': '&',
+        '<': '<',
+        '>': '>',
+        '"': '"',
+        "'": '&#039;'
+    };
+    return text.replace(/[&<>"']/g, m => map[m]);
+}
+
+loadSpecialites();
+</script>
+
+</body>
+</html>

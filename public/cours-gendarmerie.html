@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Brigades BTA / COB</title>
+    <style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  color: #e0e0e0;
+  line-height: 1.6;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+header {
+  background: rgba(0, 0, 0, 0.5);
+  border-bottom: 3px solid #d4af37;
+  padding: 2rem;
+  backdrop-filter: blur(10px);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.logo {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 8px rgba(212, 175, 55, 0.5));
+}
+
+.brand h1 {
+  font-size: 2.5rem;
+  color: #d4af37;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+}
+
+.brand p {
+  font-size: 0.95rem;
+  color: #b0b0b0;
+}
+
+nav {
+  display: flex;
+  gap: 1.5rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+nav a {
+  color: #d4af37;
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  border: 1px solid #d4af37;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+nav a:hover {
+  background: #d4af37;
+  color: #1a1a2e;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+}
+
+section {
+  flex: 1;
+  padding: 3rem 2rem;
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.card {
+  background: rgba(30, 30, 50, 0.8);
+  border-left: 4px solid #d4af37;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+  transform: translateX(5px);
+  box-shadow: 0 12px 40px rgba(212, 175, 55, 0.2);
+}
+
+.card h2 {
+  font-size: 1.8rem;
+  color: #d4af37;
+  margin-bottom: 1rem;
+}
+
+.card h3 {
+  font-size: 1.3rem;
+  color: #d4af37;
+  margin-bottom: 1rem;
+}
+
+.card p {
+  color: #d0d0d0;
+  line-height: 1.8;
+  margin-bottom: 1rem;
+}
+
+.card ul {
+  list-style: none;
+  padding-left: 0;
+  margin-bottom: 1rem;
+}
+
+.card li {
+  padding: 0.6rem 0;
+  padding-left: 1.5rem;
+  position: relative;
+  color: #d0d0d0;
+}
+
+.card li:before {
+  content: "▸";
+  position: absolute;
+  left: 0;
+  color: #d4af37;
+  font-weight: bold;
+}
+
+footer {
+  background: rgba(0, 0, 0, 0.7);
+  border-top: 2px solid #d4af37;
+  padding: 2rem;
+  text-align: center;
+  color: #b0b0b0;
+  font-size: 0.9rem;
+}
+
+footer p {
+  margin: 0.5rem 0;
+}
+
+@media (max-width: 768px) {
+  .brand {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .brand h1 {
+    font-size: 1.8rem;
+  }
+
+  nav {
+    gap: 0.8rem;
+  }
+
+  nav a {
+    font-size: 0.9rem;
+    padding: 0.4rem 0.8rem;
+  }
+
+  section {
+    padding: 1.5rem 1rem;
+  }
+
+  .card {
+    padding: 1rem;
+  }
+}
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="brand">
+        <img src="/assets/logo-gendarmerie.png" class="logo" alt="Logo Gendarmerie">
+        <div>
+            <h1>Brigades BTA / COB</h1>
+        </div>
+    </div>
+
+    <nav>
+        <a href="/cours.html">Retour aux cours</a>
+        <a href="/dashboard.html">Dashboard</a>
+    </nav>
+</header>
+
+<section>
+    <div class="card">
+        <h2>Cours sur la Gendarmerie Nationale</h2>
+        <p>Explication des Brigades Territoriales Autonomes et des Communautés de Brigades.</p>
+    </div>
+
+    <div class="card">
+        <h3>Information</h3>
+        <p>
+            Toutes les informations sur les brigades doivent être connues et respectées.
+            En cas de non-respect, le militaire pourra être sanctionné par l'ETM.
+        </p>
+    </div>
+
+    <div class="card">
+        <h3>Les Brigades</h3>
+        <p>
+            Les Communautés de Brigades, appelées COB, et les Brigades Territoriales
+            Autonomes, appelées BTA, sont intégrées au cœur des territoires et des populations
+            dont elles assurent la protection.
+        </p>
+
+        <p>
+            Elles représentent des piliers de la sécurité intérieure de proximité.
+            Elles permettent d'apporter une réponse adaptée sur le territoire confié.
+        </p>
+    </div>
+
+    <div class="card">
+        <h3>Organisation</h3>
+        <p>
+            Les brigades peuvent fonctionner de manière autonome : elles sont alors appelées BTA.
+        </p>
+        <p>
+            Elles peuvent aussi être organisées en Communautés de Brigades, appelées COB.
+            Chaque COB est composée d'une brigade chef-lieu et d'une ou plusieurs brigades de proximité.
+        </p>
+    </div>
+
+    <div class="card">
+        <h3>Missions principales</h3>
+        <ul>
+            <li>Sécurité publique</li>
+            <li>Police judiciaire</li>
+            <li>Sécurité routière</li>
+            <li>Accueil du public</li>
+            <li>Renseignement</li>
+        </ul>
+    </div>
+
+</section>
+
+<footer class="footer">
+    <p>© 2026 lexy_off1 — Tous droits réservés</p>
+</footer>
+
+</body>
+</html>

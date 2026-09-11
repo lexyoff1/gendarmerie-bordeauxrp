@@ -1,0 +1,38 @@
+<?php
+$path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+$file = __DIR__ . $path;
+
+// Serve static files directly
+if ($path !== '/' && is_file($file)) {
+    return false;
+}
+
+// Route API requests
+if (str_starts_with($path, '/api/')) {
+    require __DIR__ . '/api.php';
+    return true;
+}
+
+// Route authentication
+if ($path === '/auth/discord' || $path === '/auth/discord/callback') {
+    require __DIR__ . '/auth.php';
+    return true;
+}
+
+// Route logout
+if ($path === '/logout') {
+    require __DIR__ . '/logout.php';
+    return true;
+}
+
+// Route home
+if ($path === '/') {
+    require __DIR__ . '/index.php';
+    return true;
+}
+
+// 404 Not Found
+http_response_code(404);
+echo 'Not Found';
+return true;
+?>

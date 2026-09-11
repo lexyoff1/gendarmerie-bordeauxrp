@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Règles de sécurité</title>
+    <style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  color: #e0e0e0;
+  line-height: 1.6;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+header {
+  background: rgba(0, 0, 0, 0.5);
+  border-bottom: 3px solid #d4af37;
+  padding: 2rem;
+  backdrop-filter: blur(10px);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.logo {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 8px rgba(212, 175, 55, 0.5));
+}
+
+.brand h1 {
+  font-size: 2.5rem;
+  color: #d4af37;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+}
+
+.brand p {
+  font-size: 0.95rem;
+  color: #b0b0b0;
+}
+
+nav {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+nav a {
+  color: #d4af37;
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  border: 1px solid #d4af37;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+nav a:hover {
+  background: #d4af37;
+  color: #1a1a2e;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+}
+
+section {
+  flex: 1;
+  padding: 3rem 2rem;
+  max-width: 1000px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+section > :first-child {
+  margin-bottom: 2rem;
+}
+
+.card {
+  background: rgba(30, 30, 50, 0.8);
+  border: 2px solid #d4af37;
+  border-radius: 8px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  background: rgba(40, 40, 60, 0.9);
+  box-shadow: 0 12px 32px rgba(212, 175, 55, 0.2);
+}
+
+.card h2 {
+  font-size: 1.8rem;
+  color: #d4af37;
+  margin-bottom: 1.5rem;
+  border-bottom: 2px solid #d4af37;
+  padding-bottom: 1rem;
+}
+
+.card ul {
+  list-style: none;
+  margin: 1rem 0 1.5rem 0;
+  padding-left: 0;
+}
+
+.card li {
+  color: #d0d0d0;
+  margin-bottom: 0.8rem;
+  padding-left: 1.8rem;
+  position: relative;
+  line-height: 1.6;
+}
+
+.card li:before {
+  content: "▸";
+  color: #d4af37;
+  position: absolute;
+  left: 0;
+  font-weight: bold;
+}
+
+.cours-image {
+  width: 100%;
+  max-width: 500px;
+  height: auto;
+  border-radius: 8px;
+  border: 2px solid #d4af37;
+  display: block;
+  margin: 1.5rem auto;
+  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.2);
+}
+
+footer {
+  background: rgba(0, 0, 0, 0.7);
+  border-top: 2px solid #d4af37;
+  padding: 2rem;
+  text-align: center;
+  color: #b0b0b0;
+  font-size: 0.9rem;
+  margin-top: auto;
+}
+
+footer p {
+  margin: 0.5rem 0;
+}
+
+@media (max-width: 768px) {
+  header {
+    padding: 1.5rem;
+  }
+
+  .brand {
+    flex-direction: column;
+    text-align: center;
+    margin-bottom: 1rem;
+  }
+
+  .brand h1 {
+    font-size: 1.8rem;
+  }
+
+  nav {
+    gap: 0.6rem;
+  }
+
+  nav a {
+    font-size: 0.8rem;
+    padding: 0.4rem 0.6rem;
+  }
+
+  section {
+    padding: 1.5rem 1rem;
+  }
+
+  .card {
+    padding: 1.5rem;
+  }
+
+  .card h2 {
+    font-size: 1.4rem;
+  }
+
+  .cours-image {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  header {
+    padding: 1rem;
+  }
+
+  .brand h1 {
+    font-size: 1.5rem;
+  }
+
+  .brand p {
+    font-size: 0.85rem;
+  }
+
+  nav a {
+    font-size: 0.7rem;
+    padding: 0.3rem 0.5rem;
+  }
+
+  section {
+    padding: 1rem 0.75rem;
+  }
+
+  .card {
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .card h2 {
+    font-size: 1.2rem;
+  }
+
+  .card li {
+    font-size: 0.9rem;
+  }
+
+  .cours-image {
+    max-width: 100%;
+  }
+}
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="brand">
+        <img src="/assets/logo-gendarmerie.png" class="logo" alt="Logo Gendarmerie">
+        <div>
+            <h1>Règles de sécurité</h1>
+            <p>Gendarmerie Nationale</p>
+        </div>
+    </div>
+
+    <nav>
+        <a href="/cours.html">Retour aux cours</a>
+        <a href="/dashboard.html">Dashboard</a>
+    </nav>
+</header>
+
+<section>
+    <div class="card">
+        <h2>Légitime défense</h2>
+        <ul>
+            <li>Une menace réelle</li>
+            <li>Une réponse immédiate</li>
+            <li>Une riposte proportionnelle</li>
+        </ul>
+        <img src="/assets/securite1.png" alt="Légitime défense" class="cours-image">
+    </div>
+
+    <div class="card">
+        <h2>Cadre légal d'usage des armes</h2>
+        <ul>
+            <li>Absolue nécessité</li>
+            <li>Proportionnalité</li>
+        </ul>
+        <img src="/assets/securite2.png" alt="Cadre légal d'usage des armes" class="cours-image">
+    </div>
+
+    <div class="card">
+        <h2>Méthode A.M.E.R</h2>
+        <ul>
+            <li>A = Atteinte</li>
+            <li>M = Menace</li>
+            <li>E = Environnement</li>
+            <li>R = Recours</li>
+        </ul>
+        <img src="/assets/securite3.png" alt="Méthode A.M.E.R" class="cours-image">
+    </div>
+
+    <div class="card">
+        <h2>Instruction Sur Le Tir De Combat</h2>
+        <ul>
+            <li>Une arme est toujours considérée comme chargée.</li>
+            <li>Ne jamais pointer une arme vers quelque chose qu'on ne veut pas détruire.</li>
+            <li>Garder l'index hors de la détente.</li>
+            <li>Être sûr de son objectif et de son environnement.</li>
+            <li>Ne jamais pointer un collègue ou un civil.</li>
+        </ul>
+        <img src="/assets/securite4.png" alt="Instruction Sur Le Tir De Combat" class="cours-image">
+    </div>
+</section>
+
+<footer class="footer">
+    <p>© 2026 lexy_off1 — Tous droits réservés</p>
+</footer>
+
+</body>
+</html>

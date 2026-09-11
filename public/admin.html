@@ -1,0 +1,1030 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Admin - Gendarmerie Nationale</title>
+    <style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  color: #e0e0e0;
+  line-height: 1.6;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+header {
+  background: rgba(0, 0, 0, 0.5);
+  border-bottom: 3px solid #d4af37;
+  padding: 2rem;
+  backdrop-filter: blur(10px);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.brand-left {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.logo {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 8px rgba(212, 175, 55, 0.5));
+}
+
+.brand h1 {
+  font-size: 2.5rem;
+  color: #d4af37;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+}
+
+.brand p {
+  color: #b0b0b0;
+  font-size: 0.95rem;
+}
+
+nav {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+nav a {
+  color: #e0e0e0;
+  text-decoration: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+  font-weight: 600;
+}
+
+nav a:hover {
+  background: rgba(212, 175, 55, 0.1);
+  color: #d4af37;
+}
+
+main {
+  flex: 1;
+  padding: 3rem 2rem;
+  max-width: 1400px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+main > h2 {
+  font-size: 2.5rem;
+  color: #d4af37;
+  margin-bottom: 2rem;
+  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+.section-title {
+  font-size: 1.8rem;
+  color: #d4af37;
+  margin-top: 3rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 2px solid #d4af37;
+  padding-bottom: 0.75rem;
+}
+
+.card {
+  background: rgba(212, 175, 55, 0.05);
+  border: 2px solid #d4af37;
+  border-radius: 8px;
+  padding: 2rem;
+  margin-bottom: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  background: rgba(212, 175, 55, 0.15);
+  box-shadow: 0 8px 20px rgba(212, 175, 55, 0.2);
+}
+
+.card h3 {
+  color: #d4af37;
+  font-size: 1.3rem;
+  margin-bottom: 1rem;
+}
+
+.card p {
+  color: #b0b0b0;
+  margin-bottom: 0.75rem;
+  font-size: 0.95rem;
+}
+
+.card p strong {
+  color: #d4af37;
+}
+
+label {
+  display: block;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+  color: #d4af37;
+  font-weight: 600;
+}
+
+select,
+input[type="text"],
+input[type="number"],
+textarea {
+  width: 100%;
+  padding: 0.8rem;
+  background: rgba(212, 175, 55, 0.05);
+  color: #e0e0e0;
+  border: 2px solid #d4af37;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+}
+
+/* Les menus natifs gardent ainsi un contraste lisible sous Windows/Chrome. */
+select {
+  color-scheme: dark;
+  background-color: #242424;
+}
+
+select option {
+  background: #161616;
+  color: #f4f4f4;
+}
+
+select option:checked,
+select option:hover {
+  background: #8f731d;
+  color: #ffffff;
+}
+
+select:focus,
+input[type="text"]:focus,
+input[type="number"]:focus,
+textarea:focus {
+  outline: none;
+  background: rgba(212, 175, 55, 0.15);
+  box-shadow: 0 0 8px rgba(212, 175, 55, 0.3);
+}
+
+input[type="color"] {
+  width: 52px;
+  height: 44px;
+  padding: 2px;
+  border: 2px solid #d4af37;
+  border-radius: 6px;
+  cursor: pointer;
+  background: rgba(212, 175, 55, 0.05);
+}
+
+button {
+  background: linear-gradient(135deg, #d4af37 0%, #c9a227 100%);
+  color: #1a1a2e;
+  border: none;
+  padding: 0.7rem 1.5rem;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-top: 1rem;
+  margin-right: 0.5rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+}
+
+button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(212, 175, 55, 0.4);
+}
+
+button:active {
+  transform: translateY(0);
+}
+
+button.danger {
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+}
+
+button.danger:hover {
+  box-shadow: 0 8px 20px rgba(220, 38, 38, 0.4);
+}
+
+button.cat-btn {
+  text-transform: none;
+  letter-spacing: normal;
+  background: rgba(212, 175, 55, 0.1);
+  color: #d4af37;
+  box-shadow: none;
+}
+
+button.cat-btn.active {
+  background: linear-gradient(135deg, #d4af37 0%, #c9a227 100%);
+  color: #1a1a2e;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+}
+
+.form-grid label {
+  margin-top: 0;
+}
+
+.form-full {
+  grid-column: 1 / -1;
+}
+
+.tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+  border-bottom: 2px solid #d4af37;
+  flex-wrap: wrap;
+}
+
+.tab-btn {
+  background: transparent;
+  color: #b0b0b0;
+  border: none;
+  padding: 1rem 1.5rem;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px;
+  box-shadow: none;
+}
+
+.tab-btn:hover {
+  color: #d4af37;
+  background: transparent;
+  box-shadow: none;
+  transform: none;
+}
+
+.tab-btn.active {
+  color: #d4af37;
+  border-bottom-color: #d4af37;
+}
+
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+.muted {
+  color: #b0b0b0;
+  font-style: italic;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-left: 0.5rem;
+}
+
+.status-pending {
+  background: rgba(251, 191, 36, 0.2);
+  color: #fbbf24;
+}
+
+.status-active {
+  background: rgba(34, 197, 94, 0.2);
+  color: #86efac;
+}
+
+.status-suspended {
+  background: rgba(239, 68, 68, 0.2);
+  color: #fca5a5;
+}
+
+.vehicle-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  background: rgba(212, 175, 55, 0.05);
+  border-left: 3px solid #d4af37;
+  margin-bottom: 0.5rem;
+  border-radius: 4px;
+}
+
+.vehicle-row input[type="text"] {
+  flex: 1;
+}
+
+.vehicle-row button {
+  margin: 0;
+}
+
+.cat-tabs {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+}
+
+footer {
+  background: rgba(0, 0, 0, 0.7);
+  border-top: 2px solid #d4af37;
+  padding: 2rem;
+  text-align: center;
+  color: #b0b0b0;
+  font-size: 0.9rem;
+  margin-top: auto;
+}
+
+footer p {
+  margin: 0.5rem 0;
+}
+
+@media (max-width: 768px) {
+  header {
+    padding: 1.5rem;
+  }
+
+  .brand {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .brand-left {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .brand h1 {
+    font-size: 1.8rem;
+  }
+
+  .logo {
+    width: 60px;
+    height: 60px;
+  }
+
+  nav {
+    width: 100%;
+  }
+
+  nav a {
+    flex: 1;
+    text-align: center;
+  }
+
+  main {
+    padding: 1.5rem 1rem;
+  }
+
+  main > h2 {
+    font-size: 1.8rem;
+  }
+
+  .card {
+    padding: 1.5rem;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .tabs {
+    flex-direction: column;
+  }
+
+  .tab-btn {
+    border-bottom: none;
+    border-left: 3px solid transparent;
+    margin-bottom: 0;
+    padding: 0.75rem 1rem;
+  }
+
+  .tab-btn.active {
+    border-left-color: #d4af37;
+    border-bottom: none;
+  }
+
+  .vehicle-row {
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 480px) {
+  header {
+    padding: 1rem;
+  }
+
+  .brand h1 {
+    font-size: 1.5rem;
+  }
+
+  .logo {
+    width: 50px;
+    height: 50px;
+  }
+
+  main {
+    padding: 1rem;
+  }
+
+  button,
+  select,
+  input,
+  textarea {
+    font-size: 16px;
+  }
+
+  .section-title {
+    font-size: 1.3rem;
+  }
+
+  footer {
+    padding: 1.5rem;
+  }
+}
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="brand">
+        <div class="brand-left">
+            <img src="logo-gn.png" class="logo" alt="Logo Gendarmerie">
+            <div>
+                <h1>Gendarmerie Nationale</h1>
+                <p>Panel Administrateur</p>
+            </div>
+        </div>
+        <nav>
+            <a href="/">Accueil</a>
+            <a href="/dashboard.html">Dashboard</a>
+            <a href="/logout">Déconnexion</a>
+        </nav>
+    </div>
+</header>
+
+<main>
+    <h2>⚙️ Administration</h2>
+
+    <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('apps', this)">Candidatures</button>
+        <button class="tab-btn" onclick="switchTab('effectifs', this)">Effectifs</button>
+        <button class="tab-btn" onclick="switchTab('patrouilles', this)">Véhicules</button>
+        <button class="tab-btn" onclick="switchTab('roles', this)">Configuration</button>
+    </div>
+
+    <!-- TAB CANDIDATURES -->
+    <div id="apps" class="tab-content active">
+        <h2 class="section-title">📋 Candidatures en Attente</h2>
+        <div id="appsContainer">Chargement...</div>
+    </div>
+
+    <!-- TAB EFFECTIFS -->
+    <div id="effectifs" class="tab-content">
+        <h2 class="section-title">👥 Effectifs du Site</h2>
+        <div id="effectifsContainer">Chargement...</div>
+    </div>
+
+    <!-- TAB VEHICULES (ex Patrouilles) -->
+    <div id="patrouilles" class="tab-content">
+        <h2 class="section-title">🚗 Gestion Véhicules</h2>
+
+        <div class="cat-tabs" id="vehCatTabs"></div>
+
+        <h3 id="vehCategoryTitle" style="color:#d4af37; margin-bottom: 1rem;">Catégorie : PAM</h3>
+
+        <div class="card">
+            <label>Ajouter un véhicule à cette catégorie</label>
+            <div class="vehicle-row">
+                <input type="text" id="newVehicleName" placeholder="Ex: 2024 Falcon eStallion">
+                <input type="color" id="newVehicleColor" value="#3f51b5">
+                <button onclick="addVehicle()">+ Ajouter</button>
+            </div>
+        </div>
+
+        <div id="vehiclesList"><p class="muted">Chargement...</p></div>
+    </div>
+
+    <!-- TAB CONFIGURATION -->
+    <div id="roles" class="tab-content">
+        <h2 class="section-title">Configuration des rôles Discord</h2>
+
+        <div class="card">
+            <h3>Spécialités</h3>
+            <p>Renseignez les identifiants des rôles Discord autorisés à gérer chaque spécialité.</p>
+            <div id="specialtyRoles"><p class="muted">Chargement...</p></div>
+        </div>
+
+        <div class="card">
+            <h3>Renforts</h3>
+            <p>Associez chaque spécialité de renfort à son rôle Discord.</p>
+            <div id="renfortRoles"><p class="muted">Chargement...</p></div>
+            <button onclick="saveRoleSettings()">Enregistrer les rôles</button>
+        </div>
+
+        <div class="card">
+            <h3>Administrateurs du panel</h3>
+            <div class="form-grid">
+                <div><label for="adminDiscordId">ID Discord</label><input id="adminDiscordId" type="text" inputmode="numeric" placeholder="Ex. 123456789012345678"></div>
+                <div><label for="adminUsername">Pseudo Discord</label><input id="adminUsername" type="text" placeholder="Pseudo"></div>
+                <div><label for="adminGrade">Grade (facultatif)</label><input id="adminGrade" type="text" placeholder="Ex. LTN"></div>
+            </div>
+            <button onclick="addAdmin()">Inviter l’administrateur</button>
+            <div id="adminsList" style="margin-top: 1.5rem;"><p class="muted">Chargement...</p></div>
+        </div>
+    </div>
+
+</main>
+
+<footer>
+    <p>© 2026 lexy_off1 — Tous droits réservés</p>
+</footer>
+
+<script>
+let grades = [];
+let adminData = null;
+
+const VEH_CATEGORIES = ["PAM", "PSIG", "EDCF", "AGIGN", "GM", "PJGN", "GIC", "PGHM"];
+let vehicules = {};
+let currentVehCategory = "PAM";
+
+function switchTab(tabName, button) {
+    document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    
+    document.getElementById(tabName).classList.add('active');
+    button.classList.add('active');
+}
+
+function escapeHtml(value) {
+    return String(value ?? '').replace(/[&<>'"]/g, char => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+    })[char]);
+}
+
+async function readResponse(response) {
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(data.error || `Erreur serveur (${response.status}).`);
+    return data;
+}
+
+async function loadGrades() {
+    try {
+        const res = await fetch((window.API_BASE || "") + "/api/grades");
+        grades = await res.json();
+        renderGradesList();
+    } catch (err) {
+        console.error("Erreur loadGrades:", err);
+    }
+}
+
+function renderGradesList() {
+    // Les grades sont définis par le règlement côté serveur et alimentent les listes d'effectifs.
+}
+
+// ---- Configuration administrateur ----
+
+function roleInput(id, label, value) {
+    return `<div class="form-grid" style="margin-top: 1rem; grid-template-columns: minmax(180px, 1fr) repeat(2, minmax(180px, 1fr));">
+        <p style="align-self: end; margin: 0;"><strong>${escapeHtml(label)}</strong></p>
+        <div><label for="role-${id}-lead">Responsable</label><input id="role-${id}-lead" type="text" inputmode="numeric" value="${escapeHtml(value.responsableRoleId || '')}" placeholder="ID du rôle"></div>
+        <div><label for="role-${id}-deputy">Adjoint</label><input id="role-${id}-deputy" type="text" inputmode="numeric" value="${escapeHtml(value.adjointRoleId || '')}" placeholder="ID du rôle"></div>
+    </div>`;
+}
+
+function renderAdminSettings() {
+    const catalog = adminData?.roleCatalog || {};
+    const saved = adminData?.roleSettings || {};
+    const specialities = catalog.specialites || [];
+    document.getElementById('specialtyRoles').innerHTML = specialities.length
+        ? specialities.map(item => roleInput(item.id, item.nom, {
+            responsableRoleId: saved.specialites?.[item.id]?.responsableRoleId || item.responsableRoleId,
+            adjointRoleId: saved.specialites?.[item.id]?.adjointRoleId || item.adjointRoleId
+        })).join('')
+        : '<p class="muted">Aucune spécialité configurée.</p>';
+
+    const renforts = catalog.renfortRoles || {};
+    document.getElementById('renfortRoles').innerHTML = Object.entries(renforts).map(([name, defaultId]) => {
+        const value = saved.renfortRoles?.[name] || defaultId;
+        return `<div class="form-grid" style="margin-top: 1rem; grid-template-columns: minmax(180px, 1fr) minmax(250px, 1fr);">
+            <p style="align-self: end; margin: 0;"><strong>${escapeHtml(name)}</strong></p>
+            <div><label for="renfort-${escapeHtml(name)}">ID du rôle</label><input id="renfort-${escapeHtml(name)}" type="text" inputmode="numeric" value="${escapeHtml(value)}"></div>
+        </div>`;
+    }).join('') || '<p class="muted">Aucun rôle de renfort configuré.</p>';
+
+    const admins = adminData?.admins || [];
+    document.getElementById('adminsList').innerHTML = admins.length ? admins.map(admin => `
+        <div class="vehicle-row"><span style="flex: 1;"><strong>${escapeHtml(admin.username)}</strong><br><small>${escapeHtml(admin.discordId)}${admin.grade ? ` · ${escapeHtml(admin.grade)}` : ''}</small></span>
+        <span class="status-badge ${admin.passwordSet ? 'status-active' : 'status-pending'}">${admin.passwordSet ? 'Actif' : 'Invitation en attente'}</span>
+        <button class="danger" onclick="deleteAdmin('${escapeHtml(admin.id)}')">Retirer</button></div>`).join('')
+        : '<p class="muted">Aucun administrateur invité.</p>';
+}
+
+async function loadAdminSettings() {
+    try {
+        adminData = await readResponse(await fetch('/api/admin/data'));
+        renderAdminSettings();
+    } catch (error) {
+        document.getElementById('specialtyRoles').innerHTML = `<p class="muted">${escapeHtml(error.message)}</p>`;
+        document.getElementById('renfortRoles').innerHTML = '';
+        document.getElementById('adminsList').innerHTML = '';
+    }
+}
+
+async function saveRoleSettings() {
+    const catalog = adminData?.roleCatalog || {};
+    const specialites = Object.fromEntries((catalog.specialites || []).map(item => [item.id, {
+        responsableRoleId: document.getElementById(`role-${item.id}-lead`).value.trim(),
+        adjointRoleId: document.getElementById(`role-${item.id}-deputy`).value.trim()
+    }]));
+    const renfortRoles = Object.fromEntries(Object.keys(catalog.renfortRoles || {}).map(name => [name,
+        document.getElementById(`renfort-${name}`).value.trim()
+    ]));
+    try {
+        await readResponse(await fetch('/api/admin/role-settings', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ specialites, renfortRoles })
+        }));
+        alert('Configuration des rôles enregistrée.');
+        await loadAdminSettings();
+    } catch (error) { alert(error.message); }
+}
+
+async function addAdmin() {
+    const discordId = document.getElementById('adminDiscordId').value.trim();
+    const username = document.getElementById('adminUsername').value.trim();
+    const grade = document.getElementById('adminGrade').value.trim();
+    if (!discordId || !username) return alert('L’ID Discord et le pseudo sont requis.');
+    try {
+        await readResponse(await fetch('/api/admin/add-user', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ discordId, username, grade })
+        }));
+        document.getElementById('adminDiscordId').value = '';
+        document.getElementById('adminUsername').value = '';
+        document.getElementById('adminGrade').value = '';
+        alert('Invitation envoyée par message privé Discord.');
+        await loadAdminSettings();
+    } catch (error) { alert(error.message); }
+}
+
+async function deleteAdmin(userId) {
+    if (!confirm('Retirer cet administrateur du panel ?')) return;
+    try {
+        await readResponse(await fetch('/api/admin/delete-user', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId })
+        }));
+        await loadAdminSettings();
+    } catch (error) { alert(error.message); }
+}
+
+// ---- Gestion Véhicules ----
+
+function renderVehCatTabs() {
+    const box = document.getElementById('vehCatTabs');
+    box.innerHTML = VEH_CATEGORIES.map(c => `
+        <button class="cat-btn ${c === currentVehCategory ? 'active' : ''}" onclick="selectVehCategory('${c}')">${c}</button>
+    `).join('');
+}
+
+function selectVehCategory(cat) {
+    currentVehCategory = cat;
+    document.getElementById('vehCategoryTitle').textContent = 'Catégorie : ' + cat;
+    renderVehCatTabs();
+    renderVehiclesList();
+}
+
+function renderVehiclesList() {
+    const box = document.getElementById('vehiclesList');
+    const list = vehicules[currentVehCategory] || [];
+
+    if (list.length === 0) {
+        box.innerHTML = '<p class="muted">Aucun véhicule dans cette catégorie.</p>';
+        return;
+    }
+
+    box.innerHTML = list.map((v, index) => `
+        <div class="vehicle-row">
+            <input type="text" id="vehName-${currentVehCategory}-${index}" value="${escapeHtml(v.name)}">
+            <input type="color" id="vehColor-${currentVehCategory}-${index}" value="${escapeHtml(v.color)}">
+            <button onclick="updateVehicle(${index})">Enregistrer</button>
+            <button class="danger" onclick="deleteVehicle('${v.name.replace(/'/g, "\\'")}')">Supprimer</button>
+        </div>
+    `).join('');
+}
+
+async function loadVehicules() {
+    // On affiche les catégories tout de suite, avant même la réponse de l'API :
+    // comme ça les boutons sont toujours visibles, même si le backend n'est pas encore prêt.
+    renderVehCatTabs();
+
+    try {
+        const res = await fetch((window.API_BASE || "") + "/api/vehicules");
+
+        if (!res.ok) {
+            document.getElementById('vehiclesList').innerHTML = '<p class="muted">Erreur : le serveur a répondu ' + res.status + '. Vérifie que /api/vehicules existe côté backend.</p>';
+            return;
+        }
+
+        vehicules = await res.json();
+        renderVehiclesList();
+    } catch (err) {
+        console.error("Erreur loadVehicules:", err);
+        document.getElementById('vehiclesList').innerHTML = '<p class="muted">Impossible de contacter le serveur (' + err.message + '). Les boutons de catégorie restent visibles mais aucun véhicule ne peut être chargé/ajouté tant que /api/vehicules ne répond pas.</p>';
+    }
+}
+
+async function addVehicle() {
+    const nameInput = document.getElementById('newVehicleName');
+    const colorInput = document.getElementById('newVehicleColor');
+    const name = nameInput.value.trim();
+    const color = colorInput.value;
+
+    if (!name) {
+        alert("Entrez un nom de véhicule.");
+        return;
+    }
+
+    try {
+        const res = await fetch((window.API_BASE || "") + "/api/vehicules/add", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ category: currentVehCategory, name, color })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+            nameInput.value = '';
+            await loadVehicules();
+        } else {
+            alert(data.error || "Erreur lors de l'ajout.");
+        }
+    } catch (err) {
+        console.error("Erreur addVehicle:", err);
+        alert("Erreur de connexion.");
+    }
+}
+
+async function updateVehicle(index) {
+    const list = vehicules[currentVehCategory] || [];
+    const original = list[index];
+    const name = document.getElementById(`vehName-${currentVehCategory}-${index}`).value.trim();
+    const color = document.getElementById(`vehColor-${currentVehCategory}-${index}`).value;
+
+    if (!name) {
+        alert("Le nom ne peut pas être vide.");
+        return;
+    }
+
+    try {
+        const res = await fetch((window.API_BASE || "") + "/api/vehicules/update", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ category: currentVehCategory, oldName: original.name, name, color })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+            await loadVehicules();
+        } else {
+            alert(data.error || "Erreur lors de la mise à jour.");
+        }
+    } catch (err) {
+        console.error("Erreur updateVehicle:", err);
+    }
+}
+
+async function deleteVehicle(name) {
+    if (!confirm(`Supprimer le véhicule "${name}" ?`)) return;
+
+    try {
+        await fetch((window.API_BASE || "") + "/api/vehicules/delete", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ category: currentVehCategory, name })
+        });
+        await loadVehicules();
+    } catch (err) {
+        console.error("Erreur deleteVehicle:", err);
+    }
+}
+
+// ---- Candidatures / Effectifs ----
+
+async function loadApps() {
+    const box = document.getElementById('appsContainer');
+    
+    try {
+        const res = await fetch((window.API_BASE || "") + "/api/applications");
+        const apps = await readResponse(res);
+        
+        const pending = apps.filter(app => app.status === "En attente");
+        
+        if (pending.length === 0) {
+            box.innerHTML = '<p class="muted">Aucune candidature en attente.</p>';
+            return;
+        }
+        
+        box.innerHTML = pending.map(app => `
+            <div class="card">
+                <h3>${escapeHtml(app.nomPrenom || app.user || 'Sans nom')}</h3>
+                <p><strong>Discord :</strong> ${escapeHtml(app.user || app.username || 'Non renseigné')}</p>
+                <p><strong>ID :</strong> ${escapeHtml(app.discordId || 'Non renseigné')}</p>
+                <p><strong>Âge RP :</strong> ${escapeHtml(app.age || "Non précisé")}</p>
+                <p><strong>Motivation :</strong> ${escapeHtml(app.motivation || "Aucune")}</p>
+                <p><strong>Expérience :</strong> ${escapeHtml(app.experience || "Aucune")}</p>
+                <p><strong>Disponibilités :</strong> ${escapeHtml(app.disponibilites || "Non précisées")}</p>
+                <button onclick="acceptApp(${app.id})">✅ Accepter</button>
+                <button class="danger" onclick="rejectApp(${app.id})">❌ Refuser</button>
+            </div>
+        `).join('');
+    } catch (err) {
+        box.innerHTML = `<p class="muted">Erreur JS/API : ${err.message}</p>`;
+    }
+}
+
+async function loadEffectifs() {
+    const box = document.getElementById('effectifsContainer');
+    
+    try {
+        const res = await fetch((window.API_BASE || "") + "/api/users");
+        const users = await readResponse(res);
+        
+        if (users.length === 0) {
+            box.innerHTML = '<p class="muted">Aucun effectif enregistré.</p>';
+            return;
+        }
+        
+        box.innerHTML = users.map(user => `
+            <div class="card">
+                <h3>${escapeHtml(user.nomPrenom || user.username)}</h3>
+                <p><strong>Discord :</strong> ${escapeHtml(user.username)}</p>
+                <p><strong>ID :</strong> ${escapeHtml(user.id)}</p>
+                
+                <div class="form-grid">
+                    <div>
+                        <label>Nom / Prénom</label>
+                        <input id="nom-${user.id}" type="text" value="${escapeHtml(user.nomPrenom)}">
+                    </div>
+                    <div>
+                        <label>NIGEND</label>
+                        <input id="NIGEND-${user.id}" type="text" value="${escapeHtml(user.NIGEND)}">
+                    </div>
+                    <div>
+                        <label>Grade</label>
+                        <select id="grade-${user.id}" onchange="updateQJFromGrade('${user.id}')">
+                            <option value="">-- Sélectionner --</option>
+                            ${grades.map(g => `<option value="${escapeHtml(g)}" ${user.grade === g ? 'selected' : ''}>${escapeHtml(g)}</option>`).join('')}
+                        </select>
+                    </div>
+                    <div>
+                        <label>Qualification Judiciaire</label>
+                        <select id="qj-${user.id}">
+                            <option value="OPJ" ${user.qualificationJudiciaire === 'OPJ' ? 'selected' : ''}>OPJ</option>
+                            <option value="APJ" ${user.qualificationJudiciaire === 'APJ' ? 'selected' : ''}>APJ</option>
+                            <option value="APJA" ${user.qualificationJudiciaire === 'APJA' ? 'selected' : ''}>APJA</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>Spécialisation</label>
+                        <input id="spe-${user.id}" type="text" value="${escapeHtml(user.specialisation)}">
+                    </div>
+                    <div>
+                        <label>Statut</label>
+                        <select id="statut-${user.id}">
+                            <option ${user.statut === 'Actif' ? 'selected' : ''}>Actif</option>
+                            <option ${user.statut === 'Suspendu' ? 'selected' : ''}>Suspendu</option>
+                            <option ${user.statut === 'Retraité' ? 'selected' : ''}>Retraité</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <button onclick="saveUser('${user.id}')">💾 Sauvegarder</button>
+                <button class="danger" onclick="deleteUser('${user.id}')">🗑️ Supprimer</button>
+            </div>
+        `).join('');
+    } catch (err) {
+        box.innerHTML = `<p class="muted">Erreur JS/API : ${err.message}</p>`;
+    }
+}
+
+function getDefaultQualificationJudiciaireFront(grade) {
+    if (!grade) return "APJA";
+    
+    if (
+        grade.startsWith("COL") ||
+        grade.startsWith("LCL") ||
+        grade.startsWith("CEN") ||
+        grade.startsWith("CNE") ||
+        grade.startsWith("LTN") ||
+        grade.startsWith("SLT") ||
+        grade.startsWith("ASP")
+    ) return "OPJ";
+    
+    if (
+        grade.startsWith("MAJ") ||
+        grade.startsWith("ADC") ||
+        grade.startsWith("ADJ") ||
+        grade.startsWith("MDC") ||
+        grade.startsWith("GDC") ||
+        grade.startsWith("GDS") ||
+        grade.startsWith("ELG")
+    ) return "APJA";
+    
+    return "APJA";
+}
+
+function updateQJFromGrade(id) {
+    const grade = document.getElementById(`grade-${id}`).value;
+    document.getElementById(`qj-${id}`).value = getDefaultQualificationJudiciaireFront(grade);
+}
+
+async function acceptApp(id) {
+    try {
+        await readResponse(await fetch(`${window.API_BASE || ""}/api/applications/${id}/accept`, { method: "POST" }));
+        alert("Candidature acceptée.");
+        loadApps();
+        loadEffectifs();
+    } catch (err) { alert(err.message || "Impossible d'accepter cette candidature."); }
+}
+
+async function rejectApp(id) {
+    try {
+        await readResponse(await fetch(`${window.API_BASE || ""}/api/applications/${id}/reject`, { method: "POST" }));
+        alert("Candidature refusée.");
+        loadApps();
+    } catch (err) { alert(err.message || "Impossible de refuser cette candidature."); }
+}
+
+async function saveUser(id) {
+    try {
+        await readResponse(await fetch(`${window.API_BASE || ""}/api/user/${id}/update`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                nomPrenom: document.getElementById(`nom-${id}`).value,
+                NIGEND: document.getElementById(`NIGEND-${id}`).value,
+                grade: document.getElementById(`grade-${id}`).value,
+                qualificationJudiciaire: document.getElementById(`qj-${id}`).value,
+                specialisation: document.getElementById(`spe-${id}`).value,
+                statut: document.getElementById(`statut-${id}`).value
+            })
+        }));
+        alert("Profil sauvegardé.");
+        loadEffectifs();
+    } catch (err) { alert(err.message || "Impossible de sauvegarder ce profil."); }
+}
+
+async function deleteUser(id) {
+    if (!confirm("Supprimer définitivement ce profil ?")) return;
+    
+    try {
+        await readResponse(await fetch(`${window.API_BASE || ""}/api/user/${id}`, { method: "DELETE" }));
+        alert("Profil supprimé.");
+        loadEffectifs();
+    } catch (err) { alert(err.message || "Impossible de supprimer ce profil."); }
+}
+
+async function init() {
+    await loadGrades();
+    await Promise.all([loadApps(), loadEffectifs(), loadVehicules(), loadAdminSettings()]);
+}
+
+init();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Formation sur le terrain</title>
+    <style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  color: #e0e0e0;
+  line-height: 1.6;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+header {
+  background: rgba(0, 0, 0, 0.5);
+  border-bottom: 3px solid #d4af37;
+  padding: 2rem;
+  backdrop-filter: blur(10px);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.logo {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 8px rgba(212, 175, 55, 0.5));
+}
+
+.brand h1 {
+  font-size: 2.5rem;
+  color: #d4af37;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+}
+
+.brand p {
+  font-size: 0.95rem;
+  color: #b0b0b0;
+}
+
+nav {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+nav a {
+  color: #d4af37;
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  border: 1px solid #d4af37;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+nav a:hover {
+  background: #d4af37;
+  color: #1a1a2e;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+}
+
+section {
+  flex: 1;
+  padding: 3rem 2rem;
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.card {
+  background: rgba(30, 30, 50, 0.8);
+  border-left: 4px solid #d4af37;
+  border-radius: 8px;
+  padding: 2rem;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  margin-bottom: 2rem;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(212, 175, 55, 0.2);
+}
+
+.card h2 {
+  font-size: 1.5rem;
+  color: #d4af37;
+  margin-bottom: 1.5rem;
+  border-bottom: 2px solid #d4af37;
+  padding-bottom: 0.8rem;
+}
+
+.card p {
+  color: #d0d0d0;
+  margin-bottom: 1rem;
+  line-height: 1.8;
+}
+
+.card ul {
+  list-style: none;
+  margin-left: 0;
+}
+
+.card li {
+  background: rgba(212, 175, 55, 0.05);
+  border-left: 3px solid #d4af37;
+  padding: 0.8rem 1rem;
+  margin-bottom: 0.8rem;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+  color: #e0e0e0;
+}
+
+.card li:hover {
+  background: rgba(212, 175, 55, 0.15);
+  transform: translateX(4px);
+  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.1);
+}
+
+.card strong {
+  color: #d4af37;
+}
+
+footer {
+  background: rgba(0, 0, 0, 0.7);
+  border-top: 2px solid #d4af37;
+  padding: 2rem;
+  text-align: center;
+  color: #b0b0b0;
+  font-size: 0.9rem;
+  margin-top: auto;
+}
+
+footer p {
+  margin: 0.5rem 0;
+}
+
+@media (max-width: 768px) {
+  header {
+    padding: 1.5rem;
+  }
+
+  .brand {
+    flex-direction: column;
+    text-align: center;
+    margin-bottom: 1rem;
+  }
+
+  .brand h1 {
+    font-size: 1.8rem;
+  }
+
+  nav {
+    gap: 0.6rem;
+  }
+
+  nav a {
+    font-size: 0.8rem;
+    padding: 0.4rem 0.6rem;
+  }
+
+  section {
+    padding: 1.5rem 1rem;
+  }
+
+  .card {
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .card h2 {
+    font-size: 1.3rem;
+  }
+
+  .card p {
+    font-size: 0.95rem;
+  }
+
+  .card li {
+    padding: 0.7rem 0.8rem;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  header {
+    padding: 1rem;
+  }
+
+  .brand h1 {
+    font-size: 1.5rem;
+  }
+
+  nav a {
+    font-size: 0.7rem;
+    padding: 0.3rem 0.5rem;
+  }
+
+  section {
+    padding: 1rem 0.75rem;
+  }
+
+  .card {
+    padding: 1rem;
+  }
+
+  .card h2 {
+    font-size: 1.2rem;
+  }
+
+  .card p {
+    font-size: 0.9rem;
+  }
+
+  .card li {
+    padding: 0.6rem 0.8rem;
+    font-size: 0.85rem;
+  }
+}
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="brand">
+        <img src="/assets/logo-gendarmerie.png" class="logo" alt="Logo Gendarmerie">
+        <div>
+            <h1>Formation sur le terrain</h1>
+            <p>Gendarmerie Nationale</p>
+        </div>
+    </div>
+
+    <nav>
+        <a href="/cours.html">Retour aux cours</a>
+        <a href="/dashboard.html">Dashboard</a>
+    </nav>
+</header>
+
+<section>
+
+    <div class="card">
+        <h2>Présentation</h2>
+
+        <p>
+            La formation sur le terrain sert à deux choses essentielles pour continuer sa carrière en tant que gendarme.
+        </p>
+
+        <p>
+            Elle se divise en deux étapes qui se font tout au long de la période de formation sur le terrain en tant que GAV.
+        </p>
+    </div>
+
+    <div class="card">
+        <h2>1 — L'apprentissage sur le terrain</h2>
+
+        <p>
+            L'apprentissage sur le terrain permet au GAV de s'adapter à la Gendarmerie, de poser ses questions aux sous-officiers et d'observer les interventions effectuées durant le service.
+        </p>
+
+        <p>
+            Cette étape permet de mieux comprendre le métier de gendarme dans la réalité du terrain et non uniquement en formation théorique.
+        </p>
+
+        <p>
+            Les cours appris pendant la formation donnent déjà une base solide sur le rôle à adopter pendant une intervention, mais l'expérience terrain permet de mieux appliquer ces connaissances.
+        </p>
+    </div>
+
+    <div class="card">
+        <h2>2 — L'apprentissage par les cours</h2>
+
+        <p>
+            Grâce au site de la Gendarmerie, les cours sont répartis en deux catégories :
+        </p>
+
+        <ul>
+            <li>Cours principaux ;</li>
+            <li>Cours secondaires.</li>
+        </ul>
+
+        <p>
+            Pendant votre période de formation sur le terrain, vous avez l'obligation d'apprendre les cours principaux, car ils regroupent les connaissances essentielles au service.
+        </p>
+
+        <p>
+            Ces cours concernent notamment la hiérarchie, les procédures d'arrestation, les règles de sécurité, les contrôles, les refus d'obtempérer et les bases judiciaires.
+        </p>
+    </div>
+
+    <div class="card">
+        <h2>Choses principales à apprendre</h2>
+
+        <ul>
+            <li><strong>Hiérarchie :</strong> à connaître intégralement pour le respect, la distinction des grades et l'organisation interne.</li>
+            <li><strong>Armement :</strong> connaître les règles d'usage et les armements autorisés.</li>
+            <li><strong>Règles de sécurité :</strong> bien retenir les notions importantes comme l'ISTC, l'usage des armes et les consignes de sécurité.</li>
+            <li><strong>Équipements :</strong> savoir ce que vous devez avoir sur vous selon votre unité et votre mission.</li>
+            <li><strong>Contrôle :</strong> retenir les étapes dans l'ordre et savoir expliquer rapidement chaque étape.</li>
+            <li><strong>Refus d'obtempérer :</strong> connaître les étapes, les transmissions et les règles d'intervention.</li>
+            <li><strong>Procédure :</strong> connaître les bases de l'interpellation, de la fouille, de la garde à vue et du transport.</li>
+            <li><strong>Index judiciaire :</strong> connaître les articles essentiels ou être capable d'en faire un résumé correct.</li>
+            <li><strong>Architecture de l'intervention :</strong> connaître son rôle dans une intervention et savoir évaluer le niveau de menace.</li>
+            <li><strong>La Gendarmerie, ses devoirs et ses obligations :</strong> connaître les principes généraux, même sous forme résumée.</li>
+            <li><strong>Commandement de la Gendarmerie :</strong> connaître au minimum le Commandant de Brigade actuellement en fonction.</li>
+        </ul>
+    </div>
+
+    <div class="card">
+        <h2>Objectif de la formation terrain</h2>
+
+        <p>
+            L'objectif est de permettre au GAV de gagner en autonomie, de comprendre les attentes de la hiérarchie et d'appliquer correctement les procédures en service.
+        </p>
+
+        <p>
+            Un militaire en formation doit rester attentif, poser des questions lorsque nécessaire et faire preuve de sérieux durant toute sa période d'apprentissage.
+        </p>
+    </div>
+
+</section>
+
+<footer class="footer">
+    <p>© 2026 lexy_off1 — Tous droits réservés</p>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Document des Patrouilles</title>
+    <style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  color: #e0e0e0;
+  line-height: 1.6;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow-x: auto;
+}
+
+header {
+  background: rgba(0, 0, 0, 0.5);
+  border-bottom: 3px solid #d4af37;
+  padding: 2rem;
+  backdrop-filter: blur(10px);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.logo {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 8px rgba(212, 175, 55, 0.5));
+}
+
+.brand h1 {
+  font-size: 2.5rem;
+  color: #d4af37;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+}
+
+.brand p {
+  font-size: 0.95rem;
+  color: #b0b0b0;
+}
+
+nav {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+nav a {
+  color: #d4af37;
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  border: 1px solid #d4af37;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+nav a:hover {
+  background: #d4af37;
+  color: #1a1a2e;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+}
+
+section {
+  flex: 1;
+  padding: 3rem 2rem;
+  max-width: 100%;
+}
+
+section h2 {
+  font-size: 2rem;
+  color: #d4af37;
+  margin-bottom: 0.5rem;
+  text-align: center;
+}
+
+.save-info {
+  color: #a8c5ff;
+  margin-bottom: 1.5rem;
+  text-align: center;
+  font-size: 0.95rem;
+}
+
+.table-section {
+  margin-bottom: 2rem;
+  border: 2px solid #000;
+  background: #cfcfcf;
+  color: black;
+  border-radius: 8px;
+  /* Les listes de véhicules sont des menus flottants : elles ne doivent pas
+     être rognées par le tableau. */
+  overflow: visible;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+.section-title {
+  text-align: center;
+  color: white;
+  font-weight: bold;
+  padding: 1rem;
+  border-bottom: 2px solid #000;
+  font-size: 1.1rem;
+}
+
+.corg { background: #ffd75a; }
+.officier { background: #e88b8b; }
+.pam { background: #2f6f9f; }
+.psig { background: #004066; }
+.edcf { background: #506fc7; }
+.agign { background: #333; }
+.gm { background: #d79b32; }
+.pjgn { background: #45bfb7; }
+.gic { background: #74cdb5; }
+.pghm { background: #2f7778; }
+
+.patrol-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.patrol-table th,
+.patrol-table td {
+  border: 2px solid #000;
+  padding: 0.6rem;
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+.patrol-table th {
+  background: #999;
+  font-weight: bold;
+  color: black;
+}
+
+.patrol-name {
+  font-weight: bold;
+  color: #0066b3;
+  background: #bdbdbd;
+  min-width: 160px;
+}
+
+.badge-select {
+  position: relative;
+  width: 100%;
+}
+
+.badge-selected {
+  min-height: 24px;
+  border-radius: 14px;
+  padding: 4px 10px;
+  font-weight: bold;
+  cursor: pointer;
+  background: #eef1f5;
+  color: black;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  border: 1px solid #ccc;
+  transition: all 0.2s ease;
+  font-size: 0.85rem;
+}
+
+.badge-selected:hover {
+  filter: brightness(0.95);
+}
+
+.badge-options {
+  display: none;
+  position: absolute;
+  z-index: 9999;
+  background: #080808;
+  border: 2px solid #d4af37;
+  border-radius: 8px;
+  padding: 8px;
+  max-height: min(420px, 60vh);
+  overflow-y: auto;
+  min-width: min(420px, calc(100vw - 32px));
+  width: max-content;
+  max-width: calc(100vw - 32px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.8);
+  top: 100%;
+  left: 0;
+  margin-top: 4px;
+}
+
+.badge-select.open .badge-options {
+  display: block;
+}
+
+.badge-option {
+  padding: 6px 10px;
+  border-radius: 14px;
+  margin: 4px 0;
+  font-weight: bold;
+  cursor: pointer;
+  color: white;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+}
+
+.badge-option:hover {
+  filter: brightness(0.85);
+}
+
+.badge-options .badge-empty { background: #202020; color: white; }
+.badge-empty { background: #eef1f5; color: black; }
+.badge-ofs { background: #2f80c0; color: white; }
+.badge-ofb { background: #e85d4f; color: white; }
+.badge-sop { background: #f0a85a; color: white; }
+.badge-sob { background: #f1d34f; color: black; }
+.badge-gav { background: #9b9be8; color: white; }
+.badge-gic { background: #8ccad0; color: #123; }
+.badge-green { background: #2ecc71; color: white; }
+.badge-red { background: #e74c3c; color: white; }
+.badge-blue { background: #3f51b5; color: white; }
+.badge-orange { background: #f4a261; color: white; }
+.badge-yellow { background: #f1c40f; color: black; }
+.badge-purple { background: #5e35b1; color: white; }
+.badge-cyan { background: #4f8df7; color: white; }
+.badge-pink { background: #d252b9; color: white; }
+.badge-lightgreen { background: #8dd9a0; color: white; }
+.badge-salmon { background: #f5a7a0; color: white; }
+.badge-lavender { background: #a98be7; color: white; }
+.badge-brown { background: #8B4513; color: white; }
+.badge-darkgreen { background: #00695c; color: white; }
+.badge-agign { background: #3d3d3d; color: white; }
+.badge-pjgn { background: #45bfb7; color: white; }
+.badge-pghm { background: #2f7778; color: white; }
+.badge-edcf { background: #506fc7; color: white; }
+.badge-psig { background: #d9c36a; color: black; }
+.badge-gm { background: #d79b32; color: white; }
+
+footer {
+  background: rgba(0, 0, 0, 0.7);
+  border-top: 2px solid #d4af37;
+  padding: 2rem;
+  text-align: center;
+  color: #b0b0b0;
+  font-size: 0.9rem;
+  margin-top: auto;
+}
+
+footer p {
+  margin: 0.5rem 0;
+}
+
+@media (max-width: 768px) {
+  header {
+    padding: 1.5rem;
+  }
+
+  .brand {
+    flex-direction: column;
+    text-align: center;
+    margin-bottom: 1rem;
+  }
+
+  .brand h1 {
+    font-size: 1.8rem;
+  }
+
+  nav {
+    gap: 0.6rem;
+  }
+
+  nav a {
+    font-size: 0.8rem;
+    padding: 0.4rem 0.6rem;
+  }
+
+  section {
+    padding: 1.5rem 1rem;
+  }
+
+  .patrol-table th,
+  .patrol-table td {
+    padding: 0.4rem;
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  header {
+    padding: 1rem;
+  }
+
+  .brand h1 {
+    font-size: 1.5rem;
+  }
+
+  nav a {
+    font-size: 0.7rem;
+    padding: 0.3rem 0.5rem;
+  }
+
+  section {
+    padding: 1rem 0.75rem;
+  }
+
+  section h2 {
+    font-size: 1.3rem;
+  }
+
+  .patrol-table th,
+  .patrol-table td {
+    padding: 0.3rem;
+    font-size: 0.7rem;
+  }
+
+  .patrol-name {
+    min-width: 100px;
+    font-size: 0.75rem;
+  }
+}
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="brand">
+        <img src="/assets/logo-gendarmerie.png" class="logo" alt="Logo Gendarmerie">
+        <div>
+            <h1>Document des Patrouilles</h1>
+            <p>Gendarmerie Nationale</p>
+        </div>
+    </div>
+
+    <nav>
+        <a href="/dashboard.html">Dashboard</a>
+        <a href="/logout.html">Déconnexion</a>
+    </nav>
+</header>
+
+<section>
+    <h2>Document des Patrouilles</h2>
+    <p class="save-info">Les modifications sont sauvegardées automatiquement.</p>
+
+    <div id="patrols">Chargement...</div>
+</section>
+
+<footer class="footer">
+    <p>© 2026 lexy_off1 — Tous droits réservés</p>
+</footer>
+
+<script>
+let effectifs = [];
+let saved = {};
+
+const STATUTS = [
+    "(1) • DISPONIBLE",
+    "(2) • INDISPONIBLE",
+    "(3) • INTERVENTION",
+    "(4) • OPÉRATION",
+    "(5) • CONTRÔLE PARTIEL",
+    "(6) • CONTRÔLE TOTAL",
+    "(7) • TRANSFÈRE PÉNITENTIAIRE",
+    "(8) • ENQUÊTE PJGN",
+    "(9) • CONTRÔLE RADAR (ERI)",
+    "(10) • ESCORTE GN/SP/SM/BC",
+    "(11) • BARRAGE ROUTIER",
+    "(12) • AUDITION PJGN/OPJ",
+    "(13) • DÉPÔT DE PLAINTE",
+    "(14) • ENTRAÎNEMENT",
+    "(15) • FORMATION",
+    "(16) • COMMANDEMENT",
+    "(17) • CONVOI SPÉCIAL",
+    "(18) • HOSPITALISATION",
+    "(19) • CORG TEMPORAIRE",
+    "(20) • PATROUILLE PÉDESTRE",
+    "(21) • REFUS D'OBTEMPÉRER EN COURS",
+    "(22) • CAFÉ"
+];
+
+let VEHICULES = {
+    PAM: [
+        "2020 Bullhorn Prancer Widebody",
+        "2022 Avantismo Q8",
+        "2024 Falcon eStallion",
+        "2020 BKM Munich",
+        "2019 Chevlon Platoon PPV",
+        "2021 Falcon Rampage PPV",
+        "2018 Bullhorn Pueblo Pursuit",
+        "2021 Chevlon Camion PPV",
+        "2024 Falcon Interceptor Utility",
+        "2011 Bullhorn Prancer Pursuit",
+        "2019 Falcon Interceptor Utility",
+        "1981 Chevlon Inferno",
+        "2013 Falcon Interceptor Utility",
+        "2020 Stuttgart Runner",
+        "2015 Bullhorn Prancer Pursuit",
+        "2018 Chevlon Camion PPV",
+        "2017 Falcon Interceptor Sedan",
+        "1988 Bulleron Foreman",
+        "2002 Falcon Traveller",
+        "2008 Chevlon Camion PPV",
+        "2009 Chevlon Captain PPV",
+        "2000 Chevlon Camion PPV",
+        "2009 Bullhorn BH15 SSV",
+        "2006 Chevlon Commuter Van",
+        "2003 Falcon Prime Eques Interceptor",
+        "Chaise de Bureau",
+        "Véhicule spécialité"
+    ],
+    PSIG: [
+        "2020 BKM Munich - PSIG BANA",
+        "2019 Chevlon Platoon PPV - PSIG BANA",
+        "2018 Bullhorn Pueblo - PSIG BANA",
+        "2020 Bullhorn Prancer Pursuit Widebody - PSIG BANA",
+        "2024 Falcon eStallion - PSIG BANA",
+        "2020 Stuttgart Runner - PSIG BANA",
+        "2021 Falcon Rampage PPV",
+        "2022 Avantismo Q8",
+        "2024 Falcon Interceptor Utility"
+    ],
+    EDCF: [
+        "2014 Chevlon Corbeta TZ",
+        "2020 Bullhorn Prancer Pursuit Widebody",
+        "2011 Chevlon Amigo",
+        "2022 Bullhorn Determinator SFP Fury",
+        "2022 Averon Q8",
+        "2024 Falcon eStallion",
+        "2015 Stallion 350 Bana",
+        "2006 Chevlon Commuter Van"
+    ],
+    AGIGN: [
+        "2020 Falcon Traveller SSV",
+        "2019 Chevlon Platoon PPV",
+        "2018 Bullhorn Pueblo Pursuit",
+        "2008 Chevlon Camion PPV",
+        "2021 Chevlon Camion PPV",
+        "2020 Bullhorn Prancer Pursuit Widebody",
+        "2020 BKM Munich",
+        "2022 Averon Q8",
+        "2011 SWAT TRUCK",
+        "2005 Mobile Command"
+    ],
+    GM: [
+        "2018 Chevlon Camion PPV",
+        "2006 Chevlon Commuter Van",
+        "2021 Chevlon Camion PPV",
+        "2011 SWAT TRUCK",
+        "2005 Mobile Command",
+        "2018 Bullhorn Pueblo Pursuit",
+        "BUS GN",
+        "2020 Falcon Advance 350"
+    ],
+    PJGN: [
+        "2003 Falcon Prime Eques",
+        "2006 Chevlon Commuter Van",
+        "2009 Chevlon Captain",
+        "2011 Bullhorn Prancer Pursuit",
+        "2015 Bullhorn Prancer Pursuit",
+        "2018 Bullhorn Pueblo Pursuit",
+        "2019 Falcon Interceptor Utility",
+        "2019 Falcon Interceptor Sedan",
+        "2020 Stuttgart Runner",
+        "2021 Chevlon Camion PPV",
+        "2024 eStallion"
+    ],
+    GIC: [
+        "2018 Bullhorn Pueblo Pursuit",
+        "2019 Chevlon Platoon PPV",
+        "2006 Chevlon Commuter Van",
+        "2021 Chevlon Camion PPV",
+        "2019 Falcon Interceptor Utility"
+    ],
+    PGHM: [
+        "Averon Q8",
+        "Falcon Advance 350",
+        "2021 Chevlon Camion PPV",
+        "2021 Falcon Rampage PPV",
+        "2018 Chevlon Camion PPV",
+        "2019 Chevlon Platoon PPV",
+        "2006 Chevlon Commuter Van",
+        "2020 Stuttgart Runner",
+        "2009 Bullhorn BH15 SSV",
+        "Canyon Descender",
+        "4-Wheeler"
+    ]
+};
+
+const SECTIONS = [
+    {
+        title: "CORG ・ Centre d'opérations et de renseignement de la gendarmerie",
+        className: "corg",
+        vehicules: "PAM",
+        columns: ["CONDUCTEUR CORG", "OPÉRATEUR CORG", "ÉQUIPIER 1", "ÉQUIPIER 2"],
+        rows: ["CORG 69"]
+    },
+    {
+        title: "OFFICIER ・ Permanence Officier",
+        className: "officier",
+        vehicules: "PAM",
+        columns: ["GRADE", "OFFICIER PERMA", "MATRICULE", "CATÉGORIE"],
+        rows: ["OSCAR 130 ・ OFFICIER DE PERMANENCE", "FOXTROT 131 ・ OFFICIER ADJOINT"]
+    },
+    {
+        title: "PAM ・ Sécurité Publique",
+        className: "pam",
+        vehicules: "PAM",
+        columns: ["CONDUCTEUR", "CHEF DE BORD", "ÉQUIPIER 1", "ÉQUIPIER 2"],
+        rows: ["PAM 01 MIONS", "PAM 02 MIONS", "PAM 03 MIONS", "PAM 04 MIONS", "PAM 05 MIONS", "PAM 06 MIONS", "PAM 07 MIONS", "PAM 08 MIONS"]
+    },
+    {
+        title: "PSIG ・ Peloton de Surveillance Et d'Intervention De La Gendarmerie",
+        className: "psig",
+        vehicules: "PSIG",
+        columns: ["CONDUCTEUR PSIG", "CHEF DE BORD PSIG", "ÉQUIPIER 1 PSIG", "ÉQUIPIER 2 PSIG"],
+        rows: ["PSIG 130 ALPHA MIONS", "PSIG 131 BRAVO MIONS", "PSIG SABRE MIONS"]
+    },
+    {
+        title: "EDCF ・ Escadron Départemental de Contrôle des Flux",
+        className: "edcf",
+        vehicules: "EDCF",
+        columns: ["PILOTE ERI", "CO-PILOTE ERI", "CONDUCTEUR TPI", "CHEF DE BORD TPI"],
+        rows: ["EDCF ALPHA MIONS", "EDCF BRAVO MIONS"]
+    },
+    {
+        title: "AGIGN ・ Groupe d'Intervention De La Gendarmerie",
+        className: "agign",
+        vehicules: "AGIGN",
+        columns: ["CONDUCTEUR AGIGN", "CHEF DE SERVICE", "OPÉRATEUR AGIGN 1", "OPÉRATEUR AGIGN 2"],
+        rows: ["AGIGN 250 ALPHA", "AGIGN 251 BRAVO", "AGIGN 350 COMMANDEMENT"]
+    },
+    {
+        title: "GM ・ Gendarmerie Mobile",
+        className: "gm",
+        vehicules: "GM",
+        columns: ["CONDUCTEUR GM", "CHEF DE BORD GM", "ÉQUIPIER 1 GM", "ÉQUIPIER 2 GM"],
+        rows: ["DELTA 200", "CHARLIE 200", "ALPHA 250"]
+    },
+    {
+        title: "PJGN ・ Pôle Judiciaire De La Gendarmerie Nationale",
+        className: "pjgn",
+        vehicules: "PJGN",
+        columns: ["CONDUCTEUR PJGN", "CHEF DE BORD PJGN", "ÉQUIPIER 1", "ÉQUIPIER 2"],
+        rows: ["PJGN ALPHA", "PJGN BRAVO"]
+    },
+    {
+        title: "GIC ・ Groupe d'Investigation Cynophile",
+        className: "gic",
+        vehicules: "GIC",
+        columns: ["CONDUCTEUR CYNO", "MAÎTRE CHIEN", "ÉQUIPIER 1 CYNO", "CYNO"],
+        rows: ["GIC ALPHA MIONS", "GIC BRAVO MIONS"],
+        chiens: ["Max", "Tex", "Lego", "Rafale", "Gamin", "Capy", "Trex", "Snoupie", "Tsuki", "Zeus", "Nilla"]
+    },
+    {
+        title: "PGHM ・ Peloton de Gendarmerie De Haute Montagne",
+        className: "pghm",
+        vehicules: "PGHM",
+        columns: ["CONDUCTEUR PGHM", "CHEF DE BORD PGHM", "ÉQUIPIER 1 PGHM", "ÉQUIPIER 2 PGHM"],
+        rows: ["PGHM 300 ALPHA", "PGHM BRAVO 330"]
+    }
+];
+
+function getGradeClass(grade = "") {
+    if (grade.startsWith("COL") || grade.startsWith("LCL") || grade.startsWith("CEN")) return "badge-ofs";
+    if (grade.startsWith("CNE") || grade.startsWith("LTN") || grade.startsWith("SLT") || grade.startsWith("ASP")) return "badge-ofb";
+    if (grade.startsWith("MAJ") || grade.startsWith("ADC") || grade.startsWith("ADJ")) return "badge-sop";
+    if (grade.startsWith("MDC") || grade.startsWith("GDC") || grade.startsWith("GDS") || grade.startsWith("ELG")) return "badge-sob";
+    return "badge-gav";
+}
+
+function getVehicleClass(vehicle = "") {
+    if (vehicle.includes("PSIG BANA")) return "badge-psig";
+    if (vehicle.includes("Sérigraphies")) return "badge-ofs";
+    if (vehicle.includes("ERI") || vehicle.includes("EDCF") || vehicle.includes("Corbeta") || vehicle.includes("Determinator")) return "badge-edcf";
+    if (vehicle.includes("GIGN") || vehicle.includes("SWAT") || vehicle.includes("Mobile Command")) return "badge-agign";
+    if (vehicle.includes("(GM)") || vehicle.includes("GM 01") || vehicle.includes("GM 02") || vehicle.includes("BUS GN")) return "badge-gm";
+    if (vehicle.includes("PJGN") || vehicle.includes("Bana") || vehicle.includes("RESPONSABLE")) return "badge-pjgn";
+    if (vehicle.includes("GIC") || vehicle.includes("CYNO")) return "badge-gic";
+    if (vehicle.includes("PGHM") || vehicle.includes("R-PGHM") || vehicle.includes("Canyon") || vehicle.includes("4-Wheeler")) return "badge-pghm";
+    if (vehicle.includes("2020 Bullhorn Prancer Widebody")) return "badge-ofs";
+    if (vehicle.includes("2022 Avantismo Q8") || vehicle.includes("2024 Falcon eStallion") || vehicle.includes("2020 BKM Munich")) return "badge-ofb";
+    if (vehicle.includes("2019 Chevlon Platoon PPV") || vehicle.includes("2021 Falcon Rampage PPV") || vehicle.includes("2018 Bullhorn Pueblo Pursuit") || vehicle.includes("2021 Chevlon Camion PPV") || vehicle.includes("2024 Falcon Interceptor Utility")) return "badge-sop";
+    if (vehicle.includes("2011 Bullhorn Prancer Pursuit") || vehicle.includes("2019 Falcon Interceptor Utility") || vehicle.includes("1981 Chevlon Inferno") || vehicle.includes("2013 Falcon Interceptor Utility") || vehicle.includes("2020 Stuttgart Runner") || vehicle.includes("2015 Bullhorn Prancer Pursuit")) return "badge-sob";
+    if (vehicle.includes("2018 Chevlon Camion PPV") || vehicle.includes("2017 Falcon Interceptor Sedan") || vehicle.includes("1988 Bulleron Foreman") || vehicle.includes("2002 Falcon Traveller") || vehicle.includes("2008 Chevlon Camion PPV") || vehicle.includes("2009 Chevlon Captain PPV") || vehicle.includes("2000 Chevlon Camion PPV") || vehicle.includes("2009 Bullhorn BH15 SSV") || vehicle.includes("2006 Chevlon Commuter Van") || vehicle.includes("2003 Falcon Prime Eques Interceptor")) return "badge-gav";
+    return "badge-empty";
+}
+
+function getVehicleDetails(name) {
+    for (const list of Object.values(VEHICULES)) {
+        const found = list.find(vehicle =>
+            (typeof vehicle === "string" ? vehicle : vehicle.name) === name
+        );
+        if (found) {
+            return typeof found === "string"
+                ? { name: found, color: "" }
+                : { name: found.name, color: found.color || "" };
+        }
+    }
+    return { name, color: "" };
+}
+
+function getContrastColor(hex) {
+    if (!/^#[0-9a-f]{6}$/i.test(hex || "")) return "white";
+    const value = hex.slice(1);
+    const luminance = (parseInt(value.slice(0, 2), 16) * 0.299) +
+        (parseInt(value.slice(2, 4), 16) * 0.587) +
+        (parseInt(value.slice(4, 6), 16) * 0.114);
+    return luminance > 160 ? "black" : "white";
+}
+
+function getStatutClass(value = "") {
+    if (value.includes("(1)")) return "badge-green";
+    if (value.includes("(2)")) return "badge-red";
+    if (value.includes("(3)")) return "badge-blue";
+    if (value.includes("(4)")) return "badge-orange";
+    if (value.includes("(5)")) return "badge-yellow";
+    if (value.includes("(6)")) return "badge-purple";
+    if (value.includes("(7)")) return "badge-cyan";
+    if (value.includes("(8)")) return "badge-pink";
+    if (value.includes("(9)")) return "badge-lightgreen";
+    if (value.includes("(10)")) return "badge-salmon";
+    if (value.includes("(11)")) return "badge-yellow";
+    if (value.includes("(12)")) return "badge-pink";
+    if (value.includes("(13)")) return "badge-lavender";
+    if (value.includes("(14)")) return "badge-gav";
+    if (value.includes("(15)")) return "badge-green";
+    if (value.includes("(16)")) return "badge-red";
+    if (value.includes("(17)")) return "badge-darkgreen";
+    if (value.includes("(18)")) return "badge-orange";
+    if (value.includes("(19)")) return "badge-yellow";
+    if (value.includes("(20)")) return "badge-green";
+    if (value.includes("(21)")) return "badge-red";
+    if (value.includes("(22)")) return "badge-brown";
+    return "badge-empty";
+}
+
+function formatUser(user) {
+    const grade = String(user.grade || "").trim()
+        .match(/^(COL|LCL|CEN|CNE|LTN|SLT|ASP|MAJ|ADC|ADJ|MDC|GDC|GDS|ELG|MDL|BRC|BRI|GAV)\b/i)?.[0]
+        ?.toUpperCase() || "--";
+    const indicatif = (user.NIGEND || "--").slice(0, 2);
+    const nom = String(user.nomPrenom || user.username || "Inconnu")
+        .replace(/^(COL|LCL|CEN|CNE|LTN|SLT|ASP|MAJ|ADC|ADJ|MDC|GDC|GDS|ELG|MDL|BRC|BRI|GAV)\s*[|・—-]\s*/i, "");
+    return `${grade} - ${indicatif} • ${nom}`;
+}
+
+function makeBadgeSelect(id, items, getClassFn) {
+    return `
+        <div class="badge-select" id="wrap-${id}">
+            <div class="badge-selected badge-empty" id="${id}" data-value="" onclick="toggleBadge('${id}')">—</div>
+            <div class="badge-options">
+                <div class="badge-option badge-empty" onclick="chooseBadge('${id}', '', '—', 'badge-empty')">—</div>
+                ${items.map(item => {
+                    const label = item.label.replace(/"/g, "&quot;");
+                    const value = item.value.replace(/"/g, "&quot;");
+                    const cls = getClassFn(item.raw || item.label);
+                    const color = item.color || "";
+                    const style = color ? ` style="background:${color};color:${getContrastColor(color)}"` : "";
+                    return `<div class="badge-option ${cls}"${style} onclick="chooseBadge('${id}', '${value}', '${label}', '${cls}', '${color}')">${label}</div>`;
+                }).join("")}
+            </div>
+        </div>
+    `;
+}
+
+function makeSelect(id, type, section = null) {
+    if (type === "user") {
+        const items = effectifs.map(u => ({
+            value: u.id,
+            label: formatUser(u),
+            raw: u.grade || ""
+        }));
+        return makeBadgeSelect(id, items, getGradeClass);
+    }
+
+    if (type === "vehicle") {
+        const items = (VEHICULES[section.vehicules] || []).map(v => ({
+            value: typeof v === "string" ? v : v.name,
+            label: typeof v === "string" ? v : v.name,
+            raw: typeof v === "string" ? v : v.name,
+            color: typeof v === "string" ? "" : v.color
+        }));
+        return makeBadgeSelect(id, items, () => "");
+    }
+
+    if (type === "statut") {
+        const items = STATUTS.map(s => ({
+            value: s,
+            label: s,
+            raw: s
+        }));
+        return makeBadgeSelect(id, items, getStatutClass);
+    }
+
+    if (type === "chien") {
+        const items = (section.chiens || []).map(c => ({
+            value: c,
+            label: c,
+            raw: c
+        }));
+        return makeBadgeSelect(id, items, () => "badge-gic");
+    }
+}
+
+function toggleBadge(id) {
+    document.querySelectorAll(".badge-select").forEach(el => {
+        if (el.id !== `wrap-${id}`) el.classList.remove("open");
+    });
+    document.getElementById(`wrap-${id}`).classList.toggle("open");
+}
+
+function chooseBadge(id, value, label, cls, color = "") {
+    const selected = document.getElementById(id);
+    selected.dataset.value = value;
+    selected.textContent = label;
+    selected.className = `badge-selected ${cls}`;
+    selected.style.backgroundColor = color;
+    selected.style.color = color ? getContrastColor(color) : "";
+    document.getElementById(`wrap-${id}`).classList.remove("open");
+    savePatrouilles();
+}
+
+function render() {
+    const box = document.getElementById("patrols");
+    box.innerHTML = "";
+
+    SECTIONS.forEach(section => {
+        let html = `
+        <div class="table-section">
+            <div class="section-title ${section.className}">${section.title}</div>
+            <table class="patrol-table">
+                <thead>
+                    <tr>
+                        <th>PATROUILLE</th>
+                        ${section.columns.map(c => `<th>${c}</th>`).join("")}
+                        <th>VÉHICULE</th>
+                        <th>STATUT</th>
+                    </tr>
+                </thead>
+                <tbody>
+        `;
+
+        section.rows.forEach((row, rowIndex) => {
+            html += `<tr><td class="patrol-name">${row}</td>`;
+
+            section.columns.forEach((col, colIndex) => {
+                const id = `${section.className}_${rowIndex}_${colIndex}`;
+
+                if (section.className === "gic" && col === "CYNO") {
+                    html += `<td>${makeSelect(id, "chien", section)}</td>`;
+                } else {
+                    html += `<td>${makeSelect(id, "user", section)}</td>`;
+                }
+            });
+
+            html += `
+                <td>${makeSelect(`${section.className}_${rowIndex}_vehicule`, "vehicle", section)}</td>
+                <td>${makeSelect(`${section.className}_${rowIndex}_statut`, "statut", section)}</td>
+            </tr>`;
+        });
+
+        html += `</tbody></table></div>`;
+        box.innerHTML += html;
+    });
+
+    applySaved();
+}
+
+function applySaved() {
+    for (const [id, value] of Object.entries(saved)) {
+        const selected = document.getElementById(id);
+        if (!selected) continue;
+
+        let label = "—";
+        let cls = "badge-empty";
+
+        if (value) {
+            const user = effectifs.find(u => u.id === value);
+
+            if (user) {
+                label = formatUser(user);
+                cls = getGradeClass(user.grade || "");
+            } else if (STATUTS.includes(value)) {
+                label = value;
+                cls = getStatutClass(value);
+            } else {
+                label = value;
+                const vehicle = getVehicleDetails(value);
+                cls = "";
+                selected.style.backgroundColor = vehicle.color;
+                selected.style.color = vehicle.color ? getContrastColor(vehicle.color) : "";
+            }
+        }
+
+        selected.dataset.value = value;
+        selected.textContent = label;
+        selected.className = `badge-selected ${cls}`;
+    }
+}
+
+async function savePatrouilles() {
+    const data = {};
+
+    document.querySelectorAll(".badge-selected").forEach(el => {
+        data[el.id] = el.dataset.value || "";
+    });
+
+    try {
+        await fetch((window.API_BASE || "") + "/api/patrouilles", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data)
+        });
+    } catch (err) {
+        console.error("Erreur lors de la sauvegarde:", err);
+    }
+}
+
+async function init() {
+    try {
+        const usersRes = await fetch((window.API_BASE || "") + "/api/effectifs");
+        effectifs = await usersRes.json();
+
+        const vehiclesRes = await fetch((window.API_BASE || "") + "/api/vehicules/list");
+        if (vehiclesRes.ok) {
+            const configuredVehicles = await vehiclesRes.json();
+            VEHICULES = { ...VEHICULES, ...configuredVehicles };
+        }
+
+        const patRes = await fetch((window.API_BASE || "") + "/api/patrouilles");
+        saved = await patRes.json();
+
+        render();
+    } catch (err) {
+        console.error("Erreur lors du chargement:", err);
+        document.getElementById("patrols").innerHTML = "<p style='color: #d4af37;'>Erreur lors du chargement des données.</p>";
+    }
+}
+
+document.addEventListener("click", function(e) {
+    if (!e.target.closest(".badge-select")) {
+        document.querySelectorAll(".badge-select").forEach(el => {
+            el.classList.remove("open");
+        });
+    }
+});
+
+init();
+</script>
+
+</body>
+</html>

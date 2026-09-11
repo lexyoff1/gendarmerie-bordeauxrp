@@ -1,0 +1,435 @@
+@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap");
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: #0d1321;
+    color: white;
+    font-family: "Outfit", Arial, sans-serif;
+    line-height: 1.6;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+header {
+    background: #111a2e;
+    border-bottom: 3px solid #1f4ea8;
+    padding: 1.5rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.logo {
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
+    filter: drop-shadow(0 0 4px rgba(31, 78, 168, 0.3));
+}
+
+.brand h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #fff;
+}
+
+.brand p {
+    margin-top: 0.25rem;
+    color: #c9d6ff;
+    font-size: 0.85rem;
+}
+
+nav {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+nav a {
+    color: white;
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    transition: color 0.3s ease;
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+
+nav a:hover {
+    color: #7da7ff;
+}
+
+section {
+    flex: 1;
+    padding: 2.5rem;
+    max-width: 1400px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+section h2 {
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+    color: #fff;
+    border-bottom: 2px solid #1f4ea8;
+    padding-bottom: 0.75rem;
+}
+
+.hero {
+    min-height: 430px;
+    background:
+        linear-gradient(rgba(10, 20, 45, 0.75), rgba(10, 20, 45, 0.9)),
+        url("/assets/background-gendarmerie.png");
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+}
+
+.hero h2 {
+    font-size: 3rem;
+    margin-bottom: 0.5rem;
+    font-weight: 800;
+}
+
+.card,
+.id-card {
+    background: #151f36;
+    border-left: 4px solid #2f66d0;
+    border-radius: 10px;
+    padding: 1.5rem;
+    margin: 1rem 0;
+    transition: all 0.3s ease;
+}
+
+.card:hover,
+.id-card:hover {
+    background: #1a2847;
+    box-shadow: 0 4px 12px rgba(31, 78, 168, 0.2);
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+}
+
+button {
+    background: #1f4ea8;
+    color: white;
+    border: none;
+    padding: 0.7rem 1.25rem;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-top: 0.75rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    font-size: 0.95rem;
+}
+
+button:hover {
+    background: #163c84;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(31, 78, 168, 0.3);
+}
+
+button:active {
+    transform: translateY(0);
+}
+
+button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+button.danger {
+    background: #b91c1c;
+}
+
+button.danger:hover {
+    background: #7f1d1d;
+    box-shadow: 0 4px 12px rgba(185, 28, 28, 0.3);
+}
+
+input,
+textarea,
+select {
+    width: 100%;
+    max-width: 600px;
+    padding: 0.75rem;
+    margin: 0.5rem 0 1rem;
+    background: #202c49;
+    color: white;
+    border: 1px solid #2f66d0;
+    border-radius: 6px;
+    display: block;
+    font-family: "Outfit", Arial, sans-serif;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+    outline: none;
+    border-color: #7da7ff;
+    background: #253351;
+    box-shadow: 0 0 8px rgba(31, 78, 168, 0.3);
+}
+
+textarea {
+    resize: vertical;
+    min-height: 110px;
+}
+
+label {
+    display: block;
+    margin-top: 1rem;
+    font-weight: 600;
+    color: #fff;
+}
+
+.avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 3px solid #2f66d0;
+    object-fit: cover;
+}
+
+.effectif-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 2px solid #2f66d0;
+    object-fit: cover;
+}
+
+.ticket-avatar {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    border: 2px solid #2f66d0;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.cours-image,
+.course-image {
+    width: 100%;
+    max-width: 900px;
+    border-radius: 10px;
+    margin-top: 1.5rem;
+    display: block;
+}
+
+.quote {
+    background: #202c49;
+    border-left: 4px solid #2f66d0;
+    padding: 1rem;
+    border-radius: 6px;
+    margin: 1rem 0;
+    font-style: italic;
+    color: #d0d8f7;
+}
+
+.muted {
+    color: #c9d6ff;
+}
+
+.source {
+    color: #9db7ff;
+    font-style: italic;
+    font-size: 0.9rem;
+}
+
+hr {
+    border: none;
+    border-top: 1px solid #2f66d0;
+    margin: 1.5rem 0;
+    opacity: 0.5;
+}
+
+ul {
+    line-height: 1.8;
+    margin-left: 1.5rem;
+}
+
+ul li {
+    margin-bottom: 0.5rem;
+}
+
+a {
+    color: #7da7ff;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+a:hover {
+    color: #a8c5ff;
+    text-decoration: underline;
+}
+
+a button {
+    text-decoration: none;
+}
+
+.effectif-user {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    margin: 0.5rem 0;
+    background: #202c49;
+    border-radius: 8px;
+    border-left: 3px solid #2f66d0;
+    transition: all 0.3s ease;
+}
+
+.effectif-user:hover {
+    background: #253351;
+}
+
+.ticket-message {
+    display: flex;
+    gap: 0.75rem;
+    background: #1b2742;
+    border-left: 4px solid #2f66d0;
+    border-radius: 10px;
+    padding: 1rem;
+    margin: 0.75rem 0;
+}
+
+.ticket-message p {
+    margin: 0;
+    flex: 1;
+}
+
+.footer {
+    margin-top: auto;
+    padding: 2rem;
+    text-align: center;
+    background: #111a2e;
+    border-top: 3px solid #1f4ea8;
+}
+
+.footer p {
+    margin: 0.5rem 0;
+    color: #c9d6ff;
+    font-size: 0.9rem;
+}
+
+@media (max-width: 1200px) {
+    .grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 900px) {
+    .grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+        padding: 1rem 1.5rem;
+    }
+
+    nav {
+        width: 100%;
+    }
+
+    nav a {
+        flex: 1;
+        text-align: center;
+        margin: 0;
+    }
+
+    section {
+        padding: 1.5rem 1rem;
+    }
+
+    section h2 {
+        font-size: 1.5rem;
+    }
+
+    .hero h2 {
+        font-size: 2rem;
+    }
+
+    .grid {
+        grid-template-columns: 1fr;
+    }
+
+    .cours-image,
+    .course-image {
+        max-width: 100%;
+    }
+
+    input,
+    textarea,
+    select {
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    header {
+        padding: 0.75rem 1rem;
+    }
+
+    .brand h1 {
+        font-size: 1.25rem;
+    }
+
+    section {
+        padding: 1rem 0.75rem;
+    }
+
+    section h2 {
+        font-size: 1.25rem;
+    }
+
+    .hero h2 {
+        font-size: 1.5rem;
+    }
+
+    button,
+    input,
+    textarea,
+    select {
+        font-size: 16px;
+    }
+
+    .ticket-message {
+        flex-direction: column;
+    }
+
+    .ticket-avatar {
+        width: 32px;
+        height: 32px;
+    }
+}

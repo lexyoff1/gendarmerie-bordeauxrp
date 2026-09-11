@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Candidature - Gendarmerie Nationale</title>
+    <style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  color: #e0e0e0;
+  line-height: 1.6;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+header {
+  background: rgba(0, 0, 0, 0.5);
+  border-bottom: 3px solid #d4af37;
+  padding: 2rem;
+  backdrop-filter: blur(10px);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.logo {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 8px rgba(212, 175, 55, 0.5));
+}
+
+.brand h1 {
+  font-size: 2.5rem;
+  color: #d4af37;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+}
+
+.back-btn {
+  display: inline-block;
+  margin-left: auto;
+  background: rgba(212, 175, 55, 0.1);
+  color: #d4af37;
+  border: 2px solid #d4af37;
+  padding: 0.6rem 1.5rem;
+  border-radius: 6px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 600;
+}
+
+.back-btn:hover {
+  background: #d4af37;
+  color: #1a1a2e;
+  transform: translateY(-2px);
+}
+
+main {
+  flex: 1;
+  padding: 3rem 2rem;
+  max-width: 800px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+h1 {
+  font-size: 2.5rem;
+  color: #d4af37;
+  margin-bottom: 2rem;
+  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #d4af37;
+  font-weight: 600;
+}
+
+input,
+textarea,
+select {
+  width: 100%;
+  padding: 0.8rem;
+  border: 2px solid #d4af37;
+  border-radius: 6px;
+  background: rgba(212, 175, 55, 0.05);
+  color: #e0e0e0;
+  font-family: inherit;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  background: rgba(212, 175, 55, 0.15);
+  box-shadow: 0 0 8px rgba(212, 175, 55, 0.3);
+}
+
+select option {
+  background: #1a1a2e;
+  color: #f4f4f4;
+}
+
+select {
+  color-scheme: dark;
+}
+
+select option:checked,
+select option:hover {
+  background: #8f731d;
+  color: #ffffff;
+}
+
+textarea {
+  resize: vertical;
+  min-height: 120px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+.submit-btn {
+  background: linear-gradient(135deg, #d4af37 0%, #c9a227 100%);
+  color: #1a1a2e;
+  border: none;
+  padding: 1rem 2.5rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  box-shadow: 0 8px 24px rgba(212, 175, 55, 0.3);
+  width: 100%;
+}
+
+.submit-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 32px rgba(212, 175, 55, 0.4);
+}
+
+.submit-btn:active {
+  transform: translateY(-1px);
+}
+
+.success-message {
+  background: rgba(76, 175, 80, 0.2);
+  border: 2px solid #4CAF50;
+  color: #90EE90;
+  padding: 1rem;
+  border-radius: 6px;
+  margin-bottom: 2rem;
+  display: none;
+  text-align: center;
+}
+
+footer {
+  background: rgba(0, 0, 0, 0.7);
+  border-top: 2px solid #d4af37;
+  padding: 2rem;
+  text-align: center;
+  color: #b0b0b0;
+  font-size: 0.9rem;
+  margin-top: auto;
+}
+
+footer p {
+  margin: 0.5rem 0;
+}
+
+@media (max-width: 768px) {
+  header {
+    padding: 1.5rem;
+  }
+
+  .brand {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .back-btn {
+    margin-left: 0;
+    margin-top: 1rem;
+    width: 100%;
+    text-align: center;
+  }
+
+  .brand h1 {
+    font-size: 1.8rem;
+  }
+
+  main {
+    padding: 2rem 1.5rem;
+  }
+
+  h1 {
+    font-size: 1.8rem;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  header {
+    padding: 1rem;
+  }
+
+  .brand h1 {
+    font-size: 1.5rem;
+  }
+
+  .logo {
+    width: 60px;
+    height: 60px;
+  }
+
+  main {
+    padding: 1.5rem 1rem;
+  }
+
+  h1 {
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  input,
+  textarea,
+  select {
+    padding: 0.7rem;
+  }
+
+  .submit-btn {
+    padding: 0.8rem 1.5rem;
+    font-size: 1rem;
+  }
+
+  footer {
+    padding: 1.5rem;
+  }
+
+  footer p {
+    font-size: 0.85rem;
+  }
+}
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="brand">
+        <img src="/assets/logo-gendarmerie.png" class="logo" alt="Logo Gendarmerie">
+        <h1>Gendarmerie Nationale</h1>
+        <a href="/" class="back-btn">← Retour</a>
+    </div>
+</header>
+
+<main>
+    <h1>Formulaire de Candidature</h1>
+    
+    <div class="success-message" id="successMessage">
+        ✓ Votre candidature a été envoyée avec succès. Redirection en cours...
+    </div>
+
+    <form id="candidatureForm">
+        <div class="form-row">
+            <div class="form-group">
+                <label for="nom">Nom *</label>
+                <input type="text" id="nom" name="nom" required>
+            </div>
+            <div class="form-group">
+                <label for="prenom">Prénom *</label>
+                <input type="text" id="prenom" name="prenom" required>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="email">Email *</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            <div class="form-group">
+                <label for="telephone">Téléphone *</label>
+                <input type="tel" id="telephone" name="telephone" required>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="dateNaissance">Date de naissance *</label>
+            <input type="date" id="dateNaissance" name="dateNaissance" required>
+        </div>
+
+        <div class="form-group">
+            <label for="diplome">Diplôme le plus élevé *</label>
+            <select id="diplome" name="diplome" required>
+                <option value="">-- Sélectionner --</option>
+                <option value="bac">Baccalauréat</option>
+                <option value="bac+2">Bac+2</option>
+                <option value="bac+3">Bac+3</option>
+                <option value="bac+5">Bac+5 ou plus</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="experience">Expérience professionnelle *</label>
+            <textarea id="experience" name="experience" placeholder="Décrivez votre expérience..." required></textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="motivation">Lettre de motivation *</label>
+            <textarea id="motivation" name="motivation" placeholder="Pourquoi souhaitez-vous rejoindre la Gendarmerie Nationale ?" required></textarea>
+        </div>
+
+        <button type="submit" class="submit-btn">Envoyer ma candidature</button>
+    </form>
+</main>
+
+<footer>
+    <p>© 2026 lexy_off1 — Tous droits réservés</p>
+</footer>
+
+<script>
+document.getElementById('candidatureForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const formData = {
+        nom: document.getElementById('nom').value,
+        prenom: document.getElementById('prenom').value,
+        email: document.getElementById('email').value,
+        telephone: document.getElementById('telephone').value,
+        dateNaissance: document.getElementById('dateNaissance').value,
+        diplome: document.getElementById('diplome').value,
+        experience: document.getElementById('experience').value,
+        motivation: document.getElementById('motivation').value
+    };
+
+    fetch("/api/candidatures", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
+    })
+    .then(async res => {
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Impossible d'envoyer la candidature.");
+        return data;
+    })
+    .then(data => {
+        document.getElementById('successMessage').style.display = 'block';
+        document.getElementById('candidatureForm').reset();
+        
+        setTimeout(() => {
+            window.location.href = '/';
+        }, 3000);
+    })
+    .catch(err => {
+        console.error('Erreur:', err);
+        alert('Une erreur est survenue. Veuillez réessayer.');
+    });
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Effectifs GN</title>
+    <style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  color: #e0e0e0;
+  line-height: 1.6;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+header {
+  background: rgba(0, 0, 0, 0.5);
+  border-bottom: 3px solid #d4af37;
+  padding: 2rem;
+  backdrop-filter: blur(10px);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.logo {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 8px rgba(212, 175, 55, 0.5));
+}
+
+.brand h1 {
+  font-size: 2.5rem;
+  color: #d4af37;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+}
+
+.brand p {
+  font-size: 0.95rem;
+  color: #b0b0b0;
+}
+
+nav {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+nav a {
+  color: #d4af37;
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  border: 1px solid #d4af37;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+nav a:hover {
+  background: #d4af37;
+  color: #1a1a2e;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+}
+
+section {
+  flex: 1;
+  padding: 3rem 2rem;
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+section h2 {
+  font-size: 2rem;
+  color: #d4af37;
+  margin-bottom: 2rem;
+  border-bottom: 2px solid #d4af37;
+  padding-bottom: 0.8rem;
+}
+
+.card {
+  background: rgba(30, 30, 50, 0.8);
+  border-left: 4px solid #d4af37;
+  border-radius: 8px;
+  padding: 2rem;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  margin-bottom: 2rem;
+}
+
+.card h2 {
+  font-size: 1.5rem;
+  color: #d4af37;
+  margin-bottom: 1.5rem;
+  border: none;
+  padding: 0;
+}
+
+.card h3 {
+  font-size: 1.1rem;
+  color: #e0d050;
+  margin: 1.5rem 0 1rem 0;
+  padding-top: 1rem;
+}
+
+.card hr {
+  border: none;
+  border-top: 1px solid rgba(212, 175, 55, 0.2);
+  margin: 0;
+}
+
+.effectif-user {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 0;
+  border-bottom: 1px solid rgba(212, 175, 55, 0.1);
+  transition: background 0.3s ease;
+}
+
+.effectif-user:hover {
+  background: rgba(212, 175, 55, 0.05);
+  padding-left: 0.5rem;
+  border-radius: 4px;
+}
+
+.effectif-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 2px solid #d4af37;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.effectif-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.effectif-info span {
+  color: #e0e0e0;
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+.commandement-badge {
+  display: inline-block;
+  background: linear-gradient(135deg, #d4af37 0%, #c9a227 100%);
+  color: #1a1a2e;
+  padding: 0.2rem 0.6rem;
+  border-radius: 3px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  width: fit-content;
+}
+
+.muted {
+  color: #808080;
+  font-style: italic;
+  padding: 1rem 0;
+}
+
+footer {
+  background: rgba(0, 0, 0, 0.7);
+  border-top: 2px solid #d4af37;
+  padding: 2rem;
+  text-align: center;
+  color: #b0b0b0;
+  font-size: 0.9rem;
+  margin-top: auto;
+}
+
+footer p {
+  margin: 0.5rem 0;
+}
+
+@media (max-width: 768px) {
+  header {
+    padding: 1.5rem;
+  }
+
+  .brand {
+    flex-direction: column;
+    text-align: center;
+    margin-bottom: 1rem;
+  }
+
+  .brand h1 {
+    font-size: 1.8rem;
+  }
+
+  nav {
+    gap: 0.6rem;
+  }
+
+  nav a {
+    font-size: 0.8rem;
+    padding: 0.4rem 0.6rem;
+  }
+
+  section {
+    padding: 1.5rem 1rem;
+  }
+
+  section h2 {
+    font-size: 1.5rem;
+  }
+
+  .card {
+    padding: 1.5rem;
+  }
+
+  .card h2 {
+    font-size: 1.3rem;
+  }
+
+  .card h3 {
+    font-size: 1rem;
+  }
+
+  .effectif-user {
+    padding: 0.8rem 0;
+  }
+
+  .effectif-avatar {
+    width: 40px;
+    height: 40px;
+  }
+
+  .effectif-info span {
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  header {
+    padding: 1rem;
+  }
+
+  .brand h1 {
+    font-size: 1.5rem;
+  }
+
+  nav a {
+    font-size: 0.7rem;
+    padding: 0.3rem 0.5rem;
+  }
+
+  .card {
+    padding: 1rem;
+  }
+
+  .effectif-info span {
+    font-size: 0.85rem;
+  }
+}
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="brand">
+        <img src="/assets/logo-gendarmerie.png" class="logo" alt="Logo Gendarmerie">
+        <div>
+            <h1>Effectifs de la Gendarmerie</h1>
+            <p>Gendarmerie Nationale</p>
+        </div>
+    </div>
+
+    <nav>
+        <a href="/dashboard.html">Dashboard</a>
+        <a href="/cours.html">Cours</a>
+        <a href="/logout">Déconnexion</a>
+    </nav>
+</header>
+
+<section>
+    <h2>Annuaire des effectifs</h2>
+    <div id="effectifs">Chargement...</div>
+</section>
+
+<script>
+const categories = [
+    {
+        nom: "OFS ・ Officiers Supérieurs",
+        grades: [
+            "COL ・ Colonel",
+            "LCL ・ Lieutenant-Colonel",
+            "CEN ・ Chef d'Escadron"
+        ]
+    },
+    {
+        nom: "OFB ・ Officiers Subalternes",
+        grades: [
+            "CNE ・ Capitaine",
+            "LTN ・ Lieutenant",
+            "SLT ・ Sous-Lieutenant",
+            "ASP ・ Aspirant"
+        ]
+    },
+    {
+        nom: "SOP ・ Sous-Officiers Supérieurs",
+        grades: [
+            "MAJ ・ Major",
+            "ADC ・ Adjudant-Chef",
+            "ADJ ・ Adjudant"
+        ]
+    },
+    {
+        nom: "SOB ・ Sous-Officiers Subalternes",
+        grades: [
+            "MDC ・ Maréchal des Logis-Chef",
+            "GDC ・ Gendarme de Carrière",
+            "GDS ・ Gendarme Sous Contrat",
+            "ELG ・ Élève Gendarme"
+        ]
+    },
+    {
+        nom: "GAV ・ Gendarmes Adjoints Volontaires",
+        grades: [
+            "MDL ・ Maréchal des Logis",
+            "BRC ・ Brigadier-Chef",
+            "BRI ・ Brigadier",
+            "GAV ・ Gendarme Adjoint Volontaire"
+        ]
+    }
+];
+
+function cleanNomPrenom(nom) {
+    if (!nom) return "";
+    return nom
+        .replace(/^(COL|LCL|CEN|CNE|LTN|SLT|ASP|MAJ|ADC|ADJ|MDC|GDC|GDS|ELG|MDL|BRC|BRI|GAV)\s*・\s*/i, "")
+        .replace(/^(COL|LCL|CEN|CNE|LTN|SLT|ASP|MAJ|ADC|ADJ|MDC|GDC|GDS|ELG|MDL|BRC|BRI|GAV)\s*-\s*\d+\s*[•·]\s*/i, "");
+}
+
+async function loadEffectifs() {
+    try {
+        const res = await fetch((window.API_BASE || "") + "/api/effectifs");
+        const users = await res.json();
+
+        const box = document.getElementById("effectifs");
+        box.innerHTML = "";
+
+        categories.forEach(cat => {
+            let html = `
+                <div class="card">
+                    <h2>${cat.nom}</h2>
+            `;
+
+            cat.grades.forEach((grade, idx) => {
+                const membres = users.filter(u => u.grade === grade);
+
+                if (idx > 0) {
+                    html += `<hr>`;
+                }
+
+                html += `<h3>${grade}</h3>`;
+
+                if (membres.length === 0) {
+                    html += `<p class="muted">Aucun gendarme n'est à ce grade actuellement.</p>`;
+                } else {
+                    membres.forEach(m => {
+                        const avatar = m.avatar
+                            ? `https://cdn.discordapp.com/avatars/${m.id}/${m.avatar}.png`
+                            : "https://cdn.discordapp.com/embed/avatars/0.png";
+
+                        const commandement = m.commandement
+                            ? `<small class="commandement-badge">${m.commandement}</small>`
+                            : "";
+
+                        html += `
+                            <div class="effectif-user">
+                                <img src="${avatar}" class="effectif-avatar" alt="Avatar">
+                                <div class="effectif-info">
+                                    <span>${cleanNomPrenom(m.nomPrenom || m.username)}</span>
+                                    ${commandement}
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+            });
+
+            html += `</div>`;
+            box.innerHTML += html;
+        });
+    } catch (err) {
+        document.getElementById("effectifs").innerHTML = `<div class="card"><p class="muted">Erreur : ${err.message}</p></div>`;
+    }
+}
+
+loadEffectifs();
+</script>
+
+<footer class="footer">
+    <p>© 2026 lexy_off1 — Tous droits réservés</p>
+</footer>
+
+</body>
+</html>

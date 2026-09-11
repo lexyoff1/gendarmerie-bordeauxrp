@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tickets Commandement - Gendarmerie Nationale</title>
+    <style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  color: #e0e0e0;
+  line-height: 1.6;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+header {
+  background: rgba(0, 0, 0, 0.5);
+  border-bottom: 3px solid #d4af37;
+  padding: 2rem;
+  backdrop-filter: blur(10px);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.brand-left {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.logo {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 8px rgba(212, 175, 55, 0.5));
+}
+
+.brand h1 {
+  font-size: 2.5rem;
+  color: #d4af37;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+}
+
+.brand p {
+  color: #b0b0b0;
+  font-size: 0.95rem;
+}
+
+nav {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+nav a {
+  color: #e0e0e0;
+  text-decoration: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+  font-weight: 600;
+}
+
+nav a:hover {
+  background: rgba(212, 175, 55, 0.1);
+  color: #d4af37;
+}
+
+main {
+  flex: 1;
+  padding: 3rem 2rem;
+  max-width: 1400px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+main > h2 {
+  font-size: 2.5rem;
+  color: #d4af37;
+  margin-bottom: 2rem;
+  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+.card {
+  background: rgba(212, 175, 55, 0.05);
+  border: 2px solid #d4af37;
+  border-radius: 8px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  background: rgba(212, 175, 55, 0.15);
+  box-shadow: 0 8px 20px rgba(212, 175, 55, 0.2);
+}
+
+.card h2 {
+  color: #d4af37;
+  margin-bottom: 1.5rem;
+  font-size: 1.5rem;
+}
+
+label {
+  display: block;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+  color: #d4af37;
+  font-weight: 600;
+}
+
+select,
+input[type="text"],
+textarea {
+  width: 100%;
+  padding: 0.8rem;
+  background: rgba(212, 175, 55, 0.05);
+  color: #e0e0e0;
+  border: 2px solid #d4af37;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+}
+
+select {
+  color-scheme: dark;
+  background-color: #242424;
+}
+
+select option {
+  background: #161616;
+  color: #f4f4f4;
+}
+
+select option:checked,
+select option:hover {
+  background: #8f731d;
+  color: #ffffff;
+}
+
+select:focus,
+input[type="text"]:focus,
+textarea:focus {
+  outline: none;
+  background: rgba(212, 175, 55, 0.15);
+  box-shadow: 0 0 8px rgba(212, 175, 55, 0.3);
+}
+
+textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+button {
+  background: linear-gradient(135deg, #d4af37 0%, #c9a227 100%);
+  color: #1a1a2e;
+  border: none;
+  padding: 0.7rem 1.5rem;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-top: 1rem;
+  margin-right: 0.5rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+}
+
+button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(212, 175, 55, 0.4);
+}
+
+button:active {
+  transform: translateY(0);
+}
+
+button.danger {
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+  color: white;
+}
+
+button.danger:hover {
+  box-shadow: 0 8px 20px rgba(220, 38, 38, 0.4);
+}
+
+.ticket-layout {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 2rem;
+}
+
+.ticket-sidebar {
+  background: rgba(212, 175, 55, 0.05);
+  border: 2px solid #d4af37;
+  border-radius: 8px;
+  padding: 1.5rem;
+  height: fit-content;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.ticket-sidebar h3 {
+  color: #d4af37;
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1rem;
+  margin-bottom: 1rem;
+  font-weight: 700;
+  border-bottom: 2px solid #d4af37;
+  padding-bottom: 0.75rem;
+}
+
+#myTicketsList,
+#allTicketsList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.ticket-item {
+  padding: 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  border: 2px solid #d4af37;
+  transition: all 0.3s ease;
+  background: rgba(26, 26, 46, 0.8);
+}
+
+.ticket-item:hover {
+  transform: translateX(4px);
+  background: rgba(212, 175, 55, 0.15);
+  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.2);
+}
+
+.ticket-item strong {
+  display: block;
+  color: #d4af37;
+  font-size: 0.85rem;
+  margin-bottom: 0.25rem;
+}
+
+.ticket-item span {
+  display: block;
+  color: #e0e0e0;
+  font-size: 0.85rem;
+  margin-bottom: 0.5rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ticket-item small {
+  color: #b0b0b0;
+  font-size: 0.75rem;
+}
+
+.ticket-claimed {
+  border-color: #fbbf24;
+  background: rgba(251, 191, 36, 0.1);
+}
+
+.ticket-closed {
+  border-color: #ef4444;
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.ticket-panel {
+  background: rgba(212, 175, 55, 0.05);
+  border: 2px solid #d4af37;
+  border-radius: 8px;
+  padding: 2rem;
+  min-height: 450px;
+  overflow-y: auto;
+  max-height: 80vh;
+}
+
+.ticket-detail h2 {
+  font-size: 1.5rem;
+  color: #d4af37;
+  margin-bottom: 1.5rem;
+  border-bottom: 2px solid #d4af37;
+  padding-bottom: 0.75rem;
+}
+
+.ticket-detail p {
+  margin-bottom: 0.75rem;
+  color: #e0e0e0;
+}
+
+.ticket-detail p strong {
+  color: #d4af37;
+}
+
+hr {
+  border: none;
+  border-top: 2px solid #d4af37;
+  margin: 1.5rem 0;
+  opacity: 0.3;
+}
+
+.ticket-message {
+  display: flex;
+  gap: 1rem;
+  background: rgba(26, 26, 46, 0.8);
+  border-left: 4px solid #d4af37;
+  border-radius: 6px;
+  padding: 1rem;
+  margin: 1rem 0;
+}
+
+.ticket-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 2px solid #d4af37;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.ticket-message div {
+  flex: 1;
+}
+
+.ticket-message strong {
+  display: block;
+  color: #d4af37;
+  margin-bottom: 0.25rem;
+}
+
+.ticket-message p {
+  margin: 0.5rem 0;
+  color: #e0e0e0;
+  word-break: break-word;
+}
+
+.ticket-message small {
+  color: #b0b0b0;
+  font-size: 0.8rem;
+}
+
+.muted {
+  color: #b0b0b0;
+  font-size: 0.9rem;
+}
+
+footer {
+  background: rgba(0, 0, 0, 0.7);
+  border-top: 2px solid #d4af37;
+  padding: 2rem;
+  text-align: center;
+  color: #b0b0b0;
+  font-size: 0.9rem;
+  margin-top: auto;
+}
+
+footer p {
+  margin: 0.5rem 0;
+}
+
+@media (max-width: 1200px) {
+  main {
+    padding: 2rem 1.5rem;
+  }
+}
+
+@media (max-width: 900px) {
+  .ticket-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .ticket-sidebar {
+    max-height: 300px;
+  }
+
+  .ticket-panel {
+    max-height: 500px;
+  }
+}
+
+@media (max-width: 768px) {
+  header {
+    padding: 1.5rem;
+  }
+
+  .brand {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .brand-left {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .brand h1 {
+    font-size: 1.8rem;
+  }
+
+  .logo {
+    width: 60px;
+    height: 60px;
+  }
+
+  nav {
+    width: 100%;
+  }
+
+  nav a {
+    flex: 1;
+    text-align: center;
+  }
+
+  main {
+    padding: 1.5rem 1rem;
+  }
+
+  main > h2 {
+    font-size: 1.8rem;
+  }
+
+  .card {
+    padding: 1.5rem;
+  }
+
+  .ticket-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .ticket-sidebar {
+    max-height: 250px;
+  }
+
+  .ticket-panel {
+    padding: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  header {
+    padding: 1rem;
+  }
+
+  .brand h1 {
+    font-size: 1.5rem;
+  }
+
+  .logo {
+    width: 50px;
+    height: 50px;
+  }
+
+  main {
+    padding: 1rem;
+  }
+
+  button,
+  select,
+  input,
+  textarea {
+    font-size: 16px;
+  }
+
+  .ticket-message {
+    flex-direction: column;
+  }
+
+  .ticket-avatar {
+    width: 40px;
+    height: 40px;
+  }
+
+  footer {
+    padding: 1.5rem;
+  }
+}
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="brand">
+        <div class="brand-left">
+            <img src="logo-gn.png" class="logo" alt="Logo Gendarmerie">
+            <div>
+                <h1>Gendarmerie Nationale</h1>
+                <p>Tickets Commandement</p>
+            </div>
+        </div>
+        <nav>
+            <a href="/dashboard.html">Dashboard</a>
+            <a href="/effectifs.html">Effectifs</a>
+            <a href="/">Accueil</a>
+            <a href="/logout">Déconnexion</a>
+        </nav>
+    </div>
+</header>
+
+<main>
+    <h2>Système de Tickets</h2>
+
+    <div class="card">
+        <h2>Créer un ticket</h2>
+
+        <label for="type">Type *</label>
+        <select id="type">
+            <option value="">-- Sélectionner --</option>
+            <option>Signalement</option>
+            <option>Question</option>
+            <option>Demande de rendez-vous</option>
+            <option>Plainte interne</option>
+            <option>Demande hiérarchique</option>
+            <option>Autre</option>
+        </select>
+
+        <label for="sujet">Sujet *</label>
+        <input id="sujet" type="text" placeholder="Sujet du ticket">
+
+        <label for="message">Message *</label>
+        <textarea id="message" placeholder="Expliquez votre demande..."></textarea>
+
+        <button onclick="createTicket()">Envoyer le ticket</button>
+    </div>
+
+    <div class="ticket-layout">
+        <div class="ticket-sidebar">
+            <h3>Mes tickets</h3>
+            <div id="myTicketsList">Chargement...</div>
+
+            <div id="commandementListBox" style="display:none;">
+                <h3 style="margin-top: 2rem;">Tickets Commandement</h3>
+                <div id="allTicketsList"></div>
+            </div>
+        </div>
+
+        <div class="ticket-panel" id="ticketPanel">
+            <p class="muted">Sélectionne un ticket à gauche.</p>
+        </div>
+    </div>
+</main>
+
+<footer>
+    <p>© 2026 lexy_off1 — Tous droits réservés</p>
+</footer>
+
+<script>
+let myTickets = [];
+let allTickets = [];
+
+function avatarUrl(id, avatar) {
+    return avatar
+        ? `https://cdn.discordapp.com/avatars/${id}/${avatar}.png`
+        : "https://cdn.discordapp.com/embed/avatars/0.png";
+}
+
+function escapeHtml(text) {
+    const map = {
+        '&': '&',
+        '<': '<',
+        '>': '>',
+        '"': '"',
+        "'": '&#039;'
+    };
+    return text.replace(/[&<>"']/g, m => map[m]);
+}
+
+const urlParams = new URLSearchParams(window.location.search);
+const focusTicketId = urlParams.get("id");
+
+async function createTicket() {
+    const type = document.getElementById("type").value.trim();
+    const sujet = document.getElementById("sujet").value.trim();
+    const message = document.getElementById("message").value.trim();
+
+    if (!type || !sujet || !message) {
+        alert("Remplis tous les champs.");
+        return;
+    }
+
+    try {
+        const res = await fetch((window.API_BASE || "") + "/api/tickets-commandement/create", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ type, sujet, message })
+        });
+
+        const data = await res.json();
+
+        if (!data.success) {
+            alert(data.error || "Erreur lors de la création du ticket.");
+            return;
+        }
+
+        alert("Ticket envoyé au commandement.");
+
+        document.getElementById("type").value = "";
+        document.getElementById("sujet").value = "";
+        document.getElementById("message").value = "";
+
+        await loadTickets();
+    } catch (error) {
+        console.error("Erreur createTicket:", error);
+        alert("Erreur de connexion.");
+    }
+}
+
+async function loadTickets() {
+    try {
+        await loadMyTickets();
+        await loadAllTickets();
+
+        if (focusTicketId) {
+            openTicket(focusTicketId);
+        }
+    } catch (error) {
+        console.error("Erreur loadTickets:", error);
+    }
+}
+
+async function loadMyTickets() {
+    try {
+        const res = await fetch((window.API_BASE || "") + "/api/tickets-commandement/mine");
+        if (!res.ok) throw new Error("Erreur");
+        
+        myTickets = await res.json();
+
+        const box = document.getElementById("myTicketsList");
+        box.innerHTML = "";
+
+        if (myTickets.length === 0) {
+            box.innerHTML = `<p class="muted">Aucun ticket.</p>`;
+            return;
+        }
+
+        myTickets.slice().reverse().forEach(ticket => {
+            box.innerHTML += ticketButton(ticket);
+        });
+    } catch (error) {
+        console.error("Erreur loadMyTickets:", error);
+        document.getElementById("myTicketsList").innerHTML = "<p class=\"muted\">Erreur de chargement.</p>";
+    }
+}
+
+async function loadAllTickets() {
+    try {
+        const res = await fetch((window.API_BASE || "") + "/api/tickets-commandement/all");
+
+        if (res.status === 403) {
+            return;
+        }
+
+        if (!res.ok) throw new Error("Erreur");
+        
+        allTickets = await res.json();
+
+        document.getElementById("commandementListBox").style.display = "block";
+
+        const box = document.getElementById("allTicketsList");
+        box.innerHTML = "";
+
+        if (allTickets.length === 0) {
+            box.innerHTML = `<p class="muted">Aucun ticket.</p>`;
+            return;
+        }
+
+        allTickets.slice().reverse().forEach(ticket => {
+            box.innerHTML += ticketButton(ticket);
+        });
+    } catch (error) {
+        console.error("Erreur loadAllTickets:", error);
+    }
+}
+
+function ticketButton(ticket) {
+    let statusClass = "ticket-open";
+
+    if (ticket.statut === "Pris en charge") statusClass = "ticket-claimed";
+    if (ticket.statut === "Fermé") statusClass = "ticket-closed";
+
+    return `
+        <div class="ticket-item ${statusClass}" onclick="openTicket(${ticket.id})">
+            <strong>TICKET-${String(ticket.id).slice(-7)}</strong>
+            <span>${escapeHtml(ticket.sujet)}</span>
+            <small>${escapeHtml(ticket.statut)}</small>
+        </div>
+    `;
+}
+
+function openTicket(id) {
+    const ticket = [...allTickets, ...myTickets].find(t => String(t.id) === String(id));
+
+    if (!ticket) return;
+
+    const isCommandementTicket = allTickets.some(t => String(t.id) === String(id));
+    const canReply = ticket.statut !== "Fermé";
+
+    const reponses = (ticket.reponses || []).map(r => `
+        <div class="ticket-message">
+            <img
+                src="${avatarUrl(r.auteurId, r.avatar)}"
+                alt="${escapeHtml(r.auteur)}"
+                class="ticket-avatar"
+            >
+            <div>
+                <strong>${escapeHtml(r.auteur)}</strong>
+                <p>${escapeHtml(r.message)}</p>
+                <small>${new Date(r.createdAt).toLocaleString("fr-FR")}</small>
+            </div>
+        </div>
+    `).join("");
+
+    let actionButtons = "";
+
+    if (canReply) {
+        if (isCommandementTicket) {
+            if (ticket.statut !== "Fermé") {
+                if (!ticket.claimedBy) {
+                    actionButtons += `<button onclick="claimTicket(${ticket.id})">Prendre en charge</button>`;
+                }
+                actionButtons += `<button onclick="archiveTicket(${ticket.id})">Archiver</button>`;
+                actionButtons += `<button class="danger" onclick="closeTicket(${ticket.id})">Fermer</button>`;
+            } else {
+                actionButtons += `<button onclick="reopenTicket(${ticket.id})">Réouvrir</button>`;
+            }
+        }
+        actionButtons += `<button onclick="replyTicket(${ticket.id})">Envoyer</button>`;
+    }
+
+    document.getElementById("ticketPanel").innerHTML = `
+        <div class="ticket-detail">
+            <h2>#TICKET-${String(ticket.id).slice(-7)}</h2>
+
+            <p><strong>Objet :</strong> ${escapeHtml(ticket.sujet)}</p>
+            <p><strong>Type :</strong> ${escapeHtml(ticket.type)}</p>
+            <p><strong>Auteur :</strong> ${escapeHtml(ticket.auteur)}</p>
+            <p><strong>Statut :</strong> ${escapeHtml(ticket.statut)}</p>
+            <p><strong>Pris en charge par :</strong> ${ticket.claimedBy ? escapeHtml(ticket.claimedBy) : "Personne"}</p>
+            <p><strong>Créé le :</strong> ${new Date(ticket.createdAt).toLocaleString("fr-FR")}</p>
+
+            <hr>
+
+            <div class="ticket-message">
+                <img
+                    src="${avatarUrl(ticket.auteurId, ticket.auteurAvatar)}"
+                    alt="${escapeHtml(ticket.auteur)}"
+                    class="ticket-avatar"
+                >
+                <div>
+                    <strong>${escapeHtml(ticket.auteur)}</strong>
+                    <p>${escapeHtml(ticket.message)}</p>
+                    <small>${new Date(ticket.createdAt).toLocaleString("fr-FR")}</small>
+                </div>
+            </div>
+
+            ${reponses}
+
+            ${canReply ? `
+                <label for="reply-${ticket.id}">Message</label>
+                <textarea id="reply-${ticket.id}" placeholder="Écrire un message..."></textarea>
+
+                ${actionButtons}
+            ` : `<p class="muted">Ce ticket est fermé.</p>`}
+        </div>
+    `;
+}
+
+async function replyTicket(id) {
+    try {
+        const textarea = document.getElementById(`reply-${id}`);
+        const message = textarea.value.trim();
+
+        if (!message) {
+            alert("Écris un message.");
+            return;
+        }
+
+        const res = await fetch(`${window.API_BASE || ""}/api/tickets-commandement/${id}/reply`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ message })
+        });
+
+        const data = await res.json();
+
+        if (!data.success) {
+            alert(data.error || "Erreur lors de l'envoi.");
+            return;
+        }
+
+        await loadTickets();
+        openTicket(id);
+    } catch (error) {
+        console.error("Erreur replyTicket:", error);
+        alert("Erreur de connexion.");
+    }
+}
+
+async function claimTicket(id) {
+    try {
+        const res = await fetch(`${window.API_BASE || ""}/api/tickets-commandement/${id}/claim`, {
+            method: "POST"
+        });
+
+        const data = await res.json();
+
+        if (!data.success) {
+            alert(data.error || "Erreur.");
+            return;
+        }
+
+        await loadTickets();
+        openTicket(id);
+    } catch (error) {
+        console.error("Erreur claimTicket:", error);
+        alert("Erreur de connexion.");
+    }
+}
+
+async function archiveTicket(id) {
+    if (!confirm("Archiver ce ticket ?")) return;
+
+    try {
+        const res = await fetch(`${window.API_BASE || ""}/api/tickets-commandement/${id}/archive`, {
+            method: "POST"
+        });
+
+        const data = await res.json();
+
+        if (!data.success) {
+            alert(data.error || "Erreur.");
+            return;
+        }
+
+        await loadTickets();
+        document.getElementById("ticketPanel").innerHTML = `<p class="muted">Ticket archivé.</p>`;
+    } catch (error) {
+        console.error("Erreur archiveTicket:", error);
+        alert("Erreur de connexion.");
+    }
+}
+
+async function closeTicket(id) {
+    if (!confirm("Fermer ce ticket ?")) return;
+
+    try {
+        const res = await fetch(`${window.API_BASE || ""}/api/tickets-commandement/${id}/close`, {
+            method: "POST"
+        });
+
+        const data = await res.json();
+
+        if (!data.success) {
+            alert(data.error || "Erreur.");
+            return;
+        }
+
+        await loadTickets();
+    } catch (error) {
+        console.error("Erreur closeTicket:", error);
+        alert("Erreur de connexion.");
+    }
+}
+
+async function reopenTicket(id) {
+    try {
+        const res = await fetch(`${window.API_BASE || ""}/api/tickets-commandement/${id}/reopen`, {
+            method: "POST"
+        });
+
+        const data = await res.json();
+
+        if (!data.success) {
+            alert(data.error || "Erreur.");
+            return;
+        }
+
+        alert("Ticket réouvert.");
+        await loadTickets();
+    } catch (error) {
+        console.error("Erreur reopenTicket:", error);
+        alert("Erreur de connexion.");
+    }
+}
+
+loadTickets();
+</script>
+
+</body>
+</html>
