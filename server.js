@@ -27,7 +27,7 @@ Sujet : ${ticket.sujet}
 Auteur : ${ticket.auteur}
 
 Lien :
-https://gendarmerie-bordeauxrp.onrender.com/tickets-commandement.html?id=${ticket.id}`
+http://localhost:3000/tickets-commandement?id=${ticket.id}`
     );
 }
 
@@ -272,7 +272,7 @@ const SPECIALITES = [
             { type: "textarea", question: "Souhaiteriez-vous rajouter quelque chose ?" }
         ]
     },
-    
+
     {
     id: "gic",
     nom: "GIC",
@@ -480,7 +480,7 @@ async function requireAdminAccess(req, res, next) {
     }
 
     if (!hasAdminAccess(req)) {
-        if (!req.path.startsWith("/api/") && req.accepts("html")) return res.redirect("/admin-access.html");
+        if (!req.path.startsWith("/api/") && req.accepts("html")) return res.redirect("/admin-access");
         return res.status(403).json({ error: "Code d'accès administrateur requis." });
     }
 
@@ -605,7 +605,7 @@ Toute tentative d'accès non autorisée peut être enregistrée et signalée
 à la hiérarchie compétente.
 </p>
 
-<a href="/dashboard.html" class="btn">
+<a href="/dashboard" class="btn">
 ← Retour au Dashboard
 </a>
 
@@ -842,14 +842,58 @@ app.get("/index.html", (req, res) => {
     res.redirect("/");
 });
 
+// ---------------------------------------------------------------------
+// Pages "simples" servies directement depuis /public, protégées par
+// requireLogin + requireGNMember. On déclare ici une seule fois la liste
+// (route propre -> fichier), ce qui génère à la fois la route sans
+// extension et une redirection 301 depuis l'ancienne URL en .html.
+// ---------------------------------------------------------------------
+const PAGES_PROTEGEES = [
+    ["dashboard", "dashboard.html"],
+    ["effectifs", "effectifs.html"],
+    ["patrouilles", "patrouilles.html"],
+    ["renfort", "renfort.html"],
+    ["cours", "cours.html"],
+    ["tickets-commandement", "tickets-commandement.html"],
+    ["specialites", "specialites.html"],
+    ["cours-gendarmerie", "cours-gendarmerie.html"],
+    ["tenues", "tenues.html"],
+    ["regles-securite", "regles-securite.html"],
+    ["controle", "controle.html"],
+    ["alphabet-otan", "alphabet-otan.html"],
+    ["hierarchie", "hierarchie.html"],
+    ["armement", "armement.html"],
+    ["equipements", "equipements.html"],
+    ["procedure", "procedure.html"],
+    ["psc1", "psc1.html"],
+    ["radio", "radio.html"],
+    ["refus-obtemperer", "refus-obtemperer.html"],
+    ["sanctions", "sanctions.html"],
+    ["index-judiciaire", "index-judiciaire.html"],
+    ["gendarmerie", "gendarmerie.html"],
+    ["formation-terrain", "formation-terrain.html"],
+    ["architecture-intervention", "architecture-intervention.html"],
+    ["code-penal", "code-penal.html"]
+];
+
+for (const [cleanPath, fileName] of PAGES_PROTEGEES) {
+    app.get(`/${cleanPath}`, requireLogin, requireGNMember, (req, res) => {
+        res.sendFile(path.join(__dirname, "public", fileName));
+    });
+    // Ancienne URL en .html : redirection permanente vers la nouvelle URL propre.
+    app.get(`/${fileName}`, (req, res) => res.redirect(301, `/${cleanPath}`));
+}
+
 // Pages publiques historiques conservées afin que les liens de l'accueil ne renvoient pas une erreur 404.
-app.get("/gn-login.html", (req, res) => {
+app.get("/gn-login", (req, res) => {
     res.redirect("/auth/discord");
 });
+app.get("/gn-login.html", (req, res) => res.redirect(301, "/gn-login"));
 
-app.get("/gn-candidature.html", (req, res) => {
+app.get("/gn-candidature", (req, res) => {
     res.sendFile(path.join(__dirname, "public", "gn-candidature.html"));
 });
+app.get("/gn-candidature.html", (req, res) => res.redirect(301, "/gn-candidature"));
 
 app.post("/api/candidatures", async (req, res) => {
     const requiredFields = [
@@ -894,112 +938,12 @@ Le dossier est disponible dans le panel administrateur.`
     res.status(201).json({ success: true });
 });
 
-app.get("/dashboard.html", requireLogin, requireGNMember, (req, res) => {
-    res.sendFile(__dirname + "/public/dashboard.html");
-});
-
-app.get("/effectifs.html", requireLogin, requireGNMember, (req, res) => {
-    res.sendFile(__dirname + "/public/effectifs.html");
-});
-
-app.get("/patrouilles.html", requireLogin, requireGNMember, (req, res) => {
-    res.sendFile(__dirname + "/public/patrouilles.html");
-});
-
-app.get("/renfort.html", requireLogin, requireGNMember, (req, res) => {
-    res.sendFile(__dirname + "/public/renfort.html");
-});
-
 app.get("/test123", (req, res) => {
     res.send("TEST OK");
 });
 
-app.get("/cours.html", requireLogin, requireGNMember, (req, res) => {
-    res.sendFile(__dirname + "/public/cours.html");
-});
-
-app.get("/tickets-commandement.html", requireLogin, requireGNMember, (req, res) => {
-    res.sendFile(__dirname + "/public/tickets-commandement.html");
-});
-
-app.get("/specialites.html", requireLogin, requireGNMember, (req, res) => {
-    res.sendFile(__dirname + "/public/specialites.html");
-});
-
-app.get("/cours-gendarmerie.html", requireLogin, requireGNMember, (req, res) => {
-    res.sendFile(__dirname + "/public/cours-gendarmerie.html");
-});
-
-app.get("/tenues.html", requireLogin, requireGNMember, (req, res) => {
-    res.sendFile(__dirname + "/public/tenues.html");
-});
-
-app.get("/regles-securite.html", requireLogin, requireGNMember, (req, res) => {
-    res.sendFile(__dirname + "/public/regles-securite.html");
-});
-
-app.get("/controle.html", requireLogin, requireGNMember, (req, res) => {
-    res.sendFile(__dirname + "/public/controle.html");
-});
-
-app.get("/alphabet-otan.html", requireLogin, requireGNMember, (req, res) => {
-    res.sendFile(__dirname + "/public/alphabet-otan.html");
-});
-
-app.get("/hierarchie.html", requireLogin, requireGNMember, (req, res) => {
-    res.sendFile(__dirname + "/public/hierarchie.html");
-});
-
-app.get("/armement.html", requireLogin, requireGNMember, (req, res) => {
-    res.sendFile(__dirname + "/public/armement.html");
-});
-
-app.get("/equipements.html", requireLogin, requireGNMember, (req, res) => {
-    res.sendFile(__dirname + "/public/equipements.html");
-});
-
-app.get("/procedure.html", requireLogin, requireGNMember, (req, res) => {
-    res.sendFile(__dirname + "/public/procedure.html");
-});
-
-app.get("/psc1.html", requireLogin, requireGNMember, (req, res) => {
-    res.sendFile(__dirname + "/public/psc1.html");
-});
-
-app.get("/radio.html", requireLogin, requireGNMember, (req, res) => {
-    res.sendFile(__dirname + "/public/radio.html");
-});
-
-app.get("/refus-obtemperer.html", requireLogin, requireGNMember, (req, res) => {
-    res.sendFile(__dirname + "/public/refus-obtemperer.html");
-});
-
-app.get("/sanctions.html", requireLogin, requireGNMember, (req, res) => {
-    res.sendFile(__dirname + "/public/sanctions.html");
-});
-
-app.get("/index-judiciaire.html", requireLogin, requireGNMember, (req, res) => {
-    res.sendFile(__dirname + "/public/index-judiciaire.html");
-});
-
-app.get("/gendarmerie.html", requireLogin, requireGNMember, (req, res) => {
-    res.sendFile(__dirname + "/public/gendarmerie.html");
-});
-
-app.get("/formation-terrain.html", requireLogin, requireGNMember, (req, res) => {
-    res.sendFile(__dirname + "/public/formation-terrain.html");
-});
-
-app.get("/architecture-intervention.html", requireLogin, requireGNMember, (req, res) => {
-    res.sendFile(__dirname + "/public/architecture-intervention.html");
-});
-
-app.get("/code-penal.html", requireLogin, requireGNMember, (req, res) => {
-    res.sendFile(__dirname + "/public/code-penal.html");
-});
-
-app.get("/admin-access.html", requireAdmin, (req, res) => {
-    if (hasAdminAccess(req)) return res.redirect("/admin.html");
+app.get("/admin-access", requireAdmin, (req, res) => {
+    if (hasAdminAccess(req)) return res.redirect("/admin");
 
     res.send(`<!doctype html>
 <html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -1008,9 +952,10 @@ body{margin:0;min-height:100vh;display:grid;place-items:center;background:#11182
 main{width:min(420px,calc(100% - 32px));padding:32px;border:1px solid #d4af37;border-radius:12px;background:#1a1a2e}
 h1{color:#d4af37;font-size:1.5rem}input,button{box-sizing:border-box;width:100%;padding:12px;border-radius:6px;font:inherit}input{border:1px solid #d4af37;background:#0f1528;color:#fff}button{margin-top:16px;border:0;background:#d4af37;color:#11182e;font-weight:bold;cursor:pointer}#error{min-height:1.4em;color:#ff9b9b}
 </style></head><body><main><h1>Verrou administrateur</h1><p>Saisis ton code d'accès personnel.</p><form id="access-form"><input id="code" type="password" autocomplete="one-time-code" required autofocus><button>Déverrouiller</button></form><p id="error" role="alert"></p></main><script>
-document.getElementById('access-form').addEventListener('submit',async event=>{event.preventDefault();const response=await fetch('/api/admin/access',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code:document.getElementById('code').value})});if(response.ok)return location.assign('/admin.html');const data=await response.json();document.getElementById('error').textContent=data.error||'Code invalide.';});
+document.getElementById('access-form').addEventListener('submit',async event=>{event.preventDefault();const response=await fetch('/api/admin/access',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code:document.getElementById('code').value})});if(response.ok)return location.assign('/admin');const data=await response.json();document.getElementById('error').textContent=data.error||'Code invalide.';});
 </script></body></html>`);
 });
+app.get("/admin-access.html", (req, res) => res.redirect(301, "/admin-access"));
 
 app.post("/api/admin/access", requireAdmin, (req, res) => {
     const expectedHash = process.env.ADMIN_ACCESS_CODE_HASH || "";
@@ -1032,14 +977,16 @@ app.post("/api/admin/access", requireAdmin, (req, res) => {
     res.json({ success: true });
 });
 
-app.get("/admin.html", async (req, res) => {
-    if (!(await isAdmin(req)) || req.session?.adminPanelAuthenticated !== true) return res.redirect("/admin-login.html");
+app.get("/admin", async (req, res) => {
+    if (!(await isAdmin(req)) || req.session?.adminPanelAuthenticated !== true) return res.redirect("/admin-login");
     res.sendFile(__dirname + "/public/admin.html");
 });
+app.get("/admin.html", (req, res) => res.redirect(301, "/admin"));
 
-app.get("/admin-login.html", (req, res) => {
-    res.send(`<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Connexion admin</title><style>body{margin:0;min-height:100vh;display:grid;place-items:center;background:#11182e;color:#f4f4f4;font:16px Arial,sans-serif}main{width:min(400px,calc(100% - 32px));padding:32px;background:#1a1a2e;border:1px solid #d4af37;border-radius:12px}h1{color:#d4af37}input,button{box-sizing:border-box;width:100%;margin-top:12px;padding:12px;border-radius:6px;font:inherit}input{border:1px solid #d4af37;background:#0f1528;color:#fff}button{border:0;background:#d4af37;color:#11182e;font-weight:bold;cursor:pointer}#error{min-height:1.4em;color:#ff9b9b}</style></head><body><main><h1>Connexion administrateur</h1><form id="login"><input id="username" placeholder="Pseudo Discord" required autofocus><input id="password" type="password" placeholder="Mot de passe" required><button>Se connecter</button></form><p id="error"></p></main><script>document.getElementById('login').addEventListener('submit',async e=>{e.preventDefault();const r=await fetch('/api/admin/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:username.value,password:password.value})});if(r.ok)return location.assign('/admin.html');const d=await r.json();error.textContent=d.error||'Identifiants invalides.';});</script></body></html>`);
+app.get("/admin-login", (req, res) => {
+    res.send(`<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Connexion admin</title><style>body{margin:0;min-height:100vh;display:grid;place-items:center;background:#11182e;color:#f4f4f4;font:16px Arial,sans-serif}main{width:min(400px,calc(100% - 32px));padding:32px;background:#1a1a2e;border:1px solid #d4af37;border-radius:12px}h1{color:#d4af37}input,button{box-sizing:border-box;width:100%;margin-top:12px;padding:12px;border-radius:6px;font:inherit}input{border:1px solid #d4af37;background:#0f1528;color:#fff}button{border:0;background:#d4af37;color:#11182e;font-weight:bold;cursor:pointer}#error{min-height:1.4em;color:#ff9b9b}</style></head><body><main><h1>Connexion administrateur</h1><form id="login"><input id="username" placeholder="Pseudo Discord" required autofocus><input id="password" type="password" placeholder="Mot de passe" required><button>Se connecter</button></form><p id="error"></p></main><script>document.getElementById('login').addEventListener('submit',async e=>{e.preventDefault();const r=await fetch('/api/admin/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:username.value,password:password.value})});if(r.ok)return location.assign('/admin');const d=await r.json();error.textContent=d.error||'Identifiants invalides.';});</script></body></html>`);
 });
+app.get("/admin-login.html", (req, res) => res.redirect(301, "/admin-login"));
 
 app.post("/api/admin/login", (req, res) => {
     const username = String(req.body.username || "").trim().toLowerCase();
@@ -1285,7 +1232,7 @@ app.get("/auth/discord/callback", async (req, res) => {
 
         saveData(db);
 
-        return res.redirect("/dashboard.html");
+        return res.redirect("/dashboard");
 
     } catch (err) {
         console.log(err.response?.data || err.message);
