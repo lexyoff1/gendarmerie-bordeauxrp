@@ -305,12 +305,12 @@ footer p {
 
         <div class="form-row">
             <div class="form-group">
-                <label for="email">Email *</label>
-                <input type="email" id="email" name="email" required>
+                <label for="email">Pseudo Discord *</label>
+                <input type="text" id="email" name="email" placeholder="Ex: lexy_off1" required>
             </div>
             <div class="form-group">
-                <label for="telephone">Téléphone *</label>
-                <input type="tel" id="telephone" name="telephone" required>
+                <label for="telephone">ID Discord *</label>
+                <input type="text" id="telephone" name="telephone" placeholder="Ex: 123456789012345678" required>
             </div>
         </div>
 
@@ -320,10 +320,12 @@ footer p {
         </div>
 
         <div class="form-group">
-            <label for="diplome">Diplôme le plus élevé *</label>
-            <select id="diplome" name="diplome" required>
+            <label for="diplome">Diplôme le plus élevé</label>
+            <select id="diplome" name="diplome">
                 <option value="">-- Sélectionner --</option>
+                <option value="aucun">Aucun diplôme</option>
                 <option value="bac">Baccalauréat</option>
+                <option value="bac-pro-securite">Bac Pro Sécurité</option>
                 <option value="bac+2">Bac+2</option>
                 <option value="bac+3">Bac+3</option>
                 <option value="bac+5">Bac+5 ou plus</option>
