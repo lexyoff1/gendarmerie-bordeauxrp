@@ -310,7 +310,7 @@ footer p {
         <div class="card">
             <h2>📋 Candidatures</h2>
             <p>Postulez pour rejoindre nos rangs et participez à la sécurité publique.</p>
-            <a href="/gn-candidature.html" class="card-btn">Candidater</a>
+            <a href="/gn-candidature" class="card-btn">Candidater</a>
         </div>
 
         <div class="card">
@@ -323,10 +323,9 @@ footer p {
             <h2>📞 Contact</h2>
             <p>Nous sommes là pour répondre à vos questions et préoccupations.</p>
             <ul class="contact-list">
-                <li><strong>COL :</strong> <span id="contact-colonel">Chargement...</span></li>
-                <li><strong>LCL :</strong> <span id="contact-lcl">Chargement...</span></li>
-                <li><strong>CEN :</strong> <span id="contact-cen">Chargement...</span></li>
-                <li><strong>Responsable CIR :</strong> LTN | KING lexi</li>
+                <li><strong>CNE :</strong> <span id="contact-capitaine">Chargement...</span></li>
+                <li><strong>LTN :</strong> <span id="contact-lieutenant">Chargement...</span></li>
+                <li><strong>Responsable CIR :</strong> KING lexi</li>
             </ul>
         </div>
     </section>
@@ -342,14 +341,12 @@ footer p {
 fetch("/api/contact")
     .then(response => response.ok ? response.json() : Promise.reject())
     .then(contacts => {
-        document.getElementById("contact-colonel").textContent = contacts.colonel || "Non renseigné";
-        document.getElementById("contact-lcl").textContent = contacts.lieutenantColonel || "Non renseigné";
-        document.getElementById("contact-cen").textContent = contacts.chefEscadron || "Non renseigné";
+        document.getElementById("contact-capitaine").textContent = contacts.capitaine || "Non renseigné";
+        document.getElementById("contact-lieutenant").textContent = contacts.lieutenant || "Non renseigné";
     })
     .catch(() => {
-        document.getElementById("contact-colonel").textContent = "Non renseigné";
-        document.getElementById("contact-lcl").textContent = "Non renseigné";
-        document.getElementById("contact-cen").textContent = "Non renseigné";
+        document.getElementById("contact-capitaine").textContent = "Non renseigné";
+        document.getElementById("contact-lieutenant").textContent = "Non renseigné";
     });
 </script>
 
