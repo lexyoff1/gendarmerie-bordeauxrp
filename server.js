@@ -10,9 +10,9 @@ const path = require("path");
 require("dotenv").config();
 
 const COMMANDEMENT_ROLES = {
-    "1537874909093699604t Du Groupement",
-    "1537875328423305289t De Compagnie",
-    "1537875423260840058t De Brigade"
+    "1537874909093699604": "CG ・ Commandant Du Groupement",
+    "1537875328423305289": "CC ・ Commandant De Compagnie",
+    "1537875423260840058": "CB ・ Commandant De Brigade"
 };
 
 const ROLE_CB = "1500242417264099438";
