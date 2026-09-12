@@ -388,16 +388,22 @@ const SPECIALITES = [
 }
 ];
 
+// Le chemin du fichier de données peut être redirigé vers un disque persistant
+// Render (Settings > Disks, ex: mount path /var/data), sinon on garde le
+// fichier local par défaut pour le développement.
+const DATA_FILE = process.env.DATA_FILE_PATH || path.join(__dirname, "data.json");
+
 function getData() {
-    if (!fs.existsSync("./data.json")) {
-        fs.writeFileSync("./data.json", JSON.stringify({
+    if (!fs.existsSync(DATA_FILE)) {
+        fs.mkdirSync(path.dirname(DATA_FILE), { recursive: true });
+        fs.writeFileSync(DATA_FILE, JSON.stringify({
             users: [],
             applications: [],
             specialiteApplications: []
         }, null, 2));
     }
 
-    const db = JSON.parse(fs.readFileSync("./data.json", "utf8"));
+    const db = JSON.parse(fs.readFileSync(DATA_FILE, "utf8"));
 
     if (!Array.isArray(db.users)) db.users = [];
 if (!Array.isArray(db.applications)) db.applications = [];
@@ -420,7 +426,7 @@ return db;
 }
 
 function saveData(data) {
-    fs.writeFileSync("./data.json", JSON.stringify(data, null, 2));
+    fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2));
 }
 
 let defaultVehiculesCache = null;
@@ -454,7 +460,7 @@ async function isAdmin(req) {
     if (req.session?.systemAdmin === true) return true;
     if (!req.session.user) return false;
 
-    const admins = (process.env.ADMIN_IDS || "").split(",");
+    const admins = (process.env.ADMIN_IDS || "").split(",").map(id => id.trim()).filter(Boolean);
 
     if (admins.includes(req.session.user.id)) {
         return true;
@@ -995,11 +1001,22 @@ app.get("/admin-login.html", (req, res) => res.redirect(301, "/admin-login"));
 app.post("/api/admin/login", (req, res) => {
     const username = String(req.body.username || "").trim().toLowerCase();
     const password = String(req.body.password || "");
-    const systemUsername = (process.env.SYSTEM_ADMIN_USERNAME || "systeme").toLowerCase();
-    const expectedHash = process.env.SYSTEM_ADMIN_PASSWORD_HASH || "";
     const suppliedHash = crypto.createHash("sha256").update(password).digest("hex");
 
-    const isSystemAdmin = username === systemUsername && /^[a-f0-9]{64}$/i.test(expectedHash) &&
+    // Plusieurs comptes "système" peuvent être définis dans le .env, en listant
+    // les pseudos et les hachages de mot de passe dans le même ordre, séparés
+    // par des virgules :
+    //   SYSTEM_ADMIN_USERNAME=systeme,lexy,dupont,martin
+    //   SYSTEM_ADMIN_PASSWORD_HASH=hash1,hash2,hash3,hash4
+    const systemUsernames = (process.env.SYSTEM_ADMIN_USERNAME || "systeme")
+        .split(",").map(name => name.trim().toLowerCase()).filter(Boolean);
+    const systemHashes = (process.env.SYSTEM_ADMIN_PASSWORD_HASH || "")
+        .split(",").map(hash => hash.trim());
+
+    const systemIndex = systemUsernames.indexOf(username);
+    const expectedHash = systemIndex >= 0 ? (systemHashes[systemIndex] || "") : "";
+
+    const isSystemAdmin = systemIndex >= 0 && /^[a-f0-9]{64}$/i.test(expectedHash) &&
         crypto.timingSafeEqual(Buffer.from(expectedHash, "hex"), Buffer.from(suppliedHash, "hex"));
     const db = getData();
     const admin = (db.admins || []).find(item => item.username.toLowerCase() === username);
@@ -1013,8 +1030,8 @@ app.post("/api/admin/login", (req, res) => {
     req.session.adminAccessVerified = true;
     req.session.adminPanelAuthenticated = true;
     req.session.user = {
-        id: isSystemAdmin ? "systeme" : admin.discordId,
-        username: isSystemAdmin ? (process.env.SYSTEM_ADMIN_USERNAME || "systeme") : admin.username,
+        id: isSystemAdmin ? `systeme-${username}` : admin.discordId,
+        username: isSystemAdmin ? username : admin.username,
         nomPrenom: "Système",
         avatar: "",
         estDansServeur: true
@@ -1070,7 +1087,7 @@ app.post("/api/admin/patrouilles", requireAdmin, (req, res) => {
 });
 
 app.post("/api/admin/application/:type/:id/send-to-me", requireAdmin, async (req, res) => {
-    if (!req.session.user?.id || req.session.user.id === "systeme") {
+    if (!req.session.user?.id || req.session.user.id.startsWith("systeme")) {
         return res.status(400).json({ success: false, error: "Connectez-vous avec un compte Discord administrateur pour recevoir ce MP." });
     }
     const db = getData();
@@ -1309,7 +1326,7 @@ if (user && !user.NIGEND && user.matricule) {
 app.get("/api/debug-admin", (req, res) => {
     res.json({
         connectedUser: req.session.user || null,
-        adminIds: (process.env.ADMIN_IDS || "").split(","),
+        adminIds: (process.env.ADMIN_IDS || "").split(",").map(id => id.trim()).filter(Boolean),
         isAdmin: isAdmin(req)
     });
 });
@@ -1474,14 +1491,20 @@ app.post("/api/vehicules/delete", requireAdminAccess, (req, res) => {
 
 app.get("/api/contact", (req, res) => {
     const db = getData();
+
+    // Retire un éventuel préfixe de grade du type "LTN ・ " ou "CNE ・ "
+    // au cas où il aurait été saisi par erreur dans le nom/prénom.
+    const stripGradePrefix = value => String(value || "").replace(/^[A-ZÀ-Ü]{2,5}\s*・\s*/, "").trim();
+
     const contactForGrade = prefix => {
         const user = db.users.find(item => String(item.grade || "").startsWith(prefix));
-        return user ? (user.nomPrenom || user.username || "Non renseigné") : "Non renseigné";
+        if (!user) return "Non renseigné";
+        return stripGradePrefix(user.nomPrenom || user.username) || "Non renseigné";
     };
+
     res.json({
-        colonel: contactForGrade("COL"),
-        lieutenantColonel: contactForGrade("LCL"),
-        chefEscadron: contactForGrade("CEN")
+        capitaine: contactForGrade("CNE"),
+        lieutenant: contactForGrade("LTN")
     });
 });
 
