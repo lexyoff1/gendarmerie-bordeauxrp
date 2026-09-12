@@ -108,6 +108,10 @@ app.use("/assets", express.static("public/assets"));
 app.use("/style.css", express.static("public/style.css"));
 app.use("/script.js", express.static("public/script.js"));
 
+app.get("/favicon.ico", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "assets", "logo-gendarmerie.png"));
+});
+
 app.use(session({
     secret: process.env.SESSION_SECRET || "secret123",
     resave: false,
