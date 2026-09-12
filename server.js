@@ -15,7 +15,7 @@ const COMMANDEMENT_ROLES = {
     "1537875423260840058": "CB ・ Commandant De Brigade"
 };
 
-const ROLE_CB = "1500242417264099438";
+const ROLE_CB = "1537875423260840058";
 
 async function notifyCB(ticket) {
     await sendDMToRole(
