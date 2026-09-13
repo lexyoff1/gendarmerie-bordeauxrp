@@ -16,7 +16,7 @@ const COMMANDEMENT_ROLES = {
 };
 
 const ROLE_CB = "1537875423260840058";
-const ROLE_RESP_CIR = "1537657032621039709";
+const ROLE_RESP_CIR = "1537658191754821642";
 
 async function notifyCB(ticket) {
     await sendDMToRole(
