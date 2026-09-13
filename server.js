@@ -228,32 +228,6 @@ const SPECIALITES = [
     },
 
     {
-        id: "gm",
-        nom: "Gendarmerie Mobile",
-        titre: "Gendarmerie Mobile",
-        description: "Unité chargée du maintien et du rétablissement de l’ordre lors des manifestations, émeutes et troubles publics.",
-        responsableRoleId: "1279483239358005382",
-        adjointRoleId: "1279490167471603867",
-        questions: [
-            { type: "textarea", question: "Quel est votre pseudo Discord ?" },
-            { type: "textarea", question: "Quel est votre pseudo Roblox ?" },
-            { type: "textarea", question: "Quel est votre Nom et Prénom ?" },
-            { type: "textarea", question: "Quel est votre NIGEND ?" },
-            { type: "textarea", question: "Quel est votre grade ?" },
-            { type: "textarea", question: "Vos motivations" },
-            { type: "textarea", question: "Pourquoi la Gendarmerie Mobile ?" },
-            { type: "textarea", question: "Pourquoi vous et pas un autre ?" },
-            { type: "textarea", question: "Quelles sont les missions de celle-ci ?" },
-            { type: "textarea", question: "Des individus violents se sont retranchés dans un parking souterrain et refusent de se rendre. Vous êtes à la tête de deux équipes de trois personnes (Delta 200 et Charlie 200). Comment procédez-vous ?" },
-            { type: "textarea", question: "Une manifestation autorisée se déroule dans Mions. Vous disposez de deux équipages de quatre personnes. Comment procédez-vous ?" },
-            { type: "radio", question: "Une fusillade éclate dans le secteur de la Ferme. Le code urgence attentat est en vigilance verte. Décidez-vous d’y aller en GM légère, moyenne ou lourde ?", options: ["GM légère", "GM moyenne", "GM lourde"] },
-            { type: "textarea", question: "Expliquez votre choix pour la situation de la Ferme" },
-            { type: "textarea", question: "Mot de fin" },
-            { type: "textarea", question: "Souhaiteriez-vous ajouter quelque chose ?" }
-        ]
-    },
-
-    {
         id: "pghm",
         nom: "PGHM",
         titre: "Peloton de Gendarmerie de Haute Montagne",
