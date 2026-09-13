@@ -205,7 +205,7 @@ const SPECIALITES = [
 
     {
         id: "bdr-pjgn",
-        nom: "BDR / PJGN",
+        nom: "BDR (Brigade de Recherche)",
         titre: "Brigade de Recherche / Police Judiciaire de la Gendarmerie Nationale",
         description: "Unité qui mène les enquêtes judiciaires importantes : analyses, auditions, filatures, preuves.",
         responsableRoleId: "1279483712139952281",
@@ -277,34 +277,6 @@ const SPECIALITES = [
             { type: "textarea", question: "Souhaiteriez-vous rajouter quelque chose ?" }
         ]
     },
-
-    {
-    id: "gic",
-    nom: "GIC",
-    titre: "Groupe d’Intervention Cynophile",
-    description: "Unité cynophile utilisant des chiens pour la recherche, la détection et l’interception.",
-
-    responsableRoleId: "1279483719303823471",
-    adjointRoleId: "1279491675718422568",
-
-    questions: [
-        { type: "textarea", question: "Votre Nom et Prénom" },
-        { type: "textarea", question: "Votre Grade" },
-        { 
-            type: "radio", 
-            question: "Voulez-vous devenir Assistant Maître-Chien ou Maître-Chien ?", 
-            options: ["Assistant Maître-Chien", "Maître-Chien"] 
-        },
-        { type: "textarea", question: "Pourquoi rejoindre la GIC ? (5 lignes minimum PC / 8 lignes minimum Mobile)" },
-        { type: "textarea", question: "Qualités (3 minimum)" },
-        { type: "textarea", question: "Défauts (3 minimum)" },
-        { type: "textarea", question: "Motivation (7 lignes minimum PC / 10 lignes minimum Mobile)" },
-        { type: "textarea", question: "Pourquoi vous et pas un autre ? (5 lignes minimum PC / 8 lignes minimum Mobile)" },
-        { type: "textarea", question: "Avez-vous des connaissances sur la GIC ? Si oui, lesquelles ?" },
-        { type: "textarea", question: "Avez-vous des questions ?" },
-        { type: "textarea", question: "Mots de fin" }
-    ]
-  },
 
   {
     id: "edcf",
