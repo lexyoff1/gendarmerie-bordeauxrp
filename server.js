@@ -16,6 +16,7 @@ const COMMANDEMENT_ROLES = {
 };
 
 const ROLE_CB = "1537875423260840058";
+const ROLE_RESP_CIR = "1537657032621039709";
 
 async function notifyCB(ticket) {
     await sendDMToRole(
@@ -932,18 +933,21 @@ app.post("/api/candidatures", async (req, res) => {
 
     saveData(db);
 
-    // Les membres ayant le rôle administrateur sont avertis dès qu'un dossier
-    // est envoyé. Un échec de MP ne doit jamais empêcher le dépôt du candidat.
-    await sendDMToRole(
-        ADMIN_ROLE_ID,
+    const messageCandidature =
 `📩 NOUVELLE CANDIDATURE
 
 Nom : ${application.nomPrenom}
 Email : ${application.email}
 Date de dépôt : ${new Date(application.createdAt).toLocaleString("fr-FR")}
 
-Le dossier est disponible dans le panel administrateur.`
-    );
+Le dossier est disponible dans le panel administrateur.`;
+
+    // Les membres ayant le rôle administrateur sont avertis dès qu'un dossier
+    // est envoyé. Un échec de MP ne doit jamais empêcher le dépôt du candidat.
+    await sendDMToRole(ADMIN_ROLE_ID, messageCandidature);
+
+    // Le Responsable CIR est également averti pour traitement rapide du dossier.
+    await sendDMToRole(ROLE_RESP_CIR, messageCandidature);
 
     res.status(201).json({ success: true });
 });
