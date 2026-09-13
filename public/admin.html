@@ -859,18 +859,16 @@ async function loadApps() {
         }
         
         box.innerHTML = pending.map(app => `
-            <div class="card">
-                <h3>${escapeHtml(app.nomPrenom || app.user || 'Sans nom')}</h3>
-                <p><strong>Discord :</strong> ${escapeHtml(app.user || app.username || 'Non renseigné')}</p>
-                <p><strong>ID :</strong> ${escapeHtml(app.discordId || 'Non renseigné')}</p>
-                <p><strong>Âge RP :</strong> ${escapeHtml(app.age || "Non précisé")}</p>
-                <p><strong>Motivation :</strong> ${escapeHtml(app.motivation || "Aucune")}</p>
-                <p><strong>Expérience :</strong> ${escapeHtml(app.experience || "Aucune")}</p>
-                <p><strong>Disponibilités :</strong> ${escapeHtml(app.disponibilites || "Non précisées")}</p>
-                <button onclick="acceptApp(${app.id})">✅ Accepter</button>
-                <button class="danger" onclick="rejectApp(${app.id})">❌ Refuser</button>
-            </div>
-        `).join('');
+    <div class="card">
+        <h3>${escapeHtml(app.nomPrenom || app.user || 'Sans nom')}</h3>
+        <p><strong>Discord :</strong> ${escapeHtml(app.user || app.username || 'Non renseigné')}</p>
+        <p><strong>ID :</strong> ${escapeHtml(app.discordId || 'Non renseigné')}</p>
+        <p><strong>Motivation :</strong> ${escapeHtml(app.motivation || "Aucune")}</p>
+        <p><strong>Expérience :</strong> ${escapeHtml(app.experience || "Aucune")}</p>
+        <button onclick="acceptApp(${app.id})">✅ Accepter</button>
+        <button class="danger" onclick="rejectApp(${app.id})">❌ Refuser</button>
+    </div>
+`).join('');
     } catch (err) {
         box.innerHTML = `<p class="muted">Erreur JS/API : ${err.message}</p>`;
     }
