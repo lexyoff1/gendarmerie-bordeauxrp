@@ -17,6 +17,7 @@ const COMMANDEMENT_ROLES = {
 
 const ROLE_CB = "1537875423260840058";
 const ROLE_RESP_CIR = "1537657032621039709";
+const GN_MEMBER_ROLE_ID = "1274883278024736812";
 
 async function notifyCB(ticket) {
     await sendDMToRole(
@@ -718,61 +719,114 @@ function accessDeniedPage() {
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Accès refusé</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Accès refusé - Gendarmerie Nationale</title>
 <style>
-body{
-    margin:0;
-    background:#0d1321;
-    color:white;
-    font-family:Arial,sans-serif;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    height:100vh;
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
-.box{
-    background:#151f36;
-    padding:40px;
-    border-radius:15px;
-    border-left:5px solid #1f4ea8;
-    max-width:700px;
-    text-align:center;
-    box-shadow:0 0 25px rgba(0,0,0,0.4);
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  color: #e0e0e0;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
 }
-.logo{
-    width:100px;
-    margin-bottom:20px;
+
+.box {
+  background: rgba(212, 175, 55, 0.05);
+  border: 2px solid #d4af37;
+  border-radius: 8px;
+  padding: 3rem 2.5rem;
+  max-width: 600px;
+  text-align: center;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
 }
-h1{
-    color:#ff4d4d;
+
+.logo {
+  width: 90px;
+  height: 90px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 8px rgba(212, 175, 55, 0.5));
+  margin-bottom: 1.5rem;
 }
-p{
-    color:#d8e2ff;
-    line-height:1.6;
+
+h1 {
+  color: #d4af37;
+  font-size: 1.8rem;
+  margin-bottom: 1.5rem;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
 }
-.btn{
-    display:inline-block;
-    margin-top:20px;
-    padding:12px 20px;
-    background:#1f4ea8;
-    color:white;
-    text-decoration:none;
-    border-radius:8px;
+
+p {
+  color: #b0b0b0;
+  line-height: 1.6;
+  margin-bottom: 1rem;
 }
-.btn:hover{
-    background:#163c84;
+
+p b {
+  color: #d4af37;
+}
+
+.btn {
+  display: inline-block;
+  margin-top: 1.5rem;
+  padding: 0.8rem 2rem;
+  background: linear-gradient(135deg, #d4af37 0%, #c9a227 100%);
+  color: #1a1a2e;
+  text-decoration: none;
+  border-radius: 6px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(212, 175, 55, 0.4);
+}
+
+@media (max-width: 480px) {
+  .box {
+    padding: 2rem 1.5rem;
+  }
+
+  h1 {
+    font-size: 1.4rem;
+  }
+
+  .logo {
+    width: 70px;
+    height: 70px;
+  }
 }
 </style>
 </head>
 <body>
+
 <div class="box">
-<img src="/assets/logo-gendarmerie.png" class="logo">
+<img src="/assets/logo-gendarmerie.png" class="logo" alt="Logo Gendarmerie">
+
 <h1>🚫 Accès refusé</h1>
-<p>Vous ne faites pas partie de la <b>Gendarmerie Nationale</b>.</p>
-<p>L'accès à cette tablette est strictement réservé aux militaires de la compagnie.</p>
-<p>Si vous pensez qu'il s'agit d'une erreur, contactez un membre de l'État-Major.</p>
+
+<p>Vous ne disposez pas des <b>habilitations nécessaires</b> pour accéder à cette section.</p>
+
+<p>Cette page est réservée aux membres de la <b>Gendarmerie Nationale</b> disposant du rôle requis.</p>
+
+<p>Si vous pensez qu'il s'agit d'une erreur, contactez un membre du Corps de Commandement Opérationnel.</p>
+
 <a href="/" class="btn">← Retour à l'accueil</a>
+
 </div>
+
 </body>
 </html>
 `;
@@ -784,7 +838,12 @@ async function requireGNMember(req, res, next) {
     if (await isAdmin(req)) return next();
 
     try {
-        await getGuildMember(req.session.user.id);
+        const member = await getGuildMember(req.session.user.id);
+
+        if (!member.roles.includes(GN_MEMBER_ROLE_ID)) {
+            return res.send(accessDeniedPage());
+        }
+
         next();
     } catch {
         return res.send(accessDeniedPage());
