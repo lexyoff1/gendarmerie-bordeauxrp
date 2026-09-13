@@ -917,27 +917,28 @@ app.post("/api/candidatures", async (req, res) => {
     }
 
     const db = getData();
-    const application = {
-        id: Date.now(),
-        nomPrenom: `${req.body.nom.trim()} ${req.body.prenom.trim()}`,
-        email: req.body.email.trim(),
-        telephone: req.body.telephone.trim(),
-        dateNaissance: req.body.dateNaissance,
-        diplome: req.body.diplome.trim(),
-        experience: req.body.experience.trim(),
-        motivation: req.body.motivation.trim(),
-        status: "En attente",
-        createdAt: new Date().toISOString()
-    };
+const application = {
+    id: Date.now(),
+    nomPrenom: `${req.body.nom.trim()} ${req.body.prenom.trim()}`,
+    user: req.body.email.trim(),          // pseudo Discord
+    username: req.body.email.trim(),      // compatibilité admin.html
+    discordId: req.body.telephone.trim(), // ID Discord
+    dateNaissance: req.body.dateNaissance,
+    diplome: req.body.diplome.trim(),
+    experience: req.body.experience.trim(),
+    motivation: req.body.motivation.trim(),
+    status: "En attente",
+    createdAt: new Date().toISOString()
+};
     db.applications.push(application);
 
     saveData(db);
 
-    const messageCandidature =
+const messageCandidature =
 `📩 NOUVELLE CANDIDATURE
 
 Nom : ${application.nomPrenom}
-Email : ${application.email}
+Discord : ${application.user} (${application.discordId})
 Date de dépôt : ${new Date(application.createdAt).toLocaleString("fr-FR")}
 
 Le dossier est disponible dans le panel administrateur.`;
