@@ -2475,6 +2475,10 @@ app.post("/api/rapports/:id/valider", requireLogin, requireGNMember, async (req,
         ? new Date(rapport.dateRedaction).toLocaleString("fr-FR", { dateStyle: "short", timeStyle: "short" })
         : "Non renseignée";
 
+    // Emoji personnalisé unique utilisé pour toute la mise en forme du
+    // message (en-tête, séparateurs de section, bloc "Gendarmerie").
+    const EMOJI_LOGO = "<:Logo_Brigade:1541635052432007248>";
+
     // Un bloc "Gendarmerie" par patrouille, séparé par un trait, pour bien
     // distinguer plusieurs patrouilles au sein d'un même rapport.
     const blocsPatrouilles = (rapport.patrouilles || []).map(p => {
@@ -2482,7 +2486,7 @@ app.post("/api/rapports/:id/valider", requireLogin, requireGNMember, async (req,
             .map(e => `- __Militaire :__ ${e.militaire}\n- __Note (Facultatif) :__ ${e.note || "///"}`)
             .join("\n\n");
 
-        return `**:dividers:・ Gendarmerie :**
+        return `**${EMOJI_LOGO}・ Gendarmerie :**
 
 - **__Patrouille :__** ${p.nom}
 
@@ -2498,10 +2502,10 @@ ${blocEffectifs}`;
     // validation (jamais lors de l'enregistrement en brouillon). Format
     // repris à l'identique du modèle Groupement de Gironde.
     const message =
-`## :Logo_Brigade: Groupement de Gironde :Logo_Brigade:
+`## ${EMOJI_LOGO} Groupement de Gironde ${EMOJI_LOGO}
 ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
 
-**:scroll:・ Information :**
+**${EMOJI_LOGO}・ Information :**
 
 **—>  Nature :**・Rapport De Patrouille
 
