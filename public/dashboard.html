@@ -154,9 +154,11 @@ section {
   color: #d4af37;
 }
 
+/* Grille forcée en 4 colonnes sur desktop pour un alignement régulier
+   (auto-fill donnait un rendu 3-3-1 selon le nombre de cartes). */
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-template-columns: repeat(4, 1fr);
   gap: 2rem;
 }
 
@@ -246,6 +248,13 @@ footer {
 
 footer p {
   margin: 0.5rem 0;
+}
+
+/* Écrans intermédiaires : on passe à 2 colonnes avant de casser à 1 */
+@media (max-width: 1000px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 @media (max-width: 768px) {
@@ -345,6 +354,7 @@ footer p {
         <a href="/tickets-commandement.html">Tickets Commandement</a>
         <a href="/cours.html">Cours</a>
         <a href="/specialites.html">Spécialités</a>
+        <a href="/saisies.html">Saisies</a>
         <a href="/admin.html">Gestion Brigade</a>
         <a href="/logout">Déconnexion</a>
     </nav>
@@ -393,6 +403,12 @@ footer p {
             <h3>📡 Demande de Renfort</h3>
             <p>Transmettre une demande de renfort aux unités spécialisées.</p>
             <a href="/renfort.html"><button>Ouvrir</button></a>
+        </div>
+
+        <div class="card">
+            <h3>🔒 Stockage des Saisies</h3>
+            <p>Déclarer et consulter l'inventaire des objets saisis lors des interventions.</p>
+            <a href="/saisies.html"><button>Ouvrir</button></a>
         </div>
 
     </div>
