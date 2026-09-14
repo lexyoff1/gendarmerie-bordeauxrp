@@ -359,6 +359,8 @@ if (!Array.isArray(db.specialiteApplications)) db.specialiteApplications = [];
 if (!Array.isArray(db.tenues)) db.tenues = [];
 if (!Array.isArray(db.ticketsCommandement)) db.ticketsCommandement =[];
 if (!Array.isArray(db.saisies)) db.saisies = [];
+if (!Array.isArray(db.avis)) db.avis = [];
+if (!Array.isArray(db.rapports)) db.rapports = [];
 
 db.users.forEach(user => {
     if (!user.qualificationJudiciaire) {
@@ -891,7 +893,9 @@ const PAGES_PROTEGEES = [
     ["formation-terrain", "formation-terrain.html"],
     ["architecture-intervention", "architecture-intervention.html"],
     ["code-penal", "code-penal.html"],
-    ["saisies", "saisies.html"]
+    ["saisies", "saisies.html"],
+    ["avis-recherche", "avis-recherche.html"],
+    ["rapports", "rapports.html"]
 ];
 
 for (const [cleanPath, fileName] of PAGES_PROTEGEES) {
@@ -2234,6 +2238,295 @@ Gendarmerie Nationale`;
     await sendDiscordDM(SAISIE_DELETE_NOTIFY_ID, message);
 
     res.json({ success: true });
+});
+
+// -----------------------------------------------------------------------
+// Rôle OPJ (Officier de Police Judiciaire)
+// Ce n'est pas un rôle Discord : c'est le champ user.qualificationJudiciaire
+// (déjà présent sur vos utilisateurs, calculé selon le grade par
+// getDefaultQualificationJudiciaire, et modifiable manuellement dans le
+// panel admin via /api/user/:id/update).
+// -----------------------------------------------------------------------
+
+async function isOPJ(req) {
+    if (!req.session.user) return false;
+    if (await isAdmin(req)) return true; // les admins ont toutes les habilitations
+
+    const db = getData();
+    const user = db.users.find(u => u.id === req.session.user.id);
+    return user?.qualificationJudiciaire === "OPJ";
+}
+
+async function requireOPJ(req, res, next) {
+    if (!(await isOPJ(req))) {
+        return res.status(403).json({ error: "Action réservée aux Officiers de Police Judiciaire (OPJ)." });
+    }
+    next();
+}
+
+app.get("/api/is-opj", requireLogin, requireGNMember, async (req, res) => {
+    res.json({ isOpj: await isOPJ(req) });
+});
+
+// -----------------------------------------------------------------------
+// Avis de recherche
+// Création et suppression réservées aux OPJ (ou admins). Toute suppression
+// envoie un MP de notification à SAISIE_DELETE_NOTIFY_ID, exactement comme
+// pour la suppression d'une saisie.
+// -----------------------------------------------------------------------
+
+const AVIS_DANGEROSITE_VALIDES = ["Faible", "Moyenne", "Élevée"];
+
+app.get("/api/avis", requireLogin, requireGNMember, (req, res) => {
+    const db = getData();
+    res.json(db.avis || []);
+});
+
+app.post("/api/avis/add", requireLogin, requireGNMember, requireOPJ, (req, res) => {
+    const { suspectNom, dangerosite, lieu, description, motif } = req.body || {};
+
+    if (
+        !String(suspectNom || "").trim() ||
+        !AVIS_DANGEROSITE_VALIDES.includes(dangerosite) ||
+        !String(motif || "").trim()
+    ) {
+        return res.status(400).json({ error: "Merci de remplir tous les champs obligatoires." });
+    }
+
+    const db = getData();
+    if (!Array.isArray(db.avis)) db.avis = [];
+    const user = db.users.find(u => u.id === req.session.user.id);
+
+    const avis = {
+        id: Date.now(),
+        suspectNom: String(suspectNom).trim(),
+        dangerosite,
+        lieu: String(lieu || "").trim(),
+        description: String(description || "").trim(),
+        motif: String(motif).trim(),
+        agentId: req.session.user.id,
+        agentNom: user?.nomPrenom || req.session.user.username,
+        createdAt: new Date().toISOString()
+    };
+
+    db.avis.push(avis);
+    saveData(db);
+
+    res.status(201).json({ success: true, avis });
+});
+
+app.delete("/api/avis/:id", requireLogin, requireGNMember, requireOPJ, async (req, res) => {
+    const db = getData();
+    const avis = (db.avis || []).find(a => String(a.id) === req.params.id);
+
+    if (!avis) return res.status(404).json({ error: "Avis introuvable." });
+
+    db.avis = db.avis.filter(a => String(a.id) !== req.params.id);
+    saveData(db);
+
+    const suppresseur = req.session.user?.nomPrenom || req.session.user?.username || "Inconnu";
+
+    // Même mécanique que pour la suppression d'une saisie : MP à la même
+    // personne (SAISIE_DELETE_NOTIFY_ID).
+    const message =
+`🗑️ SUPPRESSION D'UN AVIS DE RECHERCHE
+
+Supprimé par : ${suppresseur} (${req.session.user?.id || "ID inconnu"})
+Date de suppression : ${new Date().toLocaleString("fr-FR")}
+
+━━━━━━━━━━━━━━━━━━━━━
+
+Suspect : ${avis.suspectNom}
+Dangerosité : ${avis.dangerosite}
+Dernier lieu vu : ${avis.lieu || "Non renseigné"}
+Description : ${avis.description || "Non renseignée"}
+Motif : ${avis.motif}
+OPJ responsable de la publication : ${avis.agentNom || "Inconnu"}
+Date de publication : ${new Date(avis.createdAt).toLocaleString("fr-FR")}
+
+Gendarmerie Nationale`;
+
+    await sendDiscordDM(SAISIE_DELETE_NOTIFY_ID, message);
+
+    res.json({ success: true });
+});
+
+// -----------------------------------------------------------------------
+// Rapports de patrouille
+// Statuts : Brouillon (privé à l'auteur, modifiable) -> Validé (verrouillé,
+// envoyé dans un salon Discord dédié, sans ping, au format Groupement de
+// Gironde) -> Archivé (admins uniquement).
+// -----------------------------------------------------------------------
+
+const RAPPORTS_CHANNEL_ID = process.env.RAPPORTS_CHANNEL_ID;
+
+app.get("/api/rapports", requireLogin, requireGNMember, async (req, res) => {
+    const db = getData();
+    const admin = await isAdmin(req);
+
+    // Un brouillon n'est visible que par son auteur (ou un admin) ;
+    // les rapports validés/archivés sont visibles par tous les membres GN.
+    const visibles = (db.rapports || []).filter(r =>
+        r.statut !== "Brouillon" || r.auteurId === req.session.user.id || admin
+    );
+
+    res.json(visibles);
+});
+
+function nettoyerEffectifs(effectifs) {
+    if (!Array.isArray(effectifs)) return [];
+    return effectifs
+        .map(e => ({
+            militaire: String(e?.militaire || "").trim(),
+            note: String(e?.note || "").trim()
+        }))
+        .filter(e => e.militaire);
+}
+
+function nettoyerPatrouilles(patrouilles) {
+    if (!Array.isArray(patrouilles)) return [];
+    return patrouilles
+        .map(p => ({
+            nom: String(p?.nom || "").trim(),
+            derouler: String(p?.derouler || "").trim(),
+            effectifs: nettoyerEffectifs(p?.effectifs)
+        }))
+        .filter(p => p.nom && p.derouler && p.effectifs.length > 0);
+}
+
+app.post("/api/rapports/brouillon", requireLogin, requireGNMember, (req, res) => {
+    const { id, dateRedaction, patrouilles } = req.body || {};
+    const patrouillesPropres = nettoyerPatrouilles(patrouilles);
+
+    if (!String(dateRedaction || "").trim() || patrouillesPropres.length === 0) {
+        return res.status(400).json({ error: "Merci de remplir tous les champs obligatoires pour chaque patrouille (nom, déroulé, au moins un effectif)." });
+    }
+
+    const db = getData();
+    if (!Array.isArray(db.rapports)) db.rapports = [];
+    const user = db.users.find(u => u.id === req.session.user.id);
+
+    // Mise à jour d'un brouillon existant
+    if (id) {
+        const rapport = db.rapports.find(r => String(r.id) === String(id));
+        if (!rapport) return res.status(404).json({ error: "Rapport introuvable." });
+        if (rapport.auteurId !== req.session.user.id) {
+            return res.status(403).json({ error: "Vous ne pouvez modifier que vos propres rapports." });
+        }
+        if (rapport.statut !== "Brouillon") {
+            return res.status(400).json({ error: "Ce rapport est verrouillé et ne peut plus être modifié." });
+        }
+
+        rapport.dateRedaction = dateRedaction;
+        rapport.patrouilles = patrouillesPropres;
+        rapport.updatedAt = new Date().toISOString();
+
+        saveData(db);
+        return res.json({ success: true, rapport });
+    }
+
+    // Création d'un nouveau brouillon
+    const rapport = {
+        id: Date.now(),
+        type: "Rapport de patrouille",
+        auteurId: req.session.user.id,
+        auteurNom: user?.nomPrenom || req.session.user.username,
+        dateRedaction,
+        patrouilles: patrouillesPropres,
+        statut: "Brouillon",
+        createdAt: new Date().toISOString()
+    };
+
+    db.rapports.push(rapport);
+    saveData(db);
+
+    res.status(201).json({ success: true, rapport });
+});
+
+app.post("/api/rapports/:id/valider", requireLogin, requireGNMember, async (req, res) => {
+    const db = getData();
+    const rapport = (db.rapports || []).find(r => String(r.id) === req.params.id);
+
+    if (!rapport) return res.status(404).json({ error: "Rapport introuvable." });
+    if (rapport.auteurId !== req.session.user.id) {
+        return res.status(403).json({ error: "Vous ne pouvez valider que vos propres rapports." });
+    }
+    if (rapport.statut !== "Brouillon") {
+        return res.status(400).json({ error: "Ce rapport a déjà été validé ou archivé." });
+    }
+
+    rapport.statut = "Validé";
+    rapport.validatedAt = new Date().toISOString();
+    saveData(db);
+
+    const dateRedactionFormatee = rapport.dateRedaction
+        ? new Date(rapport.dateRedaction).toLocaleString("fr-FR", { dateStyle: "short", timeStyle: "short" })
+        : "Non renseignée";
+
+    // Un bloc "Gendarmerie" par patrouille, séparé par un trait, pour bien
+    // distinguer plusieurs patrouilles au sein d'un même rapport.
+    const blocsPatrouilles = (rapport.patrouilles || []).map(p => {
+        const blocEffectifs = (p.effectifs || [])
+            .map(e => `- __Militaire :__ ${e.militaire}\n- __Note (Facultatif) :__ ${e.note || "///"}`)
+            .join("\n\n");
+
+        return `**:dividers:・ Gendarmerie :**
+
+- **__Patrouille :__** ${p.nom}
+
+- **__Déroulé:__**
+${p.derouler}
+
+- **__Effectifs de la Patrouille:__**
+
+${blocEffectifs}`;
+    }).join("\n\n⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯\n\n");
+
+    // Message envoyé dans le salon dédié, SANS ping, uniquement à la
+    // validation (jamais lors de l'enregistrement en brouillon). Format
+    // repris à l'identique du modèle Groupement de Gironde.
+    const message =
+`## :Logo_Brigade: Groupement de Gironde :Logo_Brigade:
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+
+**:scroll:・ Information :**
+
+**—>  Nature :**・Rapport De Patrouille
+
+**—>  Date & Heure De Rédaction Du Rapport :** ${dateRedactionFormatee}
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+
+${blocsPatrouilles}
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+
+*Cordialement,*
+${rapport.auteurNom}`;
+
+    if (RAPPORTS_CHANNEL_ID) {
+        await sendDiscordChannelMessage(RAPPORTS_CHANNEL_ID, message);
+    } else {
+        console.warn("RAPPORTS_CHANNEL_ID absent dans .env : le rapport validé n'a pas été envoyé dans le salon dédié.");
+    }
+
+    res.json({ success: true, rapport });
+});
+
+app.post("/api/rapports/:id/archiver", requireAdminAccess, (req, res) => {
+    const db = getData();
+    const rapport = (db.rapports || []).find(r => String(r.id) === req.params.id);
+
+    if (!rapport) return res.status(404).json({ error: "Rapport introuvable." });
+    if (rapport.statut !== "Validé") {
+        return res.status(400).json({ error: "Seul un rapport validé peut être archivé." });
+    }
+
+    rapport.statut = "Archivé";
+    rapport.archivedAt = new Date().toISOString();
+    saveData(db);
+
+    res.json({ success: true, rapport });
 });
 
 const PORT = process.env.PORT || 3000;
