@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rapports - Gendarmerie Nationale</title>
+    <style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  color: #e0e0e0;
+  line-height: 1.6;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+header {
+  background: rgba(0, 0, 0, 0.5);
+  border-bottom: 3px solid #d4af37;
+  padding: 2rem;
+  backdrop-filter: blur(10px);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+  flex-wrap: wrap;
+}
+
+.brand-left {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.logo {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 8px rgba(212, 175, 55, 0.5));
+}
+
+.brand h1 {
+  font-size: 2.5rem;
+  color: #d4af37;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+}
+
+.brand p {
+  color: #b0b0b0;
+  font-size: 0.95rem;
+}
+
+nav {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+nav a {
+  color: #e0e0e0;
+  text-decoration: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+  font-weight: 600;
+}
+
+nav a:hover {
+  background: rgba(212, 175, 55, 0.1);
+  color: #d4af37;
+}
+
+main {
+  flex: 1;
+  padding: 3rem 2rem;
+  max-width: 1400px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+main > h2 {
+  font-size: 2.5rem;
+  color: #d4af37;
+  margin-bottom: 2rem;
+  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+.section-title {
+  font-size: 1.8rem;
+  color: #d4af37;
+  margin-top: 3rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 2px solid #d4af37;
+  padding-bottom: 0.75rem;
+}
+
+.card {
+  background: rgba(212, 175, 55, 0.05);
+  border: 2px solid #d4af37;
+  border-radius: 8px;
+  padding: 2rem;
+  margin-bottom: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  background: rgba(212, 175, 55, 0.1);
+  box-shadow: 0 8px 20px rgba(212, 175, 55, 0.15);
+}
+
+.card h3 {
+  color: #d4af37;
+  font-size: 1.3rem;
+  margin-bottom: 0.5rem;
+}
+
+.card p {
+  color: #b0b0b0;
+  margin-bottom: 0.6rem;
+  font-size: 0.95rem;
+}
+
+.card p strong {
+  color: #d4af37;
+}
+
+.item-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+label {
+  display: block;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+  color: #d4af37;
+  font-weight: 600;
+}
+
+select,
+input[type="text"],
+input[type="date"],
+textarea {
+  width: 100%;
+  padding: 0.8rem;
+  background: rgba(212, 175, 55, 0.05);
+  color: #e0e0e0;
+  border: 2px solid #d4af37;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+}
+
+select {
+  color-scheme: dark;
+  background-color: #242424;
+}
+
+select option {
+  background: #161616;
+  color: #f4f4f4;
+}
+
+textarea {
+  resize: vertical;
+  min-height: 90px;
+}
+
+textarea.rapport-content {
+  min-height: 220px;
+}
+
+select:focus,
+input:focus,
+textarea:focus {
+  outline: none;
+  background: rgba(212, 175, 55, 0.15);
+  box-shadow: 0 0 8px rgba(212, 175, 55, 0.3);
+}
+
+button {
+  background: linear-gradient(135deg, #d4af37 0%, #c9a227 100%);
+  color: #1a1a2e;
+  border: none;
+  padding: 0.7rem 1.5rem;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-top: 1rem;
+  margin-right: 0.5rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+}
+
+button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(212, 175, 55, 0.4);
+}
+
+button.secondary {
+  background: rgba(212, 175, 55, 0.1);
+  color: #d4af37;
+  box-shadow: none;
+}
+
+button.danger {
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+}
+
+button.danger:hover {
+  box-shadow: 0 8px 20px rgba(220, 38, 38, 0.4);
+}
+
+button.valider-btn {
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  color: #0a0a0a;
+}
+
+button.cat-btn {
+  text-transform: none;
+  letter-spacing: normal;
+  background: rgba(212, 175, 55, 0.1);
+  color: #d4af37;
+  box-shadow: none;
+}
+
+button.cat-btn.active {
+  background: linear-gradient(135deg, #d4af37 0%, #c9a227 100%);
+  color: #1a1a2e;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.form-grid label {
+  margin-top: 0;
+}
+
+.cat-tabs {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+}
+
+.muted {
+  color: #b0b0b0;
+  font-style: italic;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 0.3rem 0.9rem;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-brouillon {
+  background: rgba(148, 163, 184, 0.2);
+  color: #cbd5e1;
+}
+
+.status-valide {
+  background: rgba(34, 197, 94, 0.2);
+  color: #86efac;
+}
+
+.status-archive {
+  background: rgba(107, 114, 128, 0.25);
+  color: #d1d5db;
+}
+
+.status-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-top: 1rem;
+}
+
+.draft-banner {
+  background: rgba(96, 165, 250, 0.12);
+  border: 1px solid rgba(96, 165, 250, 0.4);
+  color: #93c5fd;
+  padding: 0.8rem 1rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.draft-banner button {
+  margin: 0;
+  padding: 0.35rem 0.8rem;
+  font-size: 0.8rem;
+}
+
+.autosave-indicator {
+  font-size: 0.8rem;
+  color: #86efac;
+  font-style: italic;
+  margin-top: 0.5rem;
+  min-height: 1.2em;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.stat-box {
+  background: rgba(212, 175, 55, 0.05);
+  border: 2px solid #d4af37;
+  border-radius: 8px;
+  padding: 1.2rem 1rem;
+  text-align: center;
+}
+
+.stat-box .stat-number {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #d4af37;
+  display: block;
+  line-height: 1.2;
+}
+
+.stat-box .stat-label {
+  font-size: 0.85rem;
+  color: #b0b0b0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.stat-box.stat-total {
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.2) 0%, rgba(201, 162, 39, 0.1) 100%);
+}
+
+footer {
+  background: rgba(0, 0, 0, 0.7);
+  border-top: 2px solid #d4af37;
+  padding: 2rem;
+  text-align: center;
+  color: #b0b0b0;
+  font-size: 0.9rem;
+  margin-top: auto;
+}
+
+footer p {
+  margin: 0.5rem 0;
+}
+
+@media (max-width: 768px) {
+  header { padding: 1.5rem; }
+  .brand { flex-direction: column; align-items: flex-start; }
+  .brand-left { flex-direction: column; width: 100%; }
+  .brand h1 { font-size: 1.8rem; }
+  .logo { width: 60px; height: 60px; }
+  nav { width: 100%; }
+  nav a { flex: 1; text-align: center; }
+  main { padding: 1.5rem 1rem; }
+  main > h2 { font-size: 1.8rem; }
+  .card { padding: 1.5rem; }
+  .form-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 480px) {
+  header { padding: 1rem; }
+  .brand h1 { font-size: 1.5rem; }
+  .logo { width: 50px; height: 50px; }
+  main { padding: 1rem; }
+  button, select, input, textarea { font-size: 16px; }
+  .section-title { font-size: 1.3rem; }
+  footer { padding: 1.5rem; }
+  .stat-box .stat-number { font-size: 1.5rem; }
+}
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="brand">
+        <div class="brand-left">
+            <img src="/assets/logo-gendarmerie.png" class="logo" alt="Logo Gendarmerie">
+            <div>
+                <h1>Gendarmerie Nationale</h1>
+                <p>Rapports</p>
+            </div>
+        </div>
+        <nav>
+            <a href="/dashboard">Dashboard</a>
+            <a href="/avis-recherche">Avis de recherche</a>
+            <a href="/saisies">Saisies</a>
+            <a href="/logout">Déconnexion</a>
+        </nav>
+    </div>
+</header>
+
+<main>
+    <h2>📁 Rapports</h2>
+
+    <div class="stats-grid" id="statsGrid"></div>
+
+    <h2 class="section-title">📝 Déclarer un rapport</h2>
+
+    <div class="card">
+        <div class="draft-banner" id="draftBanner" style="display:none;">
+            <span>📝 Un brouillon non enregistré a été restauré pour ce type de rapport.</span>
+            <button type="button" class="secondary" onclick="clearLocalDraft()">Effacer le brouillon</button>
+        </div>
+
+        <form id="rapportForm">
+            <div class="form-grid">
+                <div>
+                    <label for="rapportType">Type de rapport *</label>
+                    <select id="rapportType" required>
+                        <option value="">-- Sélectionner --</option>
+                        <option>Rapport de patrouille</option>
+                        <option>Rapports de Services</option>
+                        <option>Rapport d'arrestation</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="rapportAuteur">Auteur</label>
+                    <input type="text" id="rapportAuteur" readonly placeholder="Auto-rempli">
+                </div>
+                <div>
+                    <label for="rapportDate">Date des faits *</label>
+                    <input type="date" id="rapportDate" required>
+                </div>
+                <div>
+                    <label for="rapportLieu">Lieu *</label>
+                    <input type="text" id="rapportLieu" placeholder="Ex: Poste central, RN7..." required>
+                </div>
+            </div>
+
+            <label for="rapportContenu">Contenu du rapport *</label>
+            <textarea id="rapportContenu" class="rapport-content" placeholder="Rédigez le rapport en détail : contexte, déroulement, personnes impliquées, suites données..." required></textarea>
+
+            <div class="autosave-indicator" id="autosaveIndicator"></div>
+
+            <input type="hidden" id="rapportEditId" value="">
+
+            <button type="submit" class="secondary" id="btnBrouillon">💾 Enregistrer en brouillon</button>
+            <button type="button" class="valider-btn" id="btnValider" onclick="validerRapportCourant()">✅ Valider et envoyer</button>
+            <button type="button" class="secondary" id="btnNouveauRapport" onclick="resetRapportForm()" style="display:none;">🆕 Nouveau rapport</button>
+        </form>
+    </div>
+
+    <h2 class="section-title">📋 Inventaire des rapports</h2>
+
+    <div class="cat-tabs" id="rapportCatTabs"></div>
+
+    <div id="rapportsList"><p class="muted">Chargement...</p></div>
+</main>
+
+<footer>
+    <p>© 2026 lexy_off1 — Tous droits réservés</p>
+</footer>
+
+<script>
+const RAPPORT_TYPES = ["Rapport de patrouille", "Rapports de Services", "Rapport d'arrestation"];
+const RAPPORT_CATS = ["Tous", ...RAPPORT_TYPES];
+const DRAFT_PREFIX = "gn_rapport_draft_";
+const AUTOSAVE_DEBOUNCE_MS = 600;
+
+let rapports = [];
+let currentUser = { id: null, nom: "", isOpj: false, isAdmin: false };
+let currentRapportCat = "Tous";
+let autosaveTimer = null;
+
+function escapeHtml(value) {
+    return String(value ?? '').replace(/[&<>'"]/g, char => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+    })[char]);
+}
+
+function statusClassRapport(statut) {
+    return { "Brouillon": "status-brouillon", "Validé": "status-valide", "Archivé": "status-archive" }[statut] || "status-brouillon";
+}
+
+/* ============ UTILISATEUR / RÔLES ============ */
+
+async function loadMe() {
+    try {
+        const [meRes, adminRes] = await Promise.all([
+            fetch("/api/me"),
+            fetch("/api/is-admin")
+        ]);
+        const me = await meRes.json();
+        const adminData = await adminRes.json();
+
+        currentUser = {
+            id: me?.id ?? null,
+            nom: me?.nomPrenom || me?.username || "",
+            isOpj: false,
+            isAdmin: !!adminData.isAdmin
+        };
+    } catch {
+        currentUser = { id: null, nom: "", isOpj: false, isAdmin: false };
+    }
+
+    document.getElementById('rapportAuteur').value = currentUser.nom || "Inconnu";
+}
+
+/* ============ STATS ============ */
+
+function renderStats() {
+    const totalRapports = rapports.length;
+    const brouillons = rapports.filter(r => r.statut === "Brouillon").length;
+    const valides = rapports.filter(r => r.statut === "Validé").length;
+    const archives = rapports.filter(r => r.statut === "Archivé").length;
+
+    document.getElementById('statsGrid').innerHTML = `
+        <div class="stat-box stat-total">
+            <span class="stat-number">${totalRapports}</span>
+            <span class="stat-label">Total rapports</span>
+        </div>
+        <div class="stat-box">
+            <span class="stat-number">${brouillons}</span>
+            <span class="stat-label">Brouillons</span>
+        </div>
+        <div class="stat-box">
+            <span class="stat-number">${valides}</span>
+            <span class="stat-label">Validés</span>
+        </div>
+        <div class="stat-box">
+            <span class="stat-number">${archives}</span>
+            <span class="stat-label">Archivés</span>
+        </div>
+    `;
+}
+
+/* ============ RAPPORTS ============ */
+
+async function loadRapports() {
+    try {
+        const res = await fetch("/api/rapports");
+        if (!res.ok) throw new Error("Erreur serveur (" + res.status + ")");
+        rapports = await res.json();
+        renderRapportsList();
+        renderStats();
+    } catch (err) {
+        document.getElementById('rapportsList').innerHTML = `<p class="muted">Erreur de chargement : ${escapeHtml(err.message)}</p>`;
+    }
+}
+
+function renderRapportCatTabs() {
+    const box = document.getElementById('rapportCatTabs');
+    box.innerHTML = RAPPORT_CATS.map(c => `
+        <button class="cat-btn ${c === currentRapportCat ? 'active' : ''}" onclick="selectRapportCat('${c}')">${escapeHtml(c)}</button>
+    `).join('');
+}
+
+function selectRapportCat(cat) {
+    currentRapportCat = cat;
+    renderRapportCatTabs();
+    renderRapportsList();
+}
+
+function renderRapportsList() {
+    const box = document.getElementById('rapportsList');
+    const list = (currentRapportCat === "Tous" ? rapports : rapports.filter(r => r.type === currentRapportCat))
+        .slice()
+        .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+
+    if (list.length === 0) {
+        box.innerHTML = '<p class="muted">Aucun rapport dans cette catégorie.</p>';
+        return;
+    }
+
+    box.innerHTML = list.map(r => {
+        const isOwner = currentUser.id && r.auteurId === currentUser.id;
+        const canEdit = r.statut === "Brouillon" && isOwner;
+        const canArchive = r.statut === "Validé" && currentUser.isAdmin;
+
+        return `
+        <div class="card">
+            <div class="item-top">
+                <div>
+                    <h3>${escapeHtml(r.type)}</h3>
+                    <p><strong>Auteur :</strong> ${escapeHtml(r.auteurNom)}</p>
+                </div>
+                <span class="status-badge ${statusClassRapport(r.statut)}">${escapeHtml(r.statut)}</span>
+            </div>
+
+            <p><strong>Date des faits :</strong> ${escapeHtml(r.date)}</p>
+            <p><strong>Lieu :</strong> ${escapeHtml(r.lieu)}</p>
+            <p><strong>Contenu :</strong> ${escapeHtml(r.contenu)}</p>
+            <p><strong>Créé le :</strong> ${new Date(r.createdAt).toLocaleString("fr-FR")}</p>
+
+            <div class="status-row">
+                ${canEdit ? `<button class="secondary" onclick="editerRapport(${r.id})">✏️ Continuer / modifier</button>` : ""}
+                ${canEdit ? `<button class="valider-btn" onclick="validerRapport(${r.id})">✅ Valider et envoyer</button>` : ""}
+                ${canArchive ? `<button class="danger" onclick="archiverRapport(${r.id})">📦 Archiver</button>` : ""}
+                ${r.statut === "Validé" && !currentUser.isAdmin ? `<span class="muted">Verrouillé — modification impossible après validation.</span>` : ""}
+            </div>
+        </div>
+        `;
+    }).join('');
+}
+
+/* --- Brouillon local (anti-perte de saisie) --- */
+
+function draftKey(type) {
+    return DRAFT_PREFIX + (type || "generique");
+}
+
+function readForm() {
+    return {
+        type: document.getElementById('rapportType').value,
+        date: document.getElementById('rapportDate').value,
+        lieu: document.getElementById('rapportLieu').value,
+        contenu: document.getElementById('rapportContenu').value
+    };
+}
+
+function saveLocalDraft() {
+    const form = readForm();
+    if (!form.type) return;
+    try {
+        localStorage.setItem(draftKey(form.type), JSON.stringify(form));
+        const ind = document.getElementById('autosaveIndicator');
+        ind.textContent = "Brouillon local sauvegardé automatiquement à " + new Date().toLocaleTimeString("fr-FR");
+    } catch {
+        /* localStorage indisponible : on ignore silencieusement */
+    }
+}
+
+function scheduleAutosave() {
+    clearTimeout(autosaveTimer);
+    autosaveTimer = setTimeout(saveLocalDraft, AUTOSAVE_DEBOUNCE_MS);
+}
+
+function loadLocalDraftFor(type) {
+    try {
+        const raw = localStorage.getItem(draftKey(type));
+        return raw ? JSON.parse(raw) : null;
+    } catch {
+        return null;
+    }
+}
+
+function clearLocalDraft() {
+    const type = document.getElementById('rapportType').value;
+    if (type) localStorage.removeItem(draftKey(type));
+    document.getElementById('draftBanner').style.display = "none";
+}
+
+document.getElementById('rapportType').addEventListener('change', () => {
+    const type = document.getElementById('rapportType').value;
+    const draft = type ? loadLocalDraftFor(type) : null;
+    const banner = document.getElementById('draftBanner');
+
+    if (draft) {
+        document.getElementById('rapportDate').value = draft.date || "";
+        document.getElementById('rapportLieu').value = draft.lieu || "";
+        document.getElementById('rapportContenu').value = draft.contenu || "";
+        banner.style.display = "flex";
+    } else {
+        banner.style.display = "none";
+    }
+});
+
+['rapportDate', 'rapportLieu', 'rapportContenu'].forEach(id => {
+    document.getElementById(id).addEventListener('input', scheduleAutosave);
+});
+
+// Sécurité supplémentaire : sauvegarde immédiate si l'utilisateur ferme/quitte la page.
+window.addEventListener('beforeunload', saveLocalDraft);
+
+/* --- Enregistrement brouillon serveur --- */
+
+document.getElementById('rapportForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const editId = document.getElementById('rapportEditId').value || null;
+    const payload = {
+        id: editId,
+        type: document.getElementById('rapportType').value,
+        date: document.getElementById('rapportDate').value,
+        lieu: document.getElementById('rapportLieu').value.trim(),
+        contenu: document.getElementById('rapportContenu').value.trim()
+    };
+
+    if (!payload.type || !payload.date || !payload.lieu || !payload.contenu) {
+        alert("Merci de remplir tous les champs obligatoires avant d'enregistrer le brouillon.");
+        return;
+    }
+
+    try {
+        const res = await fetch("/api/rapports/brouillon", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Erreur lors de l'enregistrement du brouillon.");
+
+        localStorage.removeItem(draftKey(payload.type));
+        alert("Brouillon enregistré. Vous pouvez le reprendre plus tard, il n'est visible que par vous jusqu'à validation.");
+        await loadRapports();
+    } catch (err) {
+        alert(err.message);
+    }
+});
+
+async function validerRapportCourant() {
+    const editId = document.getElementById('rapportEditId').value;
+    if (!editId) {
+        alert("Enregistrez d'abord le rapport en brouillon avant de le valider.");
+        return;
+    }
+    await validerRapport(editId);
+}
+
+async function validerRapport(id) {
+    if (!confirm("Valider ce rapport ? Il ne pourra plus être modifié après validation.")) return;
+
+    try {
+        // NOTE BACKEND : à la validation, le serveur doit poster un embed/message
+        // au format professionnel dans le salon dédié — SANS mention/ping —
+        // et uniquement à ce moment-là (jamais lors de l'enregistrement en brouillon).
+        const res = await fetch(`/api/rapports/${id}/valider`, { method: "POST" });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Erreur lors de la validation.");
+
+        resetRapportForm();
+        alert("Rapport validé et envoyé.");
+        await loadRapports();
+    } catch (err) {
+        alert(err.message);
+    }
+}
+
+async function archiverRapport(id) {
+    if (!confirm("Archiver ce rapport ? Cette action est réservée aux administrateurs.")) return;
+
+    try {
+        const res = await fetch(`/api/rapports/${id}/archiver`, { method: "POST" });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Erreur lors de l'archivage.");
+
+        await loadRapports();
+    } catch (err) {
+        alert(err.message);
+    }
+}
+
+function editerRapport(id) {
+    const r = rapports.find(x => x.id === id);
+    if (!r) return;
+
+    document.getElementById('rapportEditId').value = r.id;
+    document.getElementById('rapportType').value = r.type;
+    document.getElementById('rapportDate').value = r.date;
+    document.getElementById('rapportLieu').value = r.lieu;
+    document.getElementById('rapportContenu').value = r.contenu;
+
+    document.getElementById('draftBanner').style.display = "none";
+    document.getElementById('btnNouveauRapport').style.display = "inline-block";
+    window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function resetRapportForm() {
+    document.getElementById('rapportForm').reset();
+    document.getElementById('rapportEditId').value = "";
+    document.getElementById('rapportAuteur').value = currentUser.nom || "Inconnu";
+    document.getElementById('draftBanner').style.display = "none";
+    document.getElementById('btnNouveauRapport').style.display = "none";
+    document.getElementById('autosaveIndicator').textContent = "";
+}
+
+/* ============ INIT ============ */
+
+async function init() {
+    renderRapportCatTabs();
+    await loadMe();
+    await loadRapports();
+}
+
+init();
+</script>
+
+</body>
+</html>
