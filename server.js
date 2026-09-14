@@ -29,7 +29,7 @@ Sujet : ${ticket.sujet}
 Auteur : ${ticket.auteur}
 
 Lien :
-https://gendarmerie-bordeauxrp.onrender.com/tickets-commandement?id=${ticket.id}`
+https://gendarmerie-bordeauxrp.com/tickets-commandement?id=${ticket.id}`
     );
 }
 
