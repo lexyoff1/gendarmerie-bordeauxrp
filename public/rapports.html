@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rapports - Gendarmerie Nationale</title>
+    <title>Rapports de Patrouille - Gendarmerie Nationale</title>
     <style>
 * {
   margin: 0;
@@ -160,7 +160,7 @@ label {
 
 select,
 input[type="text"],
-input[type="date"],
+input[type="datetime-local"],
 textarea {
   width: 100%;
   padding: 0.8rem;
@@ -178,18 +178,13 @@ select {
   background-color: #242424;
 }
 
-select option {
-  background: #161616;
-  color: #f4f4f4;
-}
-
 textarea {
   resize: vertical;
   min-height: 90px;
 }
 
 textarea.rapport-content {
-  min-height: 220px;
+  min-height: 140px;
 }
 
 select:focus,
@@ -243,17 +238,12 @@ button.valider-btn {
   color: #0a0a0a;
 }
 
-button.cat-btn {
+button.small {
+  padding: 0.4rem 0.9rem;
+  margin-top: 0;
+  font-size: 0.8rem;
   text-transform: none;
   letter-spacing: normal;
-  background: rgba(212, 175, 55, 0.1);
-  color: #d4af37;
-  box-shadow: none;
-}
-
-button.cat-btn.active {
-  background: linear-gradient(135deg, #d4af37 0%, #c9a227 100%);
-  color: #1a1a2e;
 }
 
 .form-grid {
@@ -264,13 +254,6 @@ button.cat-btn.active {
 
 .form-grid label {
   margin-top: 0;
-}
-
-.cat-tabs {
-  display: flex;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-  margin-bottom: 1.5rem;
 }
 
 .muted {
@@ -374,18 +357,118 @@ button.cat-btn.active {
   background: linear-gradient(135deg, rgba(212, 175, 55, 0.2) 0%, rgba(201, 162, 39, 0.1) 100%);
 }
 
-footer {
-  background: rgba(0, 0, 0, 0.7);
-  border-top: 2px solid #d4af37;
-  padding: 2rem;
-  text-align: center;
-  color: #b0b0b0;
-  font-size: 0.9rem;
-  margin-top: auto;
+/* --- Blocs "Patrouille" (un rapport peut en contenir plusieurs) --- */
+.patrol-block {
+  border: 2px solid rgba(212, 175, 55, 0.4);
+  border-radius: 8px;
+  padding: 1.2rem 1.2rem 1.5rem;
+  margin-bottom: 1.2rem;
+  background: rgba(0, 0, 0, 0.15);
 }
 
-footer p {
-  margin: 0.5rem 0;
+.patrol-block-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.patrol-block-header h4 {
+  color: #d4af37;
+  font-size: 1.05rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.patrol-remove {
+  background: rgba(220, 38, 38, 0.15);
+  color: #fca5a5;
+  border: 1px solid rgba(220, 38, 38, 0.4);
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 0.8rem;
+  text-transform: none;
+  box-shadow: none;
+  margin: 0;
+}
+
+.patrol-remove:hover {
+  transform: none;
+  box-shadow: none;
+  background: rgba(220, 38, 38, 0.25);
+}
+
+/* --- Effectifs de la patrouille (dans chaque bloc) --- */
+.effectifs-box {
+  border: 1px dashed rgba(212, 175, 55, 0.5);
+  border-radius: 6px;
+  padding: 1rem;
+  margin-top: 0.5rem;
+}
+
+.effectif-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: 0.6rem;
+  align-items: center;
+  margin-bottom: 0.6rem;
+}
+
+.effectif-row input {
+  margin: 0;
+}
+
+.effectif-remove {
+  background: rgba(220, 38, 38, 0.15);
+  color: #fca5a5;
+  border: 1px solid rgba(220, 38, 38, 0.4);
+  padding: 0.6rem 0.9rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 700;
+  text-transform: none;
+  box-shadow: none;
+  margin: 0;
+}
+
+.effectif-remove:hover {
+  transform: none;
+  box-shadow: none;
+  background: rgba(220, 38, 38, 0.25);
+}
+
+.effectifs-list-view {
+  margin: 0.5rem 0 0.8rem 0;
+  padding-left: 1.2rem;
+}
+
+.effectifs-list-view li {
+  margin-bottom: 0.3rem;
+  font-size: 0.9rem;
+  color: #d8d8d8;
+}
+
+.derouler-box {
+  background: rgba(0, 0, 0, 0.2);
+  border-left: 3px solid #d4af37;
+  padding: 0.8rem 1rem;
+  margin: 0.5rem 0 1rem 0;
+  white-space: pre-wrap;
+  font-size: 0.92rem;
+  color: #e0e0e0;
+}
+
+.patrol-view-block {
+  border-left: 3px solid rgba(212, 175, 55, 0.5);
+  padding: 0.2rem 0 0.2rem 1rem;
+  margin-bottom: 1.2rem;
+}
+
+.patrol-view-block:last-child {
+  margin-bottom: 0;
 }
 
 @media (max-width: 768px) {
@@ -400,6 +483,7 @@ footer p {
   main > h2 { font-size: 1.8rem; }
   .card { padding: 1.5rem; }
   .form-grid { grid-template-columns: 1fr; }
+  .effectif-row { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 480px) {
@@ -412,6 +496,20 @@ footer p {
   footer { padding: 1.5rem; }
   .stat-box .stat-number { font-size: 1.5rem; }
 }
+
+footer {
+  background: rgba(0, 0, 0, 0.7);
+  border-top: 2px solid #d4af37;
+  padding: 2rem;
+  text-align: center;
+  color: #b0b0b0;
+  font-size: 0.9rem;
+  margin-top: auto;
+}
+
+footer p {
+  margin: 0.5rem 0;
+}
     </style>
 </head>
 <body>
@@ -422,7 +520,7 @@ footer p {
             <img src="/assets/logo-gendarmerie.png" class="logo" alt="Logo Gendarmerie">
             <div>
                 <h1>Gendarmerie Nationale</h1>
-                <p>Rapports</p>
+                <p>Rapports de Patrouille</p>
             </div>
         </div>
         <nav>
@@ -435,59 +533,52 @@ footer p {
 </header>
 
 <main>
-    <h2>📁 Rapports</h2>
+    <h2>📁 Rapport de Patrouille</h2>
 
     <div class="stats-grid" id="statsGrid"></div>
 
-    <h2 class="section-title">📝 Déclarer un rapport</h2>
+    <h2 class="section-title">📝 Rédiger un rapport de patrouille</h2>
 
     <div class="card">
         <div class="draft-banner" id="draftBanner" style="display:none;">
-            <span>📝 Un brouillon non enregistré a été restauré pour ce type de rapport.</span>
+            <span>📝 Un brouillon non enregistré a été restauré.</span>
             <button type="button" class="secondary" onclick="clearLocalDraft()">Effacer le brouillon</button>
         </div>
 
         <form id="rapportForm">
             <div class="form-grid">
                 <div>
-                    <label for="rapportType">Type de rapport *</label>
-                    <select id="rapportType" required>
-                        <option value="">-- Sélectionner --</option>
-                        <option>Rapport de patrouille</option>
-                        <option>Rapports de Services</option>
-                        <option>Rapport d'arrestation</option>
-                    </select>
-                </div>
-                <div>
                     <label for="rapportAuteur">Auteur</label>
                     <input type="text" id="rapportAuteur" readonly placeholder="Auto-rempli">
                 </div>
                 <div>
-                    <label for="rapportDate">Date des faits *</label>
-                    <input type="date" id="rapportDate" required>
-                </div>
-                <div>
-                    <label for="rapportLieu">Lieu *</label>
-                    <input type="text" id="rapportLieu" placeholder="Ex: Poste central, RN7..." required>
+                    <label for="rapportDateRedaction">Date &amp; heure de rédaction *</label>
+                    <input type="datetime-local" id="rapportDateRedaction" required>
                 </div>
             </div>
 
-            <label for="rapportContenu">Contenu du rapport *</label>
-            <textarea id="rapportContenu" class="rapport-content" placeholder="Rédigez le rapport en détail : contexte, déroulement, personnes impliquées, suites données..." required></textarea>
+            <p class="muted" style="margin-top:1rem;">
+                Si vous avez changé totalement de patrouille pendant votre service, ajoutez un bloc supplémentaire
+                ci-dessous : chaque patrouille garde son propre déroulé et ses propres effectifs.
+            </p>
+
+            <div id="patrouillesContainer"></div>
+
+            <button type="button" class="secondary small" onclick="addPatrolBlock()">➕ Ajouter une patrouille (changement de patrouille)</button>
 
             <div class="autosave-indicator" id="autosaveIndicator"></div>
 
             <input type="hidden" id="rapportEditId" value="">
 
-            <button type="submit" class="secondary" id="btnBrouillon">💾 Enregistrer en brouillon</button>
-            <button type="button" class="valider-btn" id="btnValider" onclick="validerRapportCourant()">✅ Valider et envoyer</button>
-            <button type="button" class="secondary" id="btnNouveauRapport" onclick="resetRapportForm()" style="display:none;">🆕 Nouveau rapport</button>
+            <div>
+                <button type="submit" class="secondary" id="btnBrouillon">💾 Enregistrer en brouillon</button>
+                <button type="button" class="valider-btn" id="btnValider" onclick="validerRapportCourant()">✅ Valider et envoyer</button>
+                <button type="button" class="secondary" id="btnNouveauRapport" onclick="resetRapportForm()" style="display:none;">🆕 Nouveau rapport</button>
+            </div>
         </form>
     </div>
 
     <h2 class="section-title">📋 Inventaire des rapports</h2>
-
-    <div class="cat-tabs" id="rapportCatTabs"></div>
 
     <div id="rapportsList"><p class="muted">Chargement...</p></div>
 </main>
@@ -497,15 +588,14 @@ footer p {
 </footer>
 
 <script>
-const RAPPORT_TYPES = ["Rapport de patrouille", "Rapports de Services", "Rapport d'arrestation"];
-const RAPPORT_CATS = ["Tous", ...RAPPORT_TYPES];
-const DRAFT_PREFIX = "gn_rapport_draft_";
+const DRAFT_KEY = "gn_rapport_patrouille_draft";
 const AUTOSAVE_DEBOUNCE_MS = 600;
 
 let rapports = [];
-let currentUser = { id: null, nom: "", isOpj: false, isAdmin: false };
-let currentRapportCat = "Tous";
+let currentUser = { id: null, nom: "", isAdmin: false };
 let autosaveTimer = null;
+let patrolCounter = 0;
+let effectifCounter = 0;
 
 function escapeHtml(value) {
     return String(value ?? '').replace(/[&<>'"]/g, char => ({
@@ -531,11 +621,10 @@ async function loadMe() {
         currentUser = {
             id: me?.id ?? null,
             nom: me?.nomPrenom || me?.username || "",
-            isOpj: false,
             isAdmin: !!adminData.isAdmin
         };
     } catch {
-        currentUser = { id: null, nom: "", isOpj: false, isAdmin: false };
+        currentUser = { id: null, nom: "", isAdmin: false };
     }
 
     document.getElementById('rapportAuteur').value = currentUser.nom || "Inconnu";
@@ -544,14 +633,14 @@ async function loadMe() {
 /* ============ STATS ============ */
 
 function renderStats() {
-    const totalRapports = rapports.length;
+    const total = rapports.length;
     const brouillons = rapports.filter(r => r.statut === "Brouillon").length;
     const valides = rapports.filter(r => r.statut === "Validé").length;
     const archives = rapports.filter(r => r.statut === "Archivé").length;
 
     document.getElementById('statsGrid').innerHTML = `
         <div class="stat-box stat-total">
-            <span class="stat-number">${totalRapports}</span>
+            <span class="stat-number">${total}</span>
             <span class="stat-label">Total rapports</span>
         </div>
         <div class="stat-box">
@@ -569,6 +658,160 @@ function renderStats() {
     `;
 }
 
+/* ============ BLOCS PATROUILLE (formulaire) ============ */
+
+function addPatrolBlock(nom = "", derouler = "", effectifs = []) {
+    const container = document.getElementById('patrouillesContainer');
+    const blockId = "patrol-" + (++patrolCounter);
+    const numero = container.children.length + 1;
+
+    const block = document.createElement('div');
+    block.className = 'patrol-block';
+    block.id = blockId;
+    block.innerHTML = `
+        <div class="patrol-block-header">
+            <h4>Patrouille ${numero}</h4>
+            <button type="button" class="patrol-remove" onclick="removePatrolBlock('${blockId}')">✕ Retirer cette patrouille</button>
+        </div>
+
+        <label>Nom de la patrouille *</label>
+        <input type="text" class="patrol-nom" placeholder="Ex: PAM 01" value="${escapeHtml(nom)}">
+
+        <label>Déroulé *</label>
+        <textarea class="patrol-derouler rapport-content" placeholder="Ex: À 20h40 nous nous sommes occupés du balisage d'un AVP sur l'autoroute en compagnie des pompiers, aucune complication, fin d'intervention à 21h...">${escapeHtml(derouler)}</textarea>
+        <p class="muted" style="margin-top:0.3rem;">Pas besoin de mettre toutes les interventions, seulement les importantes ou rarement vues.</p>
+
+        <label>Effectifs de cette patrouille *</label>
+        <div class="effectifs-box" data-effectifs-container></div>
+        <button type="button" class="secondary small" onclick="addEffectifRow('${blockId}')">➕ Ajouter un effectif</button>
+    `;
+    container.appendChild(block);
+
+    block.querySelectorAll('.patrol-nom, .patrol-derouler').forEach(el => el.addEventListener('input', scheduleAutosave));
+
+    if (effectifs.length === 0) {
+        addEffectifRow(blockId);
+    } else {
+        effectifs.forEach(e => addEffectifRow(blockId, e.militaire, e.note));
+    }
+
+    renumberPatrolBlocks();
+    scheduleAutosave();
+    return blockId;
+}
+
+function removePatrolBlock(blockId) {
+    const block = document.getElementById(blockId);
+    if (block) block.remove();
+
+    const container = document.getElementById('patrouillesContainer');
+    if (container.children.length === 0) addPatrolBlock();
+
+    renumberPatrolBlocks();
+    scheduleAutosave();
+}
+
+function renumberPatrolBlocks() {
+    const container = document.getElementById('patrouillesContainer');
+    Array.from(container.children).forEach((block, index) => {
+        block.querySelector('.patrol-block-header h4').textContent = "Patrouille " + (index + 1);
+        block.querySelector('.patrol-remove').style.display = container.children.length > 1 ? "inline-block" : "none";
+    });
+}
+
+/* ============ EFFECTIFS (lignes dynamiques, scoping par bloc patrouille) ============ */
+
+function addEffectifRow(blockId, militaire = "", note = "") {
+    const block = document.getElementById(blockId);
+    const container = block.querySelector('[data-effectifs-container]');
+    const rowId = "eff-" + (++effectifCounter);
+
+    const row = document.createElement('div');
+    row.className = 'effectif-row';
+    row.id = rowId;
+    row.innerHTML = `
+        <input type="text" class="effectif-militaire" placeholder="Militaire (ex: @jack_17gendarmerie1)" value="${escapeHtml(militaire)}">
+        <input type="text" class="effectif-note" placeholder="Note (facultatif)" value="${escapeHtml(note)}">
+        <button type="button" class="effectif-remove" onclick="removeEffectifRow('${rowId}', '${blockId}')">✕</button>
+    `;
+    container.appendChild(row);
+    row.querySelectorAll('input').forEach(el => el.addEventListener('input', scheduleAutosave));
+    scheduleAutosave();
+}
+
+function removeEffectifRow(rowId, blockId) {
+    const row = document.getElementById(rowId);
+    if (row) row.remove();
+
+    const block = document.getElementById(blockId);
+    const container = block.querySelector('[data-effectifs-container]');
+    if (container.children.length === 0) addEffectifRow(blockId);
+
+    scheduleAutosave();
+}
+
+/* ============ LECTURE / CHARGEMENT DU FORMULAIRE ============ */
+
+function readForm() {
+    const dateRedaction = document.getElementById('rapportDateRedaction').value;
+
+    const patrouilles = Array.from(document.querySelectorAll('#patrouillesContainer .patrol-block')).map(block => ({
+        nom: block.querySelector('.patrol-nom').value.trim(),
+        derouler: block.querySelector('.patrol-derouler').value.trim(),
+        effectifs: Array.from(block.querySelectorAll('.effectif-row')).map(row => ({
+            militaire: row.querySelector('.effectif-militaire').value.trim(),
+            note: row.querySelector('.effectif-note').value.trim()
+        })).filter(e => e.militaire)
+    }));
+
+    return { dateRedaction, patrouilles };
+}
+
+function loadPatrolsInto(patrouilles) {
+    document.getElementById('patrouillesContainer').innerHTML = "";
+    if (!patrouilles || patrouilles.length === 0) {
+        addPatrolBlock();
+        return;
+    }
+    patrouilles.forEach(p => addPatrolBlock(p.nom, p.derouler, p.effectifs || []));
+}
+
+/* --- Brouillon local (anti-perte de saisie) --- */
+
+function saveLocalDraft() {
+    try {
+        localStorage.setItem(DRAFT_KEY, JSON.stringify(readForm()));
+        const ind = document.getElementById('autosaveIndicator');
+        ind.textContent = "Brouillon local sauvegardé automatiquement à " + new Date().toLocaleTimeString("fr-FR");
+    } catch {
+        /* localStorage indisponible : on ignore silencieusement */
+    }
+}
+
+function scheduleAutosave() {
+    clearTimeout(autosaveTimer);
+    autosaveTimer = setTimeout(saveLocalDraft, AUTOSAVE_DEBOUNCE_MS);
+}
+
+function loadLocalDraft() {
+    try {
+        const raw = localStorage.getItem(DRAFT_KEY);
+        return raw ? JSON.parse(raw) : null;
+    } catch {
+        return null;
+    }
+}
+
+function clearLocalDraft() {
+    localStorage.removeItem(DRAFT_KEY);
+    document.getElementById('draftBanner').style.display = "none";
+}
+
+document.getElementById('rapportDateRedaction').addEventListener('input', scheduleAutosave);
+
+// Sécurité supplémentaire : sauvegarde immédiate si l'utilisateur ferme/quitte la page.
+window.addEventListener('beforeunload', saveLocalDraft);
+
 /* ============ RAPPORTS ============ */
 
 async function loadRapports() {
@@ -583,27 +826,19 @@ async function loadRapports() {
     }
 }
 
-function renderRapportCatTabs() {
-    const box = document.getElementById('rapportCatTabs');
-    box.innerHTML = RAPPORT_CATS.map(c => `
-        <button class="cat-btn ${c === currentRapportCat ? 'active' : ''}" onclick="selectRapportCat('${c}')">${escapeHtml(c)}</button>
-    `).join('');
-}
-
-function selectRapportCat(cat) {
-    currentRapportCat = cat;
-    renderRapportCatTabs();
-    renderRapportsList();
+function formatDateRedaction(value) {
+    if (!value) return "Non renseignée";
+    const d = new Date(value);
+    if (isNaN(d.getTime())) return escapeHtml(value);
+    return d.toLocaleString("fr-FR", { dateStyle: "short", timeStyle: "short" });
 }
 
 function renderRapportsList() {
     const box = document.getElementById('rapportsList');
-    const list = (currentRapportCat === "Tous" ? rapports : rapports.filter(r => r.type === currentRapportCat))
-        .slice()
-        .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+    const list = rapports.slice().sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 
     if (list.length === 0) {
-        box.innerHTML = '<p class="muted">Aucun rapport dans cette catégorie.</p>';
+        box.innerHTML = '<p class="muted">Aucun rapport enregistré.</p>';
         return;
     }
 
@@ -611,20 +846,35 @@ function renderRapportsList() {
         const isOwner = currentUser.id && r.auteurId === currentUser.id;
         const canEdit = r.statut === "Brouillon" && isOwner;
         const canArchive = r.statut === "Validé" && currentUser.isAdmin;
+        const patrouilles = r.patrouilles || [];
+        const noms = patrouilles.map(p => p.nom).filter(Boolean).join(" + ") || "Non renseignée";
+
+        const patrouillesHtml = patrouilles.map(p => `
+            <div class="patrol-view-block">
+                <p><strong>Patrouille :</strong> ${escapeHtml(p.nom)}</p>
+                <p><strong>Déroulé :</strong></p>
+                <div class="derouler-box">${escapeHtml(p.derouler)}</div>
+                <p><strong>Effectifs :</strong></p>
+                <ul class="effectifs-list-view">
+                    ${(p.effectifs || []).map(e => `<li><strong>${escapeHtml(e.militaire)}</strong>${e.note ? " — " + escapeHtml(e.note) : ""}</li>`).join('') || '<li class="muted">Aucun effectif renseigné</li>'}
+                </ul>
+            </div>
+        `).join('');
 
         return `
         <div class="card">
             <div class="item-top">
                 <div>
-                    <h3>${escapeHtml(r.type)}</h3>
+                    <h3>Rapport de patrouille — ${escapeHtml(noms)}</h3>
                     <p><strong>Auteur :</strong> ${escapeHtml(r.auteurNom)}</p>
                 </div>
                 <span class="status-badge ${statusClassRapport(r.statut)}">${escapeHtml(r.statut)}</span>
             </div>
 
-            <p><strong>Date des faits :</strong> ${escapeHtml(r.date)}</p>
-            <p><strong>Lieu :</strong> ${escapeHtml(r.lieu)}</p>
-            <p><strong>Contenu :</strong> ${escapeHtml(r.contenu)}</p>
+            <p><strong>Date &amp; heure de rédaction :</strong> ${formatDateRedaction(r.dateRedaction)}</p>
+
+            ${patrouillesHtml}
+
             <p><strong>Créé le :</strong> ${new Date(r.createdAt).toLocaleString("fr-FR")}</p>
 
             <div class="status-row">
@@ -638,93 +888,24 @@ function renderRapportsList() {
     }).join('');
 }
 
-/* --- Brouillon local (anti-perte de saisie) --- */
-
-function draftKey(type) {
-    return DRAFT_PREFIX + (type || "generique");
-}
-
-function readForm() {
-    return {
-        type: document.getElementById('rapportType').value,
-        date: document.getElementById('rapportDate').value,
-        lieu: document.getElementById('rapportLieu').value,
-        contenu: document.getElementById('rapportContenu').value
-    };
-}
-
-function saveLocalDraft() {
-    const form = readForm();
-    if (!form.type) return;
-    try {
-        localStorage.setItem(draftKey(form.type), JSON.stringify(form));
-        const ind = document.getElementById('autosaveIndicator');
-        ind.textContent = "Brouillon local sauvegardé automatiquement à " + new Date().toLocaleTimeString("fr-FR");
-    } catch {
-        /* localStorage indisponible : on ignore silencieusement */
-    }
-}
-
-function scheduleAutosave() {
-    clearTimeout(autosaveTimer);
-    autosaveTimer = setTimeout(saveLocalDraft, AUTOSAVE_DEBOUNCE_MS);
-}
-
-function loadLocalDraftFor(type) {
-    try {
-        const raw = localStorage.getItem(draftKey(type));
-        return raw ? JSON.parse(raw) : null;
-    } catch {
-        return null;
-    }
-}
-
-function clearLocalDraft() {
-    const type = document.getElementById('rapportType').value;
-    if (type) localStorage.removeItem(draftKey(type));
-    document.getElementById('draftBanner').style.display = "none";
-}
-
-document.getElementById('rapportType').addEventListener('change', () => {
-    const type = document.getElementById('rapportType').value;
-    const draft = type ? loadLocalDraftFor(type) : null;
-    const banner = document.getElementById('draftBanner');
-
-    if (draft) {
-        document.getElementById('rapportDate').value = draft.date || "";
-        document.getElementById('rapportLieu').value = draft.lieu || "";
-        document.getElementById('rapportContenu').value = draft.contenu || "";
-        banner.style.display = "flex";
-    } else {
-        banner.style.display = "none";
-    }
-});
-
-['rapportDate', 'rapportLieu', 'rapportContenu'].forEach(id => {
-    document.getElementById(id).addEventListener('input', scheduleAutosave);
-});
-
-// Sécurité supplémentaire : sauvegarde immédiate si l'utilisateur ferme/quitte la page.
-window.addEventListener('beforeunload', saveLocalDraft);
-
-/* --- Enregistrement brouillon serveur --- */
-
 document.getElementById('rapportForm').addEventListener('submit', async (e) => {
     e.preventDefault();
 
+    const form = readForm();
     const editId = document.getElementById('rapportEditId').value || null;
-    const payload = {
-        id: editId,
-        type: document.getElementById('rapportType').value,
-        date: document.getElementById('rapportDate').value,
-        lieu: document.getElementById('rapportLieu').value.trim(),
-        contenu: document.getElementById('rapportContenu').value.trim()
-    };
 
-    if (!payload.type || !payload.date || !payload.lieu || !payload.contenu) {
-        alert("Merci de remplir tous les champs obligatoires avant d'enregistrer le brouillon.");
+    const patrouillesValides = form.patrouilles.filter(p => p.nom && p.derouler && p.effectifs.length > 0);
+
+    if (!form.dateRedaction || patrouillesValides.length === 0 || patrouillesValides.length !== form.patrouilles.length) {
+        alert("Merci de remplir tous les champs obligatoires pour chaque patrouille (nom, déroulé, au moins un effectif).");
         return;
     }
+
+    const payload = {
+        id: editId,
+        dateRedaction: form.dateRedaction,
+        patrouilles: patrouillesValides
+    };
 
     try {
         const res = await fetch("/api/rapports/brouillon", {
@@ -735,7 +916,9 @@ document.getElementById('rapportForm').addEventListener('submit', async (e) => {
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || "Erreur lors de l'enregistrement du brouillon.");
 
-        localStorage.removeItem(draftKey(payload.type));
+        localStorage.removeItem(DRAFT_KEY);
+        document.getElementById('rapportEditId').value = data.rapport.id;
+        document.getElementById('btnNouveauRapport').style.display = "inline-block";
         alert("Brouillon enregistré. Vous pouvez le reprendre plus tard, il n'est visible que par vous jusqu'à validation.");
         await loadRapports();
     } catch (err) {
@@ -756,9 +939,6 @@ async function validerRapport(id) {
     if (!confirm("Valider ce rapport ? Il ne pourra plus être modifié après validation.")) return;
 
     try {
-        // NOTE BACKEND : à la validation, le serveur doit poster un embed/message
-        // au format professionnel dans le salon dédié — SANS mention/ping —
-        // et uniquement à ce moment-là (jamais lors de l'enregistrement en brouillon).
         const res = await fetch(`/api/rapports/${id}/valider`, { method: "POST" });
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || "Erreur lors de la validation.");
@@ -790,10 +970,8 @@ function editerRapport(id) {
     if (!r) return;
 
     document.getElementById('rapportEditId').value = r.id;
-    document.getElementById('rapportType').value = r.type;
-    document.getElementById('rapportDate').value = r.date;
-    document.getElementById('rapportLieu').value = r.lieu;
-    document.getElementById('rapportContenu').value = r.contenu;
+    document.getElementById('rapportDateRedaction').value = r.dateRedaction || "";
+    loadPatrolsInto(r.patrouilles || []);
 
     document.getElementById('draftBanner').style.display = "none";
     document.getElementById('btnNouveauRapport').style.display = "inline-block";
@@ -804,6 +982,7 @@ function resetRapportForm() {
     document.getElementById('rapportForm').reset();
     document.getElementById('rapportEditId').value = "";
     document.getElementById('rapportAuteur').value = currentUser.nom || "Inconnu";
+    loadPatrolsInto([]);
     document.getElementById('draftBanner').style.display = "none";
     document.getElementById('btnNouveauRapport').style.display = "none";
     document.getElementById('autosaveIndicator').textContent = "";
@@ -812,8 +991,17 @@ function resetRapportForm() {
 /* ============ INIT ============ */
 
 async function init() {
-    renderRapportCatTabs();
     await loadMe();
+
+    const draft = loadLocalDraft();
+    if (draft) {
+        document.getElementById('rapportDateRedaction').value = draft.dateRedaction || "";
+        loadPatrolsInto(draft.patrouilles || []);
+        document.getElementById('draftBanner').style.display = "flex";
+    } else {
+        loadPatrolsInto([]);
+    }
+
     await loadRapports();
 }
 
