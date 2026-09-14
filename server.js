@@ -358,6 +358,7 @@ if (!Array.isArray(db.applications)) db.applications = [];
 if (!Array.isArray(db.specialiteApplications)) db.specialiteApplications = [];
 if (!Array.isArray(db.tenues)) db.tenues = [];
 if (!Array.isArray(db.ticketsCommandement)) db.ticketsCommandement =[];
+if (!Array.isArray(db.saisies)) db.saisies = [];
 
 db.users.forEach(user => {
     if (!user.qualificationJudiciaire) {
@@ -889,7 +890,8 @@ const PAGES_PROTEGEES = [
     ["gendarmerie", "gendarmerie.html"],
     ["formation-terrain", "formation-terrain.html"],
     ["architecture-intervention", "architecture-intervention.html"],
-    ["code-penal", "code-penal.html"]
+    ["code-penal", "code-penal.html"],
+    ["saisies", "saisies.html"]
 ];
 
 for (const [cleanPath, fileName] of PAGES_PROTEGEES) {
@@ -1333,11 +1335,11 @@ if (user && !user.NIGEND && user.matricule) {
     });
 });
 
-app.get("/api/debug-admin", (req, res) => {
+app.get("/api/debug-admin", async (req, res) => {
     res.json({
         connectedUser: req.session.user || null,
         adminIds: (process.env.ADMIN_IDS || "").split(",").map(id => id.trim()).filter(Boolean),
-        isAdmin: isAdmin(req)
+        isAdmin: await isAdmin(req)
     });
 });
 
@@ -2121,6 +2123,117 @@ app.post("/api/tickets-commandement/:id/claim",
     res.json({
         success: true
     });
+});
+
+// -----------------------------------------------------------------------
+// Stockage des saisies : inventaire des objets saisis lors d'interventions
+// (armes, drogue, véhicules, argent, etc.). Consultable et modifiable par
+// tout membre GN connecté ; la suppression définitive reste réservée aux
+// administrateurs (verrou "Code d'accès administrateur").
+// -----------------------------------------------------------------------
+
+const SAISIE_STATUTS_VALIDES = ["Stocké", "Restitué", "Détruit", "Transféré"];
+
+app.get("/api/saisies", requireLogin, requireGNMember, (req, res) => {
+    const db = getData();
+    res.json(db.saisies || []);
+});
+
+app.post("/api/saisies/add", requireLogin, requireGNMember, (req, res) => {
+    const { type, designation, quantite, lieu, suspect, motif } = req.body || {};
+
+    if (
+        !String(type || "").trim() ||
+        !String(designation || "").trim() ||
+        !String(lieu || "").trim() ||
+        !String(motif || "").trim()
+    ) {
+        return res.status(400).json({ error: "Merci de remplir tous les champs obligatoires." });
+    }
+
+    const db = getData();
+    const user = db.users.find(u => u.id === req.session.user.id);
+
+    const saisie = {
+        id: Date.now(),
+        type: String(type).trim(),
+        designation: String(designation).trim(),
+        quantite: String(quantite || "").trim(),
+        lieu: String(lieu).trim(),
+        suspect: String(suspect || "").trim(),
+        motif: String(motif).trim(),
+        statut: "Stocké",
+        notes: "",
+        agentId: req.session.user.id,
+        agentNom: user?.nomPrenom || req.session.user.username,
+        createdAt: new Date().toISOString()
+    };
+
+    db.saisies.push(saisie);
+    saveData(db);
+
+    res.status(201).json({ success: true, saisie });
+});
+
+app.post("/api/saisies/:id/statut", requireLogin, requireGNMember, (req, res) => {
+    const db = getData();
+    const saisie = db.saisies.find(s => String(s.id) === req.params.id);
+
+    if (!saisie) return res.status(404).json({ error: "Saisie introuvable." });
+
+    const { statut, notes } = req.body || {};
+
+    if (!SAISIE_STATUTS_VALIDES.includes(statut)) {
+        return res.status(400).json({ error: "Statut invalide." });
+    }
+
+    saisie.statut = statut;
+    if (String(notes || "").trim()) {
+        saisie.notes = String(notes).trim();
+    }
+    saisie.updatedAt = new Date().toISOString();
+    saisie.updatedBy = req.session.user.nomPrenom || req.session.user.username;
+
+    saveData(db);
+    res.json({ success: true });
+});
+
+const SAISIE_DELETE_NOTIFY_ID = "1282035608688132106";
+
+app.delete("/api/saisies/:id", requireAdminAccess, async (req, res) => {
+    const db = getData();
+    const saisie = db.saisies.find(s => String(s.id) === req.params.id);
+
+    if (!saisie) return res.status(404).json({ error: "Saisie introuvable." });
+
+    db.saisies = db.saisies.filter(s => String(s.id) !== req.params.id);
+    saveData(db);
+
+    const suppresseur = req.session.user?.nomPrenom || req.session.user?.username || "Inconnu";
+
+    const message =
+`🗑️ SUPPRESSION D'UNE SAISIE
+
+Supprimée par : ${suppresseur} (${req.session.user?.id || "ID inconnu"})
+Date de suppression : ${new Date().toLocaleString("fr-FR")}
+
+━━━━━━━━━━━━━━━━━━━━━
+
+Catégorie : ${saisie.type}
+Désignation : ${saisie.designation}
+Quantité / Précision : ${saisie.quantite || "Non précisée"}
+Lieu de la saisie : ${saisie.lieu}
+Suspect : ${saisie.suspect || "Non renseigné"}
+Motif : ${saisie.motif}
+Statut au moment de la suppression : ${saisie.statut}
+${saisie.notes ? `Notes : ${saisie.notes}\n` : ""}Agent ayant déclaré la saisie : ${saisie.agentNom || "Inconnu"}
+Date de déclaration : ${new Date(saisie.createdAt).toLocaleString("fr-FR")}
+
+Gendarmerie Nationale`;
+
+    await sendDiscordDM(SAISIE_DELETE_NOTIFY_ID, message);
+
+    res.json({ success: true });
 });
 
 const PORT = process.env.PORT || 3000;
