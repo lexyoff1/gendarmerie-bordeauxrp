@@ -1508,9 +1508,10 @@ app.post("/api/vehicules/delete", requireAdminAccess, (req, res) => {
 app.get("/api/contact", (req, res) => {
     const db = getData();
 
-    // Retire un éventuel préfixe de grade du type "LTN ・ " ou "CNE ・ "
-    // au cas où il aurait été saisi par erreur dans le nom/prénom.
-    const stripGradePrefix = value => String(value || "").replace(/^[A-ZÀ-Ü]{2,5}\s*・\s*/, "").trim();
+    // Retire un éventuel préfixe de grade du type "LTN ・ ", "LTN • " ou
+    // "LTN - " au cas où il aurait été saisi par erreur dans le nom/prénom
+    // (plusieurs caractères séparateurs sont tolérés).
+    const stripGradePrefix = value => String(value || "").replace(/^[A-ZÀ-Ü]{2,5}\s*[・•·:-]\s*/, "").trim();
 
     const contactForGrade = prefix => {
         const user = db.users.find(item => String(item.grade || "").startsWith(prefix));
