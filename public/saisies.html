@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stockage des Saisies - Gendarmerie Nationale</title>
+    <style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  color: #e0e0e0;
+  line-height: 1.6;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+header {
+  background: rgba(0, 0, 0, 0.5);
+  border-bottom: 3px solid #d4af37;
+  padding: 2rem;
+  backdrop-filter: blur(10px);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+  flex-wrap: wrap;
+}
+
+.brand-left {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.logo {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 8px rgba(212, 175, 55, 0.5));
+}
+
+.brand h1 {
+  font-size: 2.5rem;
+  color: #d4af37;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+}
+
+.brand p {
+  color: #b0b0b0;
+  font-size: 0.95rem;
+}
+
+nav {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+nav a {
+  color: #e0e0e0;
+  text-decoration: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+  font-weight: 600;
+}
+
+nav a:hover {
+  background: rgba(212, 175, 55, 0.1);
+  color: #d4af37;
+}
+
+main {
+  flex: 1;
+  padding: 3rem 2rem;
+  max-width: 1400px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+main > h2 {
+  font-size: 2.5rem;
+  color: #d4af37;
+  margin-bottom: 2rem;
+  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+.section-title {
+  font-size: 1.8rem;
+  color: #d4af37;
+  margin-top: 3rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 2px solid #d4af37;
+  padding-bottom: 0.75rem;
+}
+
+.card {
+  background: rgba(212, 175, 55, 0.05);
+  border: 2px solid #d4af37;
+  border-radius: 8px;
+  padding: 2rem;
+  margin-bottom: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  background: rgba(212, 175, 55, 0.1);
+  box-shadow: 0 8px 20px rgba(212, 175, 55, 0.15);
+}
+
+.card h3 {
+  color: #d4af37;
+  font-size: 1.3rem;
+  margin-bottom: 0.5rem;
+}
+
+.card p {
+  color: #b0b0b0;
+  margin-bottom: 0.6rem;
+  font-size: 0.95rem;
+}
+
+.card p strong {
+  color: #d4af37;
+}
+
+.item-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+label {
+  display: block;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+  color: #d4af37;
+  font-weight: 600;
+}
+
+select,
+input[type="text"],
+textarea {
+  width: 100%;
+  padding: 0.8rem;
+  background: rgba(212, 175, 55, 0.05);
+  color: #e0e0e0;
+  border: 2px solid #d4af37;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+}
+
+select {
+  color-scheme: dark;
+  background-color: #242424;
+}
+
+select option {
+  background: #161616;
+  color: #f4f4f4;
+}
+
+textarea {
+  resize: vertical;
+  min-height: 90px;
+}
+
+select:focus,
+input[type="text"]:focus,
+textarea:focus {
+  outline: none;
+  background: rgba(212, 175, 55, 0.15);
+  box-shadow: 0 0 8px rgba(212, 175, 55, 0.3);
+}
+
+button {
+  background: linear-gradient(135deg, #d4af37 0%, #c9a227 100%);
+  color: #1a1a2e;
+  border: none;
+  padding: 0.7rem 1.5rem;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-top: 1rem;
+  margin-right: 0.5rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+}
+
+button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(212, 175, 55, 0.4);
+}
+
+button.danger {
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+}
+
+button.danger:hover {
+  box-shadow: 0 8px 20px rgba(220, 38, 38, 0.4);
+}
+
+button.cat-btn {
+  text-transform: none;
+  letter-spacing: normal;
+  background: rgba(212, 175, 55, 0.1);
+  color: #d4af37;
+  box-shadow: none;
+}
+
+button.cat-btn.active {
+  background: linear-gradient(135deg, #d4af37 0%, #c9a227 100%);
+  color: #1a1a2e;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.form-grid label {
+  margin-top: 0;
+}
+
+.form-full {
+  grid-column: 1 / -1;
+}
+
+.cat-tabs {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+}
+
+.muted {
+  color: #b0b0b0;
+  font-style: italic;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 0.3rem 0.9rem;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-stocke {
+  background: rgba(96, 165, 250, 0.2);
+  color: #93c5fd;
+}
+
+.status-restitue {
+  background: rgba(34, 197, 94, 0.2);
+  color: #86efac;
+}
+
+.status-detruit {
+  background: rgba(239, 68, 68, 0.2);
+  color: #fca5a5;
+}
+
+.status-transfere {
+  background: rgba(251, 191, 36, 0.2);
+  color: #fbbf24;
+}
+
+.status-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-top: 1rem;
+}
+
+.status-row select {
+  width: auto;
+  min-width: 180px;
+}
+
+footer {
+  background: rgba(0, 0, 0, 0.7);
+  border-top: 2px solid #d4af37;
+  padding: 2rem;
+  text-align: center;
+  color: #b0b0b0;
+  font-size: 0.9rem;
+  margin-top: auto;
+}
+
+footer p {
+  margin: 0.5rem 0;
+}
+
+@media (max-width: 768px) {
+  header {
+    padding: 1.5rem;
+  }
+
+  .brand {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .brand-left {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .brand h1 {
+    font-size: 1.8rem;
+  }
+
+  .logo {
+    width: 60px;
+    height: 60px;
+  }
+
+  nav {
+    width: 100%;
+  }
+
+  nav a {
+    flex: 1;
+    text-align: center;
+  }
+
+  main {
+    padding: 1.5rem 1rem;
+  }
+
+  main > h2 {
+    font-size: 1.8rem;
+  }
+
+  .card {
+    padding: 1.5rem;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  header {
+    padding: 1rem;
+  }
+
+  .brand h1 {
+    font-size: 1.5rem;
+  }
+
+  .logo {
+    width: 50px;
+    height: 50px;
+  }
+
+  main {
+    padding: 1rem;
+  }
+
+  button,
+  select,
+  input,
+  textarea {
+    font-size: 16px;
+  }
+
+  .section-title {
+    font-size: 1.3rem;
+  }
+
+  footer {
+    padding: 1.5rem;
+  }
+}
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="brand">
+        <div class="brand-left">
+            <img src="/assets/logo-gendarmerie.png" class="logo" alt="Logo Gendarmerie">
+            <div>
+                <h1>Gendarmerie Nationale</h1>
+                <p>Stockage des Saisies</p>
+            </div>
+        </div>
+        <nav>
+            <a href="/dashboard">Dashboard</a>
+            <a href="/logout">Déconnexion</a>
+        </nav>
+    </div>
+</header>
+
+<main>
+    <h2>🔒 Stockage des Saisies</h2>
+
+    <h2 class="section-title">📝 Déclarer une nouvelle saisie</h2>
+    <div class="card">
+        <form id="saisieForm">
+            <div class="form-grid">
+                <div>
+                    <label for="saisieType">Catégorie *</label>
+                    <select id="saisieType" required>
+                        <option value="">-- Sélectionner --</option>
+                        <option>Armes</option>
+                        <option>Drogue</option>
+                        <option>Véhicules</option>
+                        <option>Argent / Valeurs</option>
+                        <option>Autres</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="saisieDesignation">Désignation *</label>
+                    <input type="text" id="saisieDesignation" placeholder="Ex: Pistolet Glock 17, 250g de cannabis..." required>
+                </div>
+                <div>
+                    <label for="saisieQuantite">Quantité / Précision</label>
+                    <input type="text" id="saisieQuantite" placeholder="Ex: 1 unité, 250g, 3 200 €...">
+                </div>
+                <div>
+                    <label for="saisieLieu">Lieu de la saisie *</label>
+                    <input type="text" id="saisieLieu" placeholder="Ex: Contrôle routier - Route de Mions" required>
+                </div>
+                <div>
+                    <label for="saisieSuspect">Nom du suspect (si connu)</label>
+                    <input type="text" id="saisieSuspect" placeholder="Facultatif">
+                </div>
+            </div>
+
+            <label for="saisieMotif">Motif de la saisie *</label>
+            <textarea id="saisieMotif" placeholder="Décrivez les circonstances : contrôle, perquisition, interpellation..." required></textarea>
+
+            <button type="submit">📥 Enregistrer la saisie</button>
+        </form>
+    </div>
+
+    <h2 class="section-title">📦 Inventaire des saisies</h2>
+
+    <div class="cat-tabs" id="saisieCatTabs"></div>
+
+    <div id="saisiesList"><p class="muted">Chargement...</p></div>
+</main>
+
+<footer>
+    <p>© 2026 lexy_off1 — Tous droits réservés</p>
+</footer>
+
+<script>
+const SAISIE_CATEGORIES = ["Toutes", "Armes", "Drogue", "Véhicules", "Argent / Valeurs", "Autres"];
+const SAISIE_STATUTS = ["Stocké", "Restitué", "Détruit", "Transféré"];
+let saisies = [];
+let currentCat = "Toutes";
+let isAdminUser = false;
+
+function escapeHtml(value) {
+    return String(value ?? '').replace(/[&<>'"]/g, char => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+    })[char]);
+}
+
+function statusClass(statut) {
+    return {
+        "Stocké": "status-stocke",
+        "Restitué": "status-restitue",
+        "Détruit": "status-detruit",
+        "Transféré": "status-transfere"
+    }[statut] || "status-stocke";
+}
+
+function renderCatTabs() {
+    const box = document.getElementById('saisieCatTabs');
+    box.innerHTML = SAISIE_CATEGORIES.map(c => `
+        <button class="cat-btn ${c === currentCat ? 'active' : ''}" onclick="selectCat('${c}')">${escapeHtml(c)}</button>
+    `).join('');
+}
+
+function selectCat(cat) {
+    currentCat = cat;
+    renderCatTabs();
+    renderSaisiesList();
+}
+
+function renderSaisiesList() {
+    const box = document.getElementById('saisiesList');
+    const list = (currentCat === "Toutes" ? saisies : saisies.filter(s => s.type === currentCat))
+        .slice()
+        .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+
+    if (list.length === 0) {
+        box.innerHTML = '<p class="muted">Aucune saisie enregistrée dans cette catégorie.</p>';
+        return;
+    }
+
+    box.innerHTML = list.map(s => `
+        <div class="card">
+            <div class="item-top">
+                <div>
+                    <h3>${escapeHtml(s.designation)}</h3>
+                    <p><strong>Catégorie :</strong> ${escapeHtml(s.type)}</p>
+                </div>
+                <span class="status-badge ${statusClass(s.statut)}">${escapeHtml(s.statut)}</span>
+            </div>
+
+            <p><strong>Quantité :</strong> ${escapeHtml(s.quantite || "Non précisée")}</p>
+            <p><strong>Lieu :</strong> ${escapeHtml(s.lieu)}</p>
+            ${s.suspect ? `<p><strong>Suspect :</strong> ${escapeHtml(s.suspect)}</p>` : ""}
+            <p><strong>Motif :</strong> ${escapeHtml(s.motif)}</p>
+            <p><strong>Agent :</strong> ${escapeHtml(s.agentNom)}</p>
+            <p><strong>Date :</strong> ${new Date(s.createdAt).toLocaleString("fr-FR")}</p>
+            ${s.notes ? `<p><strong>Notes :</strong> ${escapeHtml(s.notes)}</p>` : ""}
+
+            <div class="status-row">
+                <select id="statut-${s.id}">
+                    ${SAISIE_STATUTS.map(st => `<option ${s.statut === st ? 'selected' : ''}>${st}</option>`).join('')}
+                </select>
+                <button onclick="updateStatut(${s.id})">💾 Mettre à jour</button>
+                ${isAdminUser ? `<button class="danger" onclick="deleteSaisie(${s.id})">🗑️ Supprimer</button>` : ""}
+            </div>
+        </div>
+    `).join('');
+}
+
+async function loadSaisies() {
+    try {
+        const res = await fetch("/api/saisies");
+        if (!res.ok) throw new Error("Erreur serveur (" + res.status + ")");
+        saisies = await res.json();
+        renderSaisiesList();
+    } catch (err) {
+        document.getElementById('saisiesList').innerHTML = `<p class="muted">Erreur de chargement : ${escapeHtml(err.message)}</p>`;
+    }
+}
+
+async function checkAdmin() {
+    try {
+        const res = await fetch("/api/is-admin");
+        const data = await res.json();
+        isAdminUser = !!data.isAdmin;
+    } catch {
+        isAdminUser = false;
+    }
+}
+
+document.getElementById('saisieForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const payload = {
+        type: document.getElementById('saisieType').value,
+        designation: document.getElementById('saisieDesignation').value.trim(),
+        quantite: document.getElementById('saisieQuantite').value.trim(),
+        lieu: document.getElementById('saisieLieu').value.trim(),
+        suspect: document.getElementById('saisieSuspect').value.trim(),
+        motif: document.getElementById('saisieMotif').value.trim()
+    };
+
+    try {
+        const res = await fetch("/api/saisies/add", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Erreur lors de l'enregistrement.");
+
+        document.getElementById('saisieForm').reset();
+        alert("Saisie enregistrée avec succès.");
+        await loadSaisies();
+    } catch (err) {
+        alert(err.message);
+    }
+});
+
+async function updateStatut(id) {
+    const statut = document.getElementById(`statut-${id}`).value;
+    const notes = prompt("Ajouter une note à ce changement de statut (facultatif) :", "") || "";
+
+    try {
+        const res = await fetch(`/api/saisies/${id}/statut`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ statut, notes })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Erreur lors de la mise à jour.");
+
+        await loadSaisies();
+    } catch (err) {
+        alert(err.message);
+    }
+}
+
+async function deleteSaisie(id) {
+    if (!confirm("Supprimer définitivement cette saisie de l'inventaire ?")) return;
+
+    try {
+        const res = await fetch(`/api/saisies/${id}`, { method: "DELETE" });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Erreur lors de la suppression.");
+
+        await loadSaisies();
+    } catch (err) {
+        alert(err.message);
+    }
+}
+
+async function init() {
+    renderCatTabs();
+    await checkAdmin();
+    await loadSaisies();
+}
+
+init();
+</script>
+
+</body>
+</html>
