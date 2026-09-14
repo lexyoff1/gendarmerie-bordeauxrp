@@ -205,9 +205,9 @@ const SPECIALITES = [
     },
 
     {
-        id: "bdr-pjgn",
-        nom: "BDR (Brigade de Recherche)",
-        titre: "Brigade de Recherche / Police Judiciaire de la Gendarmerie Nationale",
+        id: "bdr",
+        nom: "BDR Brigade de Recherches",
+        titre: "Brigade de Recherches de la Gendarmerie Nationale",
         description: "Unité qui mène les enquêtes judiciaires importantes : analyses, auditions, filatures, preuves.",
         responsableRoleId: "1279483712139952281",
         adjointRoleId: "1279490647430135872",
@@ -218,10 +218,10 @@ const SPECIALITES = [
             { type: "textarea", question: "Nom & Prénom RP" },
             { type: "textarea", question: "Âge RP" },
             { type: "radio", question: "Avez-vous un casier judiciaire ?", options: ["Oui", "Non"] },
-            { type: "textarea", question: "Pourquoi postuler au PJGN ? (2 lignes minimum)" },
+            { type: "textarea", question: "Pourquoi postuler à la BDR ? (2 lignes minimum)" },
             { type: "textarea", question: "Quelle est votre motivation pour nous rejoindre ? (3 lignes minimum)" },
             { type: "textarea", question: "Pourquoi vous et pas un autre ? (2 lignes minimum)" },
-            { type: "textarea", question: "Que apporterez-vous au PJGN ? (Développez)" },
+            { type: "textarea", question: "Que apporterez-vous à la BDR ? (Développez)" },
             { type: "textarea", question: "Citez 3 qualités que vous possédez" },
             { type: "textarea", question: "Citez 3 défauts que vous possédez" },
             { type: "textarea", question: "Mot de fin" }
@@ -1694,10 +1694,8 @@ const RENFORT_ROLES = {
     "Territoriale": "1167182889365012580",
     "PSIG": "1167189238941495390",
     "AGIGN": "1167189220385890397",
-    "BDR / PJGN": "1167189229625938010",
-    "Gendarmerie Mobile": "1167189234801721474",
+    "BDR Brigade de Recherches": "1167189229625938010",
     "PGHM": "1175760189857726584",
-    "GIC": "1167189241940426782",
     "EDCF": "1167189222038438000"
 };
 
