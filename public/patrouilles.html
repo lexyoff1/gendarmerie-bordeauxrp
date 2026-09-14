@@ -133,9 +133,7 @@ section h2 {
 .psig { background: #004066; }
 .edcf { background: #506fc7; }
 .agign { background: #333; }
-.gm { background: #d79b32; }
-.pjgn { background: #45bfb7; }
-.gic { background: #74cdb5; }
+.bdr { background: #45bfb7; }
 .pghm { background: #2f7778; }
 
 .patrol-table {
@@ -238,7 +236,6 @@ section h2 {
 .badge-sop { background: #f0a85a; color: white; }
 .badge-sob { background: #f1d34f; color: black; }
 .badge-gav { background: #9b9be8; color: white; }
-.badge-gic { background: #8ccad0; color: #123; }
 .badge-green { background: #2ecc71; color: white; }
 .badge-red { background: #e74c3c; color: white; }
 .badge-blue { background: #3f51b5; color: white; }
@@ -253,11 +250,10 @@ section h2 {
 .badge-brown { background: #8B4513; color: white; }
 .badge-darkgreen { background: #00695c; color: white; }
 .badge-agign { background: #3d3d3d; color: white; }
-.badge-pjgn { background: #45bfb7; color: white; }
+.badge-bdr { background: #45bfb7; color: white; }
 .badge-pghm { background: #2f7778; color: white; }
 .badge-edcf { background: #506fc7; color: white; }
 .badge-psig { background: #d9c36a; color: black; }
-.badge-gm { background: #d79b32; color: white; }
 
 footer {
   background: rgba(0, 0, 0, 0.7);
@@ -535,11 +531,11 @@ const SECTIONS = [
         rows: ["AGIGN 250 ALPHA", "AGIGN 251 BRAVO", "AGIGN 350 COMMANDEMENT"]
     },
     {
-        title: "PJGN ・ Pôle Judiciaire De La Gendarmerie Nationale",
-        className: "pjgn",
-        vehicules: "PJGN",
-        columns: ["CONDUCTEUR PJGN", "CHEF DE BORD PJGN", "ÉQUIPIER 1", "ÉQUIPIER 2"],
-        rows: ["PJGN ALPHA", "PJGN BRAVO"]
+        title: "BDR ・ Brigade de Recherches",
+        className: "bdr",
+        vehicules: "BDR",
+        columns: ["CONDUCTEUR BDR", "CHEF DE BORD BDR", "ÉQUIPIER 1", "ÉQUIPIER 2"],
+        rows: ["BDR ALPHA", "BDR BRAVO"]
     },
     {
         title: "PGHM ・ Peloton de Gendarmerie De Haute Montagne",
@@ -563,9 +559,7 @@ function getVehicleClass(vehicle = "") {
     if (vehicle.includes("Sérigraphies")) return "badge-ofs";
     if (vehicle.includes("ERI") || vehicle.includes("EDCF") || vehicle.includes("Corbeta") || vehicle.includes("Determinator")) return "badge-edcf";
     if (vehicle.includes("GIGN") || vehicle.includes("SWAT") || vehicle.includes("Mobile Command")) return "badge-agign";
-    if (vehicle.includes("(GM)") || vehicle.includes("GM 01") || vehicle.includes("GM 02") || vehicle.includes("BUS GN")) return "badge-gm";
-    if (vehicle.includes("PJGN") || vehicle.includes("Bana") || vehicle.includes("RESPONSABLE")) return "badge-pjgn";
-    if (vehicle.includes("GIC") || vehicle.includes("CYNO")) return "badge-gic";
+    if (vehicle.includes("BDR") || vehicle.includes("Bana") || vehicle.includes("RESPONSABLE")) return "badge-bdr";
     if (vehicle.includes("PGHM") || vehicle.includes("R-PGHM") || vehicle.includes("Canyon") || vehicle.includes("4-Wheeler")) return "badge-pghm";
     if (vehicle.includes("2020 Bullhorn Prancer Widebody")) return "badge-ofs";
     if (vehicle.includes("2022 Avantismo Q8") || vehicle.includes("2024 Falcon eStallion") || vehicle.includes("2020 BKM Munich")) return "badge-ofb";
@@ -630,7 +624,7 @@ function formatUser(user) {
         ?.toUpperCase() || "--";
     const indicatif = (user.NIGEND || "--").slice(0, 2);
     const nom = String(user.nomPrenom || user.username || "Inconnu")
-        .replace(/^(COL|LCL|CEN|CNE|LTN|SLT|ASP|MAJ|ADC|ADJ|MDC|GDC|GDS|ELG|MDL|BRC|BRI|GAV)\s*[|・—-]\s*/i, "");
+        .replace(/^(COL|LCL|CEN|CNE|LTN|SLT|ASP|MAJ|ADC|ADJ|MDC|GDC|GDS|ELG|MDL|BRC|BRI|GAV)\s*[|・—•-]\s*/i, "");
     return `${grade} - ${indicatif} • ${nom}`;
 }
 
@@ -681,15 +675,6 @@ function makeSelect(id, type, section = null) {
         }));
         return makeBadgeSelect(id, items, getStatutClass);
     }
-
-    if (type === "chien") {
-        const items = (section.chiens || []).map(c => ({
-            value: c,
-            label: c,
-            raw: c
-        }));
-        return makeBadgeSelect(id, items, () => "badge-gic");
-    }
 }
 
 function toggleBadge(id) {
@@ -735,12 +720,7 @@ function render() {
 
             section.columns.forEach((col, colIndex) => {
                 const id = `${section.className}_${rowIndex}_${colIndex}`;
-
-                if (section.className === "gic" && col === "CYNO") {
-                    html += `<td>${makeSelect(id, "chien", section)}</td>`;
-                } else {
-                    html += `<td>${makeSelect(id, "user", section)}</td>`;
-                }
+                html += `<td>${makeSelect(id, "user", section)}</td>`;
             });
 
             html += `
