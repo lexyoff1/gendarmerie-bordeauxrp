@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Avis de Recherche - Gendarmerie Nationale</title>
+    <style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  color: #e0e0e0;
+  line-height: 1.6;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+header {
+  background: rgba(0, 0, 0, 0.5);
+  border-bottom: 3px solid #d4af37;
+  padding: 2rem;
+  backdrop-filter: blur(10px);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+  flex-wrap: wrap;
+}
+
+.brand-left {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.logo {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 8px rgba(212, 175, 55, 0.5));
+}
+
+.brand h1 {
+  font-size: 2.5rem;
+  color: #d4af37;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+}
+
+.brand p {
+  color: #b0b0b0;
+  font-size: 0.95rem;
+}
+
+nav {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+nav a {
+  color: #e0e0e0;
+  text-decoration: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+  font-weight: 600;
+}
+
+nav a:hover {
+  background: rgba(212, 175, 55, 0.1);
+  color: #d4af37;
+}
+
+main {
+  flex: 1;
+  padding: 3rem 2rem;
+  max-width: 1400px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+main > h2 {
+  font-size: 2.5rem;
+  color: #d4af37;
+  margin-bottom: 2rem;
+  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+.section-title {
+  font-size: 1.8rem;
+  color: #d4af37;
+  margin-top: 3rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 2px solid #d4af37;
+  padding-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.section-title .opj-tag {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #fca5a5;
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  padding: 0.3rem 0.7rem;
+  border-radius: 4px;
+}
+
+.card {
+  background: rgba(220, 38, 38, 0.05);
+  border: 2px solid #dc2626;
+  border-radius: 8px;
+  padding: 2rem;
+  margin-bottom: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  background: rgba(220, 38, 38, 0.08);
+  box-shadow: 0 8px 20px rgba(220, 38, 38, 0.15);
+}
+
+.card h3 {
+  color: #f87171;
+  font-size: 1.3rem;
+  margin-bottom: 0.5rem;
+}
+
+.card p {
+  color: #b0b0b0;
+  margin-bottom: 0.6rem;
+  font-size: 0.95rem;
+}
+
+.card p strong {
+  color: #f87171;
+}
+
+.item-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+label {
+  display: block;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+  color: #d4af37;
+  font-weight: 600;
+}
+
+select,
+input[type="text"],
+textarea {
+  width: 100%;
+  padding: 0.8rem;
+  background: rgba(212, 175, 55, 0.05);
+  color: #e0e0e0;
+  border: 2px solid #d4af37;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+}
+
+select {
+  color-scheme: dark;
+  background-color: #242424;
+}
+
+select option {
+  background: #161616;
+  color: #f4f4f4;
+}
+
+textarea {
+  resize: vertical;
+  min-height: 90px;
+}
+
+select:focus,
+input:focus,
+textarea:focus {
+  outline: none;
+  background: rgba(212, 175, 55, 0.15);
+  box-shadow: 0 0 8px rgba(212, 175, 55, 0.3);
+}
+
+button {
+  background: linear-gradient(135deg, #d4af37 0%, #c9a227 100%);
+  color: #1a1a2e;
+  border: none;
+  padding: 0.7rem 1.5rem;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-top: 1rem;
+  margin-right: 0.5rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+}
+
+button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(212, 175, 55, 0.4);
+}
+
+button.danger {
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+}
+
+button.danger:hover {
+  box-shadow: 0 8px 20px rgba(220, 38, 38, 0.4);
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.form-grid label {
+  margin-top: 0;
+}
+
+.muted {
+  color: #b0b0b0;
+  font-style: italic;
+}
+
+.no-access {
+  color: #b0b0b0;
+  font-style: italic;
+  padding: 1rem 0;
+}
+
+.danger-badge {
+  display: inline-block;
+  padding: 0.3rem 0.9rem;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.danger-faible {
+  background: rgba(34, 197, 94, 0.2);
+  color: #86efac;
+}
+
+.danger-moyenne {
+  background: rgba(251, 191, 36, 0.2);
+  color: #fbbf24;
+}
+
+.danger-elevee {
+  background: rgba(239, 68, 68, 0.25);
+  color: #fca5a5;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.stat-box {
+  background: rgba(212, 175, 55, 0.05);
+  border: 2px solid #d4af37;
+  border-radius: 8px;
+  padding: 1.2rem 1rem;
+  text-align: center;
+}
+
+.stat-box .stat-number {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #d4af37;
+  display: block;
+  line-height: 1.2;
+}
+
+.stat-box .stat-label {
+  font-size: 0.85rem;
+  color: #b0b0b0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.stat-box.stat-total {
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.2) 0%, rgba(201, 162, 39, 0.1) 100%);
+}
+
+footer {
+  background: rgba(0, 0, 0, 0.7);
+  border-top: 2px solid #d4af37;
+  padding: 2rem;
+  text-align: center;
+  color: #b0b0b0;
+  font-size: 0.9rem;
+  margin-top: auto;
+}
+
+footer p {
+  margin: 0.5rem 0;
+}
+
+@media (max-width: 768px) {
+  header { padding: 1.5rem; }
+  .brand { flex-direction: column; align-items: flex-start; }
+  .brand-left { flex-direction: column; width: 100%; }
+  .brand h1 { font-size: 1.8rem; }
+  .logo { width: 60px; height: 60px; }
+  nav { width: 100%; }
+  nav a { flex: 1; text-align: center; }
+  main { padding: 1.5rem 1rem; }
+  main > h2 { font-size: 1.8rem; }
+  .card { padding: 1.5rem; }
+  .form-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 480px) {
+  header { padding: 1rem; }
+  .brand h1 { font-size: 1.5rem; }
+  .logo { width: 50px; height: 50px; }
+  main { padding: 1rem; }
+  button, select, input, textarea { font-size: 16px; }
+  .section-title { font-size: 1.3rem; }
+  footer { padding: 1.5rem; }
+  .stat-box .stat-number { font-size: 1.5rem; }
+}
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="brand">
+        <div class="brand-left">
+            <img src="/assets/logo-gendarmerie.png" class="logo" alt="Logo Gendarmerie">
+            <div>
+                <h1>Gendarmerie Nationale</h1>
+                <p>Avis de Recherche</p>
+            </div>
+        </div>
+        <nav>
+            <a href="/dashboard">Dashboard</a>
+            <a href="/rapports">Rapports</a>
+            <a href="/saisies">Saisies</a>
+            <a href="/logout">Déconnexion</a>
+        </nav>
+    </div>
+</header>
+
+<main>
+    <h2>🚨 Avis de Recherche</h2>
+
+    <div class="stats-grid" id="statsGrid"></div>
+
+    <h2 class="section-title">
+        📝 Publier un avis de recherche
+        <span class="opj-tag">Réservé OPJ</span>
+    </h2>
+
+    <div class="card" id="avisFormCard" style="display:none;">
+        <form id="avisForm">
+            <div class="form-grid">
+                <div>
+                    <label for="avisSuspect">Nom du suspect *</label>
+                    <input type="text" id="avisSuspect" placeholder="Ex: Jean Dupont" required>
+                </div>
+                <div>
+                    <label for="avisDangerosite">Niveau de dangerosité *</label>
+                    <select id="avisDangerosite" required>
+                        <option value="">-- Sélectionner --</option>
+                        <option>Faible</option>
+                        <option>Moyenne</option>
+                        <option>Élevée</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="avisLieu">Dernier lieu vu</label>
+                    <input type="text" id="avisLieu" placeholder="Ex: Centre-ville, quartier Nord...">
+                </div>
+                <div>
+                    <label for="avisAgent">OPJ responsable</label>
+                    <input type="text" id="avisAgent" readonly placeholder="Auto-rempli">
+                </div>
+            </div>
+
+            <label for="avisDescription">Description physique / signes distinctifs</label>
+            <textarea id="avisDescription" placeholder="Taille, corpulence, tatouages, vêtements habituels..."></textarea>
+
+            <label for="avisMotif">Motif de l'avis de recherche *</label>
+            <textarea id="avisMotif" placeholder="Faits reprochés, mandat, contexte..." required></textarea>
+
+            <button type="submit">🚨 Publier l'avis de recherche</button>
+        </form>
+    </div>
+
+    <p class="no-access" id="avisNoAccess" style="display:none;">
+        Seuls les Officiers de Police Judiciaire (OPJ) peuvent publier ou supprimer un avis de recherche.
+    </p>
+
+    <h2 class="section-title">📋 Avis actifs</h2>
+    <div id="avisList"><p class="muted">Chargement...</p></div>
+</main>
+
+<footer>
+    <p>© 2026 lexy_off1 — Tous droits réservés</p>
+</footer>
+
+<script>
+let avisListData = [];
+let currentUser = { id: null, nom: "", isOpj: false, isAdmin: false };
+
+function escapeHtml(value) {
+    return String(value ?? '').replace(/[&<>'"]/g, char => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+    })[char]);
+}
+
+function dangerClass(niveau) {
+    return { "Faible": "danger-faible", "Moyenne": "danger-moyenne", "Élevée": "danger-elevee" }[niveau] || "danger-faible";
+}
+
+/* ============ UTILISATEUR / RÔLES ============ */
+/* Le rôle OPJ n'est pas un rôle Discord : c'est le champ
+   user.qualificationJudiciaire === "OPJ" côté serveur (voir /api/is-opj). */
+
+async function loadMe() {
+    try {
+        const [meRes, adminRes, opjRes] = await Promise.all([
+            fetch("/api/me"),
+            fetch("/api/is-admin"),
+            fetch("/api/is-opj")
+        ]);
+        const me = await meRes.json();
+        const adminData = await adminRes.json();
+        const opjData = await opjRes.json();
+
+        currentUser = {
+            id: me?.id ?? null,
+            nom: me?.nomPrenom || me?.username || "",
+            isOpj: !!opjData.isOpj,
+            isAdmin: !!adminData.isAdmin
+        };
+    } catch {
+        currentUser = { id: null, nom: "", isOpj: false, isAdmin: false };
+    }
+
+    document.getElementById('avisAgent').value = currentUser.nom || "Inconnu";
+    document.getElementById('avisFormCard').style.display = currentUser.isOpj ? "block" : "none";
+    document.getElementById('avisNoAccess').style.display = currentUser.isOpj ? "none" : "block";
+}
+
+/* ============ STATS ============ */
+
+function renderStats() {
+    const total = avisListData.length;
+    const faible = avisListData.filter(a => a.dangerosite === "Faible").length;
+    const moyenne = avisListData.filter(a => a.dangerosite === "Moyenne").length;
+    const elevee = avisListData.filter(a => a.dangerosite === "Élevée").length;
+
+    document.getElementById('statsGrid').innerHTML = `
+        <div class="stat-box stat-total">
+            <span class="stat-number">${total}</span>
+            <span class="stat-label">Avis actifs</span>
+        </div>
+        <div class="stat-box">
+            <span class="stat-number">${faible}</span>
+            <span class="stat-label">Dangerosité faible</span>
+        </div>
+        <div class="stat-box">
+            <span class="stat-number">${moyenne}</span>
+            <span class="stat-label">Dangerosité moyenne</span>
+        </div>
+        <div class="stat-box">
+            <span class="stat-number">${elevee}</span>
+            <span class="stat-label">Dangerosité élevée</span>
+        </div>
+    `;
+}
+
+/* ============ AVIS DE RECHERCHE ============ */
+
+async function loadAvis() {
+    try {
+        const res = await fetch("/api/avis");
+        if (!res.ok) throw new Error("Erreur serveur (" + res.status + ")");
+        avisListData = await res.json();
+        renderAvisList();
+        renderStats();
+    } catch (err) {
+        document.getElementById('avisList').innerHTML = `<p class="muted">Erreur de chargement : ${escapeHtml(err.message)}</p>`;
+    }
+}
+
+function renderAvisList() {
+    const box = document.getElementById('avisList');
+    const list = avisListData.slice().sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+
+    if (list.length === 0) {
+        box.innerHTML = '<p class="muted">Aucun avis de recherche actif.</p>';
+        return;
+    }
+
+    box.innerHTML = list.map(a => `
+        <div class="card">
+            <div class="item-top">
+                <div>
+                    <h3>${escapeHtml(a.suspectNom)}</h3>
+                    <p><strong>OPJ responsable :</strong> ${escapeHtml(a.agentNom)}</p>
+                </div>
+                <span class="danger-badge ${dangerClass(a.dangerosite)}">Dangerosité : ${escapeHtml(a.dangerosite)}</span>
+            </div>
+
+            ${a.lieu ? `<p><strong>Dernier lieu vu :</strong> ${escapeHtml(a.lieu)}</p>` : ""}
+            ${a.description ? `<p><strong>Description :</strong> ${escapeHtml(a.description)}</p>` : ""}
+            <p><strong>Motif :</strong> ${escapeHtml(a.motif)}</p>
+            <p><strong>Publié le :</strong> ${new Date(a.createdAt).toLocaleString("fr-FR")}</p>
+
+            ${currentUser.isOpj ? `
+                <div>
+                    <button class="danger" onclick="deleteAvis(${a.id})">🗑️ Supprimer l'avis</button>
+                </div>
+            ` : ""}
+        </div>
+    `).join('');
+}
+
+document.getElementById('avisForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const payload = {
+        suspectNom: document.getElementById('avisSuspect').value.trim(),
+        dangerosite: document.getElementById('avisDangerosite').value,
+        lieu: document.getElementById('avisLieu').value.trim(),
+        description: document.getElementById('avisDescription').value.trim(),
+        motif: document.getElementById('avisMotif').value.trim()
+    };
+
+    try {
+        // Le backend DOIT revérifier isOpj côté serveur avant toute création
+        // (le masquage du formulaire côté client n'est qu'un confort visuel).
+        // NOTE BACKEND : à la création, ajouter une entrée dans l'historique
+        // (action="Création", agentNom, suspectNom, date) pour la traçabilité.
+        const res = await fetch("/api/avis/add", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Erreur lors de la publication.");
+
+        document.getElementById('avisForm').reset();
+        document.getElementById('avisAgent').value = currentUser.nom || "Inconnu";
+        alert("Avis de recherche publié.");
+        await loadAvis();
+    } catch (err) {
+        alert(err.message);
+    }
+});
+
+async function deleteAvis(id) {
+    if (!confirm("Supprimer définitivement cet avis de recherche ?")) return;
+
+    try {
+        // Le serveur envoie un MP de notification (même mécanique que pour
+        // la suppression d'une saisie) — voir /api/avis/:id DELETE.
+        const res = await fetch(`/api/avis/${id}`, { method: "DELETE" });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Erreur lors de la suppression.");
+
+        await loadAvis();
+    } catch (err) {
+        alert(err.message);
+    }
+}
+
+/* ============ INIT ============ */
+
+async function init() {
+    await loadMe();
+    await loadAvis();
+}
+
+init();
+</script>
+
+</body>
+</html>
