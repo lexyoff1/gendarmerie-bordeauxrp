@@ -309,6 +309,96 @@ button.cat-btn.active {
   min-width: 180px;
 }
 
+/* --- Résumé / statistiques --- */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.stat-box {
+  background: rgba(212, 175, 55, 0.05);
+  border: 2px solid #d4af37;
+  border-radius: 8px;
+  padding: 1.2rem 1rem;
+  text-align: center;
+}
+
+.stat-box .stat-number {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #d4af37;
+  display: block;
+  line-height: 1.2;
+}
+
+.stat-box .stat-label {
+  font-size: 0.85rem;
+  color: #b0b0b0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.stat-box.stat-total {
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.2) 0%, rgba(201, 162, 39, 0.1) 100%);
+}
+
+.breakdown-block {
+  background: rgba(212, 175, 55, 0.05);
+  border: 2px solid #d4af37;
+  border-radius: 8px;
+  padding: 1.2rem 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.breakdown-block h4 {
+  color: #d4af37;
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.9rem;
+}
+
+.breakdown-row {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin-bottom: 0.6rem;
+}
+
+.breakdown-row:last-child {
+  margin-bottom: 0;
+}
+
+.breakdown-name {
+  min-width: 150px;
+  color: #e0e0e0;
+  font-size: 0.9rem;
+}
+
+.breakdown-bar-track {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 4px;
+  height: 10px;
+  overflow: hidden;
+}
+
+.breakdown-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #d4af37 0%, #c9a227 100%);
+  border-radius: 4px;
+}
+
+.breakdown-count {
+  min-width: 28px;
+  text-align: right;
+  color: #d4af37;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
 footer {
   background: rgba(0, 0, 0, 0.7);
   border-top: 2px solid #d4af37;
@@ -371,6 +461,10 @@ footer p {
   .form-grid {
     grid-template-columns: 1fr;
   }
+
+  .breakdown-name {
+    min-width: 110px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -405,6 +499,10 @@ footer p {
   footer {
     padding: 1.5rem;
   }
+
+  .stat-box .stat-number {
+    font-size: 1.5rem;
+  }
 }
     </style>
 </head>
@@ -428,6 +526,20 @@ footer p {
 
 <main>
     <h2>🔒 Stockage des Saisies</h2>
+
+    <h2 class="section-title">📊 Résumé</h2>
+
+    <div class="stats-grid" id="statsGrid"></div>
+
+    <div class="breakdown-block">
+        <h4>Répartition par catégorie</h4>
+        <div id="breakdownCategorie"></div>
+    </div>
+
+    <div class="breakdown-block">
+        <h4>Répartition par statut</h4>
+        <div id="breakdownStatut"></div>
+    </div>
 
     <h2 class="section-title">📝 Déclarer une nouvelle saisie</h2>
     <div class="card">
@@ -502,6 +614,66 @@ function statusClass(statut) {
     }[statut] || "status-stocke";
 }
 
+function renderStats() {
+    const total = saisies.length;
+    const stocke = saisies.filter(s => s.statut === "Stocké").length;
+    const restitue = saisies.filter(s => s.statut === "Restitué").length;
+    const detruit = saisies.filter(s => s.statut === "Détruit").length;
+    const transfere = saisies.filter(s => s.statut === "Transféré").length;
+
+    document.getElementById('statsGrid').innerHTML = `
+        <div class="stat-box stat-total">
+            <span class="stat-number">${total}</span>
+            <span class="stat-label">Total saisies</span>
+        </div>
+        <div class="stat-box">
+            <span class="stat-number">${stocke}</span>
+            <span class="stat-label">Stocké</span>
+        </div>
+        <div class="stat-box">
+            <span class="stat-number">${restitue}</span>
+            <span class="stat-label">Restitué</span>
+        </div>
+        <div class="stat-box">
+            <span class="stat-number">${detruit}</span>
+            <span class="stat-label">Détruit</span>
+        </div>
+        <div class="stat-box">
+            <span class="stat-number">${transfere}</span>
+            <span class="stat-label">Transféré</span>
+        </div>
+    `;
+
+    const categories = SAISIE_CATEGORIES.filter(c => c !== "Toutes");
+    const maxCat = Math.max(1, ...categories.map(c => saisies.filter(s => s.type === c).length));
+
+    document.getElementById('breakdownCategorie').innerHTML = categories.map(cat => {
+        const count = saisies.filter(s => s.type === cat).length;
+        const pct = Math.round((count / maxCat) * 100);
+        return `
+            <div class="breakdown-row">
+                <span class="breakdown-name">${escapeHtml(cat)}</span>
+                <div class="breakdown-bar-track"><div class="breakdown-bar-fill" style="width:${pct}%"></div></div>
+                <span class="breakdown-count">${count}</span>
+            </div>
+        `;
+    }).join('');
+
+    const maxStatut = Math.max(1, ...SAISIE_STATUTS.map(st => saisies.filter(s => s.statut === st).length));
+
+    document.getElementById('breakdownStatut').innerHTML = SAISIE_STATUTS.map(st => {
+        const count = saisies.filter(s => s.statut === st).length;
+        const pct = Math.round((count / maxStatut) * 100);
+        return `
+            <div class="breakdown-row">
+                <span class="breakdown-name">${escapeHtml(st)}</span>
+                <div class="breakdown-bar-track"><div class="breakdown-bar-fill" style="width:${pct}%"></div></div>
+                <span class="breakdown-count">${count}</span>
+            </div>
+        `;
+    }).join('');
+}
+
 function renderCatTabs() {
     const box = document.getElementById('saisieCatTabs');
     box.innerHTML = SAISIE_CATEGORIES.map(c => `
@@ -560,6 +732,7 @@ async function loadSaisies() {
         const res = await fetch("/api/saisies");
         if (!res.ok) throw new Error("Erreur serveur (" + res.status + ")");
         saisies = await res.json();
+        renderStats();
         renderSaisiesList();
     } catch (err) {
         document.getElementById('saisiesList').innerHTML = `<p class="muted">Erreur de chargement : ${escapeHtml(err.message)}</p>`;
