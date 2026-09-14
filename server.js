@@ -380,6 +380,18 @@ function saveData(data) {
     fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2));
 }
 
+// Trie une liste d'utilisateurs selon l'ordre hiérarchique défini dans
+// GRADES (du Colonel au Gendarme Adjoint Volontaire). Les grades non
+// reconnus sont placés à la fin.
+function gradeSortIndex(grade) {
+    const index = GRADES.indexOf(grade);
+    return index === -1 ? GRADES.length : index;
+}
+
+function sortUsersByGrade(users) {
+    return [...(users || [])].sort((a, b) => gradeSortIndex(a.grade) - gradeSortIndex(b.grade));
+}
+
 let defaultVehiculesCache = null;
 
 function getDefaultVehicules() {
@@ -1062,6 +1074,7 @@ app.get("/api/admin/data", requireAdmin, (req, res) => {
 
     res.json({
         ...db,
+        users: sortUsersByGrade(db.users),
         admins: db.admins || (db.users || []).filter(user => adminIds.includes(user.id)),
         gnApplications: db.applications || [],
         roleCatalog: {
@@ -1375,7 +1388,7 @@ app.get("/api/effectifs", requireLogin, requireGNMember, async (req, res) => {
         }
     }));
 
-    res.json(usersWithCommandement);
+    res.json(sortUsersByGrade(usersWithCommandement));
 });
 
 app.get("/api/patrouilles", requireLogin, requireGNMember, (req, res) => {
@@ -1799,7 +1812,7 @@ app.get("/api/users", requireAdminAccess, async (req, res) => {
         }
 
         const db = getData();
-        return res.json(db.users);
+        return res.json(sortUsersByGrade(db.users));
     } catch (err) {
         return res.status(500).json({ error: err.message });
     }
