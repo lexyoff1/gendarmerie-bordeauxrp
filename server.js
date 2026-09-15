@@ -35,8 +35,6 @@ https://gendarmerie-bordeauxrp.com/tickets-commandement?id=${ticket.id}`
 
 const app = express();
 
-// Le bot ne traite les MP que pour les administrateurs qui viennent d'être ajoutés.
-// Le mot de passe est haché avant d'être enregistré.
 const discordBot = new Client({
     intents: [GatewayIntentBits.Guilds, GatewayIntentBits.DirectMessages, GatewayIntentBits.MessageContent],
     partials: [Partials.Channel]
@@ -336,9 +334,6 @@ const SPECIALITES = [
 }
 ];
 
-// Le chemin du fichier de données peut être redirigé vers un disque persistant
-// Render (Settings > Disks, ex: mount path /var/data), sinon on garde le
-// fichier local par défaut pour le développement.
 const DATA_FILE = process.env.DATA_FILE_PATH || path.join(__dirname, "data.json");
 
 function getData() {
@@ -380,9 +375,6 @@ function saveData(data) {
     fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2));
 }
 
-// Trie une liste d'utilisateurs selon l'ordre hiérarchique défini dans
-// GRADES (du Colonel au Gendarme Adjoint Volontaire). Les grades non
-// reconnus sont placés à la fin.
 function gradeSortIndex(grade) {
     const index = GRADES.indexOf(grade);
     return index === -1 ? GRADES.length : index;
@@ -873,12 +865,6 @@ app.get("/index.html", (req, res) => {
     res.redirect("/");
 });
 
-// ---------------------------------------------------------------------
-// Pages "simples" servies directement depuis /public, protégées par
-// requireLogin + requireGNMember. On déclare ici une seule fois la liste
-// (route propre -> fichier), ce qui génère à la fois la route sans
-// extension et une redirection 301 depuis l'ancienne URL en .html.
-// ---------------------------------------------------------------------
 const PAGES_PROTEGEES = [
     ["dashboard", "dashboard.html"],
     ["effectifs", "effectifs.html"],
@@ -914,11 +900,9 @@ for (const [cleanPath, fileName] of PAGES_PROTEGEES) {
     app.get(`/${cleanPath}`, requireLogin, requireGNMember, (req, res) => {
         res.sendFile(path.join(__dirname, "public", fileName));
     });
-    // Ancienne URL en .html : redirection permanente vers la nouvelle URL propre.
     app.get(`/${fileName}`, (req, res) => res.redirect(301, `/${cleanPath}`));
 }
 
-// Pages publiques historiques conservées afin que les liens de l'accueil ne renvoient pas une erreur 404.
 app.get("/gn-login", (req, res) => {
     res.redirect("/auth/discord");
 });
@@ -943,9 +927,9 @@ app.post("/api/candidatures", async (req, res) => {
 const application = {
     id: Date.now(),
     nomPrenom: `${req.body.nom.trim()} ${req.body.prenom.trim()}`,
-    user: req.body.email.trim(),          // pseudo Discord
-    username: req.body.email.trim(),      // compatibilité admin.html
-    discordId: req.body.telephone.trim(), // ID Discord
+    user: req.body.email.trim(),
+    username: req.body.email.trim(),
+    discordId: req.body.telephone.trim(),
     dateNaissance: req.body.dateNaissance,
     diplome: req.body.diplome.trim(),
     experience: req.body.experience.trim(),
@@ -966,11 +950,7 @@ Date de dépôt : ${new Date(application.createdAt).toLocaleString("fr-FR")}
 
 Le dossier est disponible dans le panel administrateur.`;
 
-    // Les membres ayant le rôle administrateur sont avertis dès qu'un dossier
-    // est envoyé. Un échec de MP ne doit jamais empêcher le dépôt du candidat.
     await sendDMToRole(ADMIN_ROLE_ID, messageCandidature);
-
-    // Le Responsable CIR est également averti pour traitement rapide du dossier.
     await sendDMToRole(ROLE_RESP_CIR, messageCandidature);
 
     res.status(201).json({ success: true });
@@ -1031,11 +1011,8 @@ app.post("/api/admin/login", (req, res) => {
     const password = String(req.body.password || "");
     const suppliedHash = crypto.createHash("sha256").update(password).digest("hex");
 
-    // Plusieurs comptes "système" peuvent être définis dans le .env, en listant
-    // les pseudos et les hachages de mot de passe dans le même ordre, séparés
-    // par des virgules :
-    //   SYSTEM_ADMIN_USERNAME=systeme,lexy,dupont,martin
-    //   SYSTEM_ADMIN_PASSWORD_HASH=hash1,hash2,hash3,hash4
+    // SYSTEM_ADMIN_USERNAME=systeme,lexy,dupont,martin
+    // SYSTEM_ADMIN_PASSWORD_HASH=hash1,hash2,hash3,hash4
     const systemUsernames = (process.env.SYSTEM_ADMIN_USERNAME || "systeme")
         .split(",").map(name => name.trim().toLowerCase()).filter(Boolean);
     const systemHashes = (process.env.SYSTEM_ADMIN_PASSWORD_HASH || "")
@@ -1473,8 +1450,6 @@ app.get("/api/vehicules", requireAdminAccess, (req, res) => {
 });
 
 app.get("/api/vehicules/list", requireLogin, requireGNMember, (req, res) => {
-    // Les patrouilles ont besoin de la couleur configurée dans le panel admin,
-    // pas seulement du nom du véhicule.
     res.json(getVehicules(getData()));
 });
 
@@ -1521,9 +1496,6 @@ app.post("/api/vehicules/delete", requireAdminAccess, (req, res) => {
 app.get("/api/contact", (req, res) => {
     const db = getData();
 
-    // Retire un éventuel préfixe de grade du type "LTN ・ ", "LTN • " ou
-    // "LTN - " au cas où il aurait été saisi par erreur dans le nom/prénom
-    // (plusieurs caractères séparateurs sont tolérés).
     const stripGradePrefix = value => String(value || "").replace(/^[A-ZÀ-Ü]{2,5}\s*[・•·:-]\s*/, "").trim();
 
     const contactForGrade = prefix => {
@@ -2141,13 +2113,6 @@ app.post("/api/tickets-commandement/:id/claim",
     });
 });
 
-// -----------------------------------------------------------------------
-// Stockage des saisies : inventaire des objets saisis lors d'interventions
-// (armes, drogue, véhicules, argent, etc.). Consultable et modifiable par
-// tout membre GN connecté ; la suppression définitive reste réservée aux
-// administrateurs (verrou "Code d'accès administrateur").
-// -----------------------------------------------------------------------
-
 const SAISIE_STATUTS_VALIDES = ["Stocké", "Restitué", "Détruit", "Transféré"];
 
 app.get("/api/saisies", requireLogin, requireGNMember, (req, res) => {
@@ -2252,17 +2217,9 @@ Gendarmerie Nationale`;
     res.json({ success: true });
 });
 
-// -----------------------------------------------------------------------
-// Rôle OPJ (Officier de Police Judiciaire)
-// Ce n'est pas un rôle Discord : c'est le champ user.qualificationJudiciaire
-// (déjà présent sur vos utilisateurs, calculé selon le grade par
-// getDefaultQualificationJudiciaire, et modifiable manuellement dans le
-// panel admin via /api/user/:id/update).
-// -----------------------------------------------------------------------
-
 async function isOPJ(req) {
     if (!req.session.user) return false;
-    if (await isAdmin(req)) return true; // les admins ont toutes les habilitations
+    if (await isAdmin(req)) return true;
 
     const db = getData();
     const user = db.users.find(u => u.id === req.session.user.id);
@@ -2279,13 +2236,6 @@ async function requireOPJ(req, res, next) {
 app.get("/api/is-opj", requireLogin, requireGNMember, async (req, res) => {
     res.json({ isOpj: await isOPJ(req) });
 });
-
-// -----------------------------------------------------------------------
-// Avis de recherche
-// Création et suppression réservées aux OPJ (ou admins). Toute suppression
-// envoie un MP de notification à SAISIE_DELETE_NOTIFY_ID, exactement comme
-// pour la suppression d'une saisie.
-// -----------------------------------------------------------------------
 
 const AVIS_DANGEROSITE_VALIDES = ["Faible", "Moyenne", "Élevée"];
 
@@ -2338,8 +2288,6 @@ app.delete("/api/avis/:id", requireLogin, requireGNMember, requireOPJ, async (re
 
     const suppresseur = req.session.user?.nomPrenom || req.session.user?.username || "Inconnu";
 
-    // Même mécanique que pour la suppression d'une saisie : MP à la même
-    // personne (SAISIE_DELETE_NOTIFY_ID).
     const message =
 `🗑️ SUPPRESSION D'UN AVIS DE RECHERCHE
 
@@ -2363,23 +2311,14 @@ Gendarmerie Nationale`;
     res.json({ success: true });
 });
 
-// -----------------------------------------------------------------------
-// Rapports de patrouille
-// Statuts : Brouillon (privé à l'auteur, modifiable) -> Validé (verrouillé,
-// envoyé dans un salon Discord dédié, sans ping, au format Groupement de
-// Gironde) -> Archivé (admins uniquement).
-// -----------------------------------------------------------------------
-
 const RAPPORTS_CHANNEL_ID = process.env.RAPPORTS_CHANNEL_ID;
 
 app.get("/api/rapports", requireLogin, requireGNMember, async (req, res) => {
     const db = getData();
     const admin = await isAdmin(req);
 
-    // Un brouillon n'est visible que par son auteur (ou un admin) ;
-    // les rapports validés/archivés sont visibles par tous les membres GN.
     const visibles = (db.rapports || []).filter(r =>
-        r.statut !== "Brouillon" || r.auteurId === req.session.user.id || admin
+        r.auteurId === req.session.user.id || admin
     );
 
     res.json(visibles);
@@ -2418,7 +2357,6 @@ app.post("/api/rapports/brouillon", requireLogin, requireGNMember, (req, res) =>
     if (!Array.isArray(db.rapports)) db.rapports = [];
     const user = db.users.find(u => u.id === req.session.user.id);
 
-    // Mise à jour d'un brouillon existant
     if (id) {
         const rapport = db.rapports.find(r => String(r.id) === String(id));
         if (!rapport) return res.status(404).json({ error: "Rapport introuvable." });
@@ -2437,7 +2375,6 @@ app.post("/api/rapports/brouillon", requireLogin, requireGNMember, (req, res) =>
         return res.json({ success: true, rapport });
     }
 
-    // Création d'un nouveau brouillon
     const rapport = {
         id: Date.now(),
         type: "Rapport de patrouille",
@@ -2475,12 +2412,8 @@ app.post("/api/rapports/:id/valider", requireLogin, requireGNMember, async (req,
         ? new Date(rapport.dateRedaction).toLocaleString("fr-FR", { dateStyle: "short", timeStyle: "short" })
         : "Non renseignée";
 
-    // Emoji personnalisé unique utilisé pour toute la mise en forme du
-    // message (en-tête, séparateurs de section, bloc "Gendarmerie").
     const EMOJI_LOGO = "<:Logo_Brigade:1541635052432007248>";
 
-    // Un bloc "Gendarmerie" par patrouille, séparé par un trait, pour bien
-    // distinguer plusieurs patrouilles au sein d'un même rapport.
     const blocsPatrouilles = (rapport.patrouilles || []).map(p => {
         const blocEffectifs = (p.effectifs || [])
             .map(e => `- __Militaire :__ ${e.militaire}\n- __Note (Facultatif) :__ ${e.note || "///"}`)
@@ -2498,9 +2431,6 @@ ${p.derouler}
 ${blocEffectifs}`;
     }).join("\n\n⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯\n\n");
 
-    // Message envoyé dans le salon dédié, SANS ping, uniquement à la
-    // validation (jamais lors de l'enregistrement en brouillon). Format
-    // repris à l'identique du modèle Groupement de Gironde.
     const message =
 `## ${EMOJI_LOGO} Groupement de Gironde ${EMOJI_LOGO}
 ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
