@@ -256,6 +256,11 @@ button.danger:hover {
   box-shadow: 0 4px 12px rgba(212, 175, 55, 0.2);
 }
 
+.ticket-item.active {
+  border-color: #4ade80;
+  box-shadow: 0 0 0 2px rgba(74, 222, 128, 0.4);
+}
+
 .ticket-item strong {
   display: block;
   color: #d4af37;
@@ -365,6 +370,31 @@ hr {
 .muted {
   color: #b0b0b0;
   font-size: 0.9rem;
+}
+
+.live-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.75rem;
+  color: #4ade80;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05rem;
+  margin-left: 0.75rem;
+}
+
+.live-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #4ade80;
+  animation: pulse-dot 1.6s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.8); }
 }
 
 footer {
@@ -507,7 +537,7 @@ footer p {
             <img src="/assets/logo-gendarmerie.png" class="logo" alt="Logo Gendarmerie">
             <div>
                 <h1>Gendarmerie Nationale</h1>
-                <p>Tickets Commandement</p>
+                <p>Tickets Commandement <span class="live-indicator"><span class="live-dot"></span>Live</span></p>
             </div>
         </div>
         <nav>
@@ -569,6 +599,9 @@ footer p {
 <script>
 let myTickets = [];
 let allTickets = [];
+let currentTicketId = null;       // ticket actuellement affiché dans le panneau
+const POLL_INTERVAL_MS = 5000;    // fréquence du rafraîchissement auto (5s)
+let pollTimer = null;
 
 function avatarUrl(id, avatar) {
     return avatar
@@ -578,10 +611,10 @@ function avatarUrl(id, avatar) {
 
 function escapeHtml(text) {
     const map = {
-        '&': '&',
-        '<': '<',
-        '>': '>',
-        '"': '"',
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
         "'": '&#039;'
     };
     return text.replace(/[&<>"']/g, m => map[m]);
@@ -632,19 +665,39 @@ async function loadTickets() {
         await loadMyTickets();
         await loadAllTickets();
 
-        if (focusTicketId) {
+        if (focusTicketId && currentTicketId === null) {
+            // premier chargement : on ouvre le ticket ciblé par l'URL (?id=...)
             openTicket(focusTicketId);
+        } else if (currentTicketId !== null) {
+            // rafraîchissements suivants : on réaffiche le ticket déjà ouvert
+            // pour montrer les nouveaux messages, sans perdre le brouillon en cours
+            refreshOpenTicket();
         }
     } catch (error) {
         console.error("Erreur loadTickets:", error);
     }
 }
 
+function refreshOpenTicket() {
+    const textarea = document.getElementById(`reply-${currentTicketId}`);
+    const draft = textarea ? textarea.value : "";
+    const scrollPos = document.getElementById("ticketPanel").scrollTop;
+
+    openTicket(currentTicketId);
+
+    const newTextarea = document.getElementById(`reply-${currentTicketId}`);
+    if (newTextarea && draft) {
+        newTextarea.value = draft;
+    }
+
+    document.getElementById("ticketPanel").scrollTop = scrollPos;
+}
+
 async function loadMyTickets() {
     try {
         const res = await fetch((window.API_BASE || "") + "/api/tickets-commandement/mine");
         if (!res.ok) throw new Error("Erreur");
-        
+
         myTickets = await res.json();
 
         const box = document.getElementById("myTicketsList");
@@ -673,7 +726,7 @@ async function loadAllTickets() {
         }
 
         if (!res.ok) throw new Error("Erreur");
-        
+
         allTickets = await res.json();
 
         document.getElementById("commandementListBox").style.display = "block";
@@ -700,8 +753,10 @@ function ticketButton(ticket) {
     if (ticket.statut === "Pris en charge") statusClass = "ticket-claimed";
     if (ticket.statut === "Fermé") statusClass = "ticket-closed";
 
+    const activeClass = String(ticket.id) === String(currentTicketId) ? "active" : "";
+
     return `
-        <div class="ticket-item ${statusClass}" onclick="openTicket(${ticket.id})">
+        <div class="ticket-item ${statusClass} ${activeClass}" onclick="openTicket(${ticket.id})">
             <strong>TICKET-${String(ticket.id).slice(-7)}</strong>
             <span>${escapeHtml(ticket.sujet)}</span>
             <small>${escapeHtml(ticket.statut)}</small>
@@ -710,6 +765,8 @@ function ticketButton(ticket) {
 }
 
 function openTicket(id) {
+    currentTicketId = id;
+
     const ticket = [...allTickets, ...myTickets].find(t => String(t.id) === String(id));
 
     if (!ticket) return;
@@ -785,6 +842,14 @@ function openTicket(id) {
             ` : `<p class="muted">Ce ticket est fermé.</p>`}
         </div>
     `;
+
+    // met en surbrillance l'item actif dans les listes (sans tout recharger)
+    document.querySelectorAll(".ticket-item").forEach(el => el.classList.remove("active"));
+    document.querySelectorAll(".ticket-item").forEach(el => {
+        if (el.getAttribute("onclick") === `openTicket(${id})`) {
+            el.classList.add("active");
+        }
+    });
 }
 
 async function replyTicket(id) {
@@ -854,6 +919,7 @@ async function archiveTicket(id) {
             return;
         }
 
+        currentTicketId = null;
         await loadTickets();
         document.getElementById("ticketPanel").innerHTML = `<p class="muted">Ticket archivé.</p>`;
     } catch (error) {
@@ -905,7 +971,21 @@ async function reopenTicket(id) {
     }
 }
 
+// Rafraîchissement automatique : on ne pause pas quand l'onglet est en arrière-plan,
+// mais on évite les appels concurrents si un rechargement précédent est encore en cours.
+let isRefreshing = false;
+async function pollLoop() {
+    if (isRefreshing) return;
+    isRefreshing = true;
+    try {
+        await loadTickets();
+    } finally {
+        isRefreshing = false;
+    }
+}
+
 loadTickets();
+pollTimer = setInterval(pollLoop, POLL_INTERVAL_MS);
 </script>
 
 </body>
