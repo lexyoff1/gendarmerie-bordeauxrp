@@ -2113,6 +2113,35 @@ app.post("/api/tickets-commandement/:id/claim",
     });
 });
 
+// NOUVELLE ROUTE : suppression d'un ticket commandement (réservée au commandement)
+app.delete("/api/tickets-commandement/:id/delete",
+    requireLogin,
+    requireGNMember,
+    requireCommandement,
+    (req, res) => {
+
+    const db = getData();
+
+    const ticketExists = db.ticketsCommandement.some(
+        t => t.id == req.params.id
+    );
+
+    if (!ticketExists) {
+        return res.status(404).json({
+            success: false,
+            error: "Ticket introuvable."
+        });
+    }
+
+    db.ticketsCommandement = db.ticketsCommandement.filter(
+        t => t.id != req.params.id
+    );
+
+    saveData(db);
+
+    res.json({ success: true });
+});
+
 const SAISIE_STATUTS_VALIDES = ["Stocké", "Restitué", "Détruit", "Transféré"];
 
 app.get("/api/saisies", requireLogin, requireGNMember, (req, res) => {
