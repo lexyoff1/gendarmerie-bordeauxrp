@@ -537,7 +537,7 @@ footer p {
             <img src="/assets/logo-gendarmerie.png" class="logo" alt="Logo Gendarmerie">
             <div>
                 <h1>Gendarmerie Nationale</h1>
-                <p>Tickets Commandement <span class="live-indicator"><span class="live-dot"></span>Live</span></p>
+                <p>Tickets Commandement</p>
             </div>
         </div>
         <nav>
@@ -836,7 +836,7 @@ function openTicket(id) {
 
             ${canReply ? `
                 <label for="reply-${ticket.id}">Message</label>
-                <textarea id="reply-${ticket.id}" placeholder="Écrire un message..."></textarea>
+                <textarea id="reply-${ticket.id}" placeholder="Écrire un message... (Entrée pour envoyer, Maj+Entrée pour un saut de ligne)"></textarea>
 
                 ${actionButtons}
             ` : `<p class="muted">Ce ticket est fermé.</p>`}
@@ -850,6 +850,18 @@ function openTicket(id) {
             el.classList.add("active");
         }
     });
+
+    if (canReply) {
+        const replyTextarea = document.getElementById(`reply-${id}`);
+        if (replyTextarea) {
+            replyTextarea.addEventListener("keydown", (e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
+                    replyTicket(id);
+                }
+            });
+        }
+    }
 }
 
 async function replyTicket(id) {
