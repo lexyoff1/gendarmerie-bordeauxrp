@@ -818,6 +818,30 @@ async function init() {
 }
 
 init();
+
+// ---- Auto-refresh ----
+// Même principe que sur la page Tickets Commandement : on relit l'inventaire
+// toutes les 5 secondes, sans écraser une saisie en cours dans le formulaire.
+const POLL_INTERVAL_MS = 5000;
+let isRefreshing = false;
+
+function isTypingInForm() {
+    const active = document.activeElement;
+    if (!active) return false;
+    return ['INPUT', 'TEXTAREA', 'SELECT'].includes(active.tagName);
+}
+
+async function pollLoop() {
+    if (isRefreshing || isTypingInForm()) return;
+    isRefreshing = true;
+    try {
+        await loadSaisies();
+    } finally {
+        isRefreshing = false;
+    }
+}
+
+setInterval(pollLoop, POLL_INTERVAL_MS);
 </script>
 
 </body>
