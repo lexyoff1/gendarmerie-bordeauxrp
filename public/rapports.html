@@ -357,6 +357,46 @@ button.small {
   background: linear-gradient(135deg, rgba(212, 175, 55, 0.2) 0%, rgba(201, 162, 39, 0.1) 100%);
 }
 
+/* --- Précisions / règles --- */
+.precisions-card {
+  border-left: 4px solid #d4af37;
+}
+
+.precisions-card ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.precisions-card li {
+  position: relative;
+  padding-left: 1.4rem;
+  margin-bottom: 1rem;
+  color: #d8d8d8;
+  font-size: 0.95rem;
+}
+
+.precisions-card li:last-child {
+  margin-bottom: 0;
+}
+
+.precisions-card li::before {
+  content: "—";
+  position: absolute;
+  left: 0;
+  color: #d4af37;
+  font-weight: 700;
+}
+
+.precisions-divider {
+  color: #d4af37;
+  opacity: 0.5;
+  letter-spacing: 2px;
+  font-size: 0.8rem;
+  margin: 0.5rem 0 1.2rem;
+  word-break: break-all;
+}
+
 /* --- Blocs "Patrouille" (un rapport peut en contenir plusieurs) --- */
 .patrol-block {
   border: 2px solid rgba(212, 175, 55, 0.4);
@@ -471,6 +511,10 @@ button.small {
   margin-bottom: 0;
 }
 
+.access-note {
+  margin-bottom: 1rem;
+}
+
 @media (max-width: 768px) {
   header { padding: 1.5rem; }
   .brand { flex-direction: column; align-items: flex-start; }
@@ -537,6 +581,18 @@ footer p {
 
     <div class="stats-grid" id="statsGrid"></div>
 
+    <h2 class="section-title">📌 Précision</h2>
+
+    <div class="card precisions-card">
+        <div class="precisions-divider">⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯</div>
+        <ul>
+            <li>Dès que vous changiez totalement de patrouille vous avez 2 options : soit envoyer votre rapport de patrouille pour la première patrouille que vous avez faite, soit vous prévenez dans le déroulé la dissolution de votre patrouille et la reprise de telle nouvelle patrouille avec tels nouveaux effectifs (il est demandé de faire une séparation entre les effectifs de votre première patrouille et de votre deuxième patrouille).</li>
+            <li>Les rapports seront enregistrés et répertoriés chaque fin de semaine, remettant donc les rapports de patrouille au modèle directement.</li>
+            <li>Une patrouille doit durer au moins 1h pour devoir faire un rapport de patrouille (sauf s'il y a eu beaucoup d'interventions ou des interventions importantes).</li>
+        </ul>
+        <div class="precisions-divider">⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯</div>
+    </div>
+
     <h2 class="section-title">📝 Rédiger un rapport de patrouille</h2>
 
     <div class="card">
@@ -579,6 +635,8 @@ footer p {
     </div>
 
     <h2 class="section-title">📋 Inventaire des rapports</h2>
+
+    <p class="muted access-note" id="accessNote"></p>
 
     <div id="rapportsList"><p class="muted">Chargement...</p></div>
 </main>
@@ -633,10 +691,11 @@ async function loadMe() {
 /* ============ STATS ============ */
 
 function renderStats() {
-    const total = rapports.length;
-    const brouillons = rapports.filter(r => r.statut === "Brouillon").length;
-    const valides = rapports.filter(r => r.statut === "Validé").length;
-    const archives = rapports.filter(r => r.statut === "Archivé").length;
+    const visibles = getVisibleRapports();
+    const total = visibles.length;
+    const brouillons = visibles.filter(r => r.statut === "Brouillon").length;
+    const valides = visibles.filter(r => r.statut === "Validé").length;
+    const archives = visibles.filter(r => r.statut === "Archivé").length;
 
     document.getElementById('statsGrid').innerHTML = `
         <div class="stat-box stat-total">
@@ -833,9 +892,26 @@ function formatDateRedaction(value) {
     return d.toLocaleString("fr-FR", { dateStyle: "short", timeStyle: "short" });
 }
 
+/* Ne renvoie que les rapports que l'utilisateur courant est autorisé à voir :
+   - un administrateur voit tous les rapports,
+   - un utilisateur normal ne voit que ses propres rapports. */
+function getVisibleRapports() {
+    if (currentUser.isAdmin) return rapports;
+    return rapports.filter(r => currentUser.id && r.auteurId === currentUser.id);
+}
+
+function updateAccessNote() {
+    const note = document.getElementById('accessNote');
+    if (!note) return;
+    note.textContent = currentUser.isAdmin
+        ? "Vous êtes administrateur : vous voyez l'ensemble des rapports de tous les militaires."
+        : "Par confidentialité, vous ne voyez ici que vos propres rapports.";
+}
+
 function renderRapportsList() {
+    updateAccessNote();
     const box = document.getElementById('rapportsList');
-    const list = rapports.slice().sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+    const list = getVisibleRapports().slice().sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 
     if (list.length === 0) {
         box.innerHTML = '<p class="muted">Aucun rapport enregistré.</p>';
