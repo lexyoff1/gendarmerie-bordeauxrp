@@ -791,18 +791,20 @@ function openTicket(id) {
 
     let actionButtons = "";
 
-    if (canReply) {
-        if (isCommandementTicket) {
-            if (ticket.statut !== "Fermé") {
-                if (!ticket.claimedBy) {
-                    actionButtons += `<button onclick="claimTicket(${ticket.id})">Prendre en charge</button>`;
-                }
-                actionButtons += `<button onclick="archiveTicket(${ticket.id})">Archiver</button>`;
-                actionButtons += `<button class="danger" onclick="closeTicket(${ticket.id})">Fermer</button>`;
-            } else {
-                actionButtons += `<button onclick="reopenTicket(${ticket.id})">Réouvrir</button>`;
+    if (isCommandementTicket && canReply) {
+        if (ticket.statut !== "Fermé") {
+            if (!ticket.claimedBy) {
+                actionButtons += `<button onclick="claimTicket(${ticket.id})">Prendre en charge</button>`;
             }
+            actionButtons += `<button onclick="archiveTicket(${ticket.id})">Archiver</button>`;
+            actionButtons += `<button class="danger" onclick="closeTicket(${ticket.id})">Fermer</button>`;
+        } else {
+            actionButtons += `<button onclick="reopenTicket(${ticket.id})">Réouvrir</button>`;
         }
+        actionButtons += `<button class="danger" onclick="deleteTicket(${ticket.id})">Supprimer</button>`;
+    }
+
+    if (canReply) {
         actionButtons += `<button onclick="replyTicket(${ticket.id})">Envoyer</button>`;
     }
 
@@ -839,7 +841,10 @@ function openTicket(id) {
                 <textarea id="reply-${ticket.id}" placeholder="Écrire un message... (Entrée pour envoyer, Maj+Entrée pour un saut de ligne)"></textarea>
 
                 ${actionButtons}
-            ` : `<p class="muted">Ce ticket est fermé.</p>`}
+            ` : `
+                <p class="muted">Ce ticket est fermé.</p>
+                ${isCommandementTicket ? `<button class="danger" onclick="deleteTicket(${ticket.id})">Supprimer</button>` : ``}
+            `}
         </div>
     `;
 
@@ -958,6 +963,33 @@ async function closeTicket(id) {
         await loadTickets();
     } catch (error) {
         console.error("Erreur closeTicket:", error);
+        alert("Erreur de connexion.");
+    }
+}
+
+async function deleteTicket(id) {
+    if (!confirm("Supprimer définitivement ce ticket ? Cette action est irréversible.")) return;
+
+    try {
+        const res = await fetch(`${window.API_BASE || ""}/api/tickets-commandement/${id}/delete`, {
+            method: "DELETE"
+        });
+
+        const data = await res.json();
+
+        if (!data.success) {
+            alert(data.error || "Erreur lors de la suppression.");
+            return;
+        }
+
+        if (String(currentTicketId) === String(id)) {
+            currentTicketId = null;
+            document.getElementById("ticketPanel").innerHTML = `<p class="muted">Ticket supprimé.</p>`;
+        }
+
+        await loadTickets();
+    } catch (error) {
+        console.error("Erreur deleteTicket:", error);
         alert("Erreur de connexion.");
     }
 }
