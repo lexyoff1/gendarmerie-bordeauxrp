@@ -424,6 +424,9 @@ footer p {
 </section>
 
 <script>
+    const POLL_INTERVAL_MS = 15000; // la carte pro change rarement : rafraîchissement plus espacé
+    let isPolling = false;
+
     function cleanNomPrenom(nom) {
         if (!nom) return "";
 
@@ -432,45 +435,62 @@ footer p {
             .replace(/^(COL|LCL|CEN|CNE|LTN|SLT|ASP|MAJ|ADC|ADJ|MDC|GDC|GDS|ELG|MDL|BRC|BRI|GAV)\s*-\s*\d+\s*[•·]\s*/i, "");
     }
 
-    fetch((window.API_BASE || "") + "/api/me")
-        .then(res => res.json())
-        .then(user => {
-            const box = document.getElementById("profile");
+    function loadProfile() {
+        return fetch((window.API_BASE || "") + "/api/me")
+            .then(res => res.json())
+            .then(user => {
+                const box = document.getElementById("profile");
 
-            if (!user) {
+                if (!user) {
+                    box.innerHTML = `
+                        <p>Tu n'es pas connecté.</p>
+                        <a href="/auth/discord"><button>Connexion Discord</button></a>
+                    `;
+                    return;
+                }
+
+                const avatar = user.avatar
+                    ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`
+                    : "https://cdn.discordapp.com/embed/avatars/0.png";
+
+                const dateServeur = user.dateArriveeServeur
+                    ? new Date(user.dateArriveeServeur).toLocaleDateString("fr-FR")
+                    : "Inconnue";
+
                 box.innerHTML = `
-                    <p>Tu n'es pas connecté.</p>
-                    <a href="/auth/discord"><button>Connexion Discord</button></a>
+                    <div class="id-card">
+                        <img src="${avatar}" class="avatar" alt="Avatar">
+
+                        <h2>${cleanNomPrenom(user.nomPrenom || user.username)}</h2>
+
+                        <p><b>NIGEND :</b> ${user.NIGEND || "Non attribué"}</p>
+                        <p><b>Grade :</b> ${user.grade || "Non attribué"}</p>
+                        <p><b>Qualification Judiciaire :</b> ${user.qualificationJudiciaire || "Non attribuée"}</p>
+                        <p><b>Statut :</b> ${user.statut || "Actif"}</p>
+                        <p><b>Date d'arrivée serveur :</b> ${dateServeur}</p>
+                        <p><b>Discord :</b> ${user.username}</p>
+                    </div>
                 `;
-                return;
-            }
+            })
+            .catch(err => {
+                document.getElementById("profile").innerHTML = `<p>Erreur lors du chargement du profil.</p>`;
+            });
+    }
 
-            const avatar = user.avatar
-                ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`
-                : "https://cdn.discordapp.com/embed/avatars/0.png";
+    // Rafraîchissement automatique de la carte pro : utile si un admin met à jour
+    // ton grade / NIGEND / statut pendant que tu es sur le dashboard.
+    async function pollLoop() {
+        if (isPolling) return;
+        isPolling = true;
+        try {
+            await loadProfile();
+        } finally {
+            isPolling = false;
+        }
+    }
 
-            const dateServeur = user.dateArriveeServeur
-                ? new Date(user.dateArriveeServeur).toLocaleDateString("fr-FR")
-                : "Inconnue";
-
-            box.innerHTML = `
-                <div class="id-card">
-                    <img src="${avatar}" class="avatar" alt="Avatar">
-
-                    <h2>${cleanNomPrenom(user.nomPrenom || user.username)}</h2>
-
-                    <p><b>NIGEND :</b> ${user.NIGEND || "Non attribué"}</p>
-                    <p><b>Grade :</b> ${user.grade || "Non attribué"}</p>
-                    <p><b>Qualification Judiciaire :</b> ${user.qualificationJudiciaire || "Non attribuée"}</p>
-                    <p><b>Statut :</b> ${user.statut || "Actif"}</p>
-                    <p><b>Date d'arrivée serveur :</b> ${dateServeur}</p>
-                    <p><b>Discord :</b> ${user.username}</p>
-                </div>
-            `;
-        })
-        .catch(err => {
-            document.getElementById("profile").innerHTML = `<p>Erreur lors du chargement du profil.</p>`;
-        });
+    loadProfile();
+    setInterval(pollLoop, POLL_INTERVAL_MS);
 </script>
 
 <footer class="footer">
