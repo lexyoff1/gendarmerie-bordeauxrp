@@ -353,6 +353,8 @@ const categories = [
     }
 ];
 
+const POLL_INTERVAL_MS = 10000; // rafraîchissement auto (page en lecture seule, pas de formulaire à préserver)
+
 function cleanNomPrenom(nom) {
     if (!nom) return "";
     return nom
@@ -417,6 +419,7 @@ async function loadEffectifs() {
 }
 
 loadEffectifs();
+setInterval(loadEffectifs, POLL_INTERVAL_MS);
 </script>
 
 <footer class="footer">
