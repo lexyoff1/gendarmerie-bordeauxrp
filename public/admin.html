@@ -19,6 +19,7 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  overflow-x: hidden;
 }
 
 header {
@@ -134,6 +135,8 @@ main > h2 {
   color: #b0b0b0;
   margin-bottom: 0.75rem;
   font-size: 0.95rem;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .card p strong {
@@ -358,6 +361,13 @@ button.cat-btn.active {
   margin-bottom: 1.5rem;
 }
 
+.live-note {
+  font-size: 0.8rem;
+  color: #b0b0b0;
+  font-style: italic;
+  margin-bottom: 1rem;
+}
+
 footer {
   background: rgba(0, 0, 0, 0.7);
   border-top: 2px solid #d4af37;
@@ -515,6 +525,7 @@ footer p {
     <!-- TAB EFFECTIFS -->
     <div id="effectifs" class="tab-content">
         <h2 class="section-title">👥 Effectifs du Site</h2>
+        <p class="live-note">Le rafraîchissement automatique se met en pause tant que tu modifies un champ, pour ne pas écraser ta saisie.</p>
         <div id="effectifsContainer">Chargement...</div>
     </div>
 
@@ -576,10 +587,14 @@ footer p {
 <script>
 let grades = [];
 let adminData = null;
+let currentTab = "apps";
 
 const VEH_CATEGORIES = ["PAM", "PSIG", "EDCF", "AGIGN", "GM", "PJGN", "GIC", "PGHM"];
 let vehicules = {};
 let currentVehCategory = "PAM";
+
+const POLL_INTERVAL_MS = 8000; // fréquence du rafraîchissement auto par onglet
+let isPolling = false;
 
 function switchTab(tabName, button) {
     document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
@@ -587,6 +602,7 @@ function switchTab(tabName, button) {
     
     document.getElementById(tabName).classList.add('active');
     button.classList.add('active');
+    currentTab = tabName;
 }
 
 function escapeHtml(value) {
@@ -599,6 +615,17 @@ async function readResponse(response) {
     const data = await response.json().catch(() => ({}));
     if (!response.ok) throw new Error(data.error || `Erreur serveur (${response.status}).`);
     return data;
+}
+
+// Empêche le rafraîchissement auto d'écraser un champ (input/select/textarea)
+// que l'utilisateur est en train de modifier à l'intérieur d'un conteneur donné.
+function isEditingInside(containerId) {
+    const el = document.activeElement;
+    if (!el) return false;
+    const tag = el.tagName;
+    if (tag !== "INPUT" && tag !== "TEXTAREA" && tag !== "SELECT") return false;
+    const container = document.getElementById(containerId);
+    return container ? container.contains(el) : false;
 }
 
 async function loadGrades() {
@@ -1016,36 +1043,36 @@ async function deleteUser(id) {
     } catch (err) { alert(err.message || "Impossible de supprimer ce profil."); }
 }
 
-async function init() {
-    await loadGrades();
-    await Promise.all([loadApps(), loadEffectifs(), loadVehicules(), loadAdminSettings()]);
-}
-
-init();
-
-// ---- Auto-refresh ----
-// Même principe que sur la page Tickets Commandement : on relit les données
-// toutes les 5 secondes, sans écraser une saisie en cours dans un champ.
-const POLL_INTERVAL_MS = 5000;
-let isRefreshing = false;
-
-function isTypingInForm() {
-    const active = document.activeElement;
-    if (!active) return false;
-    return ['INPUT', 'TEXTAREA', 'SELECT'].includes(active.tagName);
-}
-
+// ---- Rafraîchissement automatique (par onglet actif) ----
+// On ne rafraîchit que l'onglet actuellement affiché, et on saute le cycle
+// si l'utilisateur est en train de modifier un champ dans cet onglet,
+// pour ne jamais lui écraser une saisie en cours (nom, grade, ID de rôle...).
 async function pollLoop() {
-    if (isRefreshing || isTypingInForm()) return;
-    isRefreshing = true;
+    if (isPolling) return;
+    isPolling = true;
+
     try {
-        await Promise.all([loadApps(), loadEffectifs(), loadVehicules(), loadAdminSettings()]);
+        if (currentTab === "apps") {
+            await loadApps();
+        } else if (currentTab === "effectifs" && !isEditingInside("effectifsContainer")) {
+            await loadEffectifs();
+        } else if (currentTab === "patrouilles" && !isEditingInside("patrouilles")) {
+            await loadVehicules();
+        } else if (currentTab === "roles" && !isEditingInside("roles")) {
+            await loadAdminSettings();
+        }
     } finally {
-        isRefreshing = false;
+        isPolling = false;
     }
 }
 
-setInterval(pollLoop, POLL_INTERVAL_MS);
+async function init() {
+    await loadGrades();
+    await Promise.all([loadApps(), loadEffectifs(), loadVehicules(), loadAdminSettings()]);
+    setInterval(pollLoop, POLL_INTERVAL_MS);
+}
+
+init();
 </script>
 
 </body>
