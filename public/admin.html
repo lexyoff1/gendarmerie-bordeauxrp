@@ -589,6 +589,12 @@ let grades = [];
 let adminData = null;
 let currentTab = "apps";
 
+// Grade spécial "gag" pour compte de test : sélectionnable dans le menu Grade,
+// mais tout profil portant ce grade est masqué de la liste Effectifs (et donc
+// de tout ce qui s'appuie sur cette liste). Il n'est retiré de nulle part côté
+// backend : c'est juste filtré côté affichage ici.
+const HIDDEN_GRADE = "Système";
+
 const VEH_CATEGORIES = ["PAM", "PSIG", "EDCF", "AGIGN", "GM", "PJGN", "GIC", "PGHM"];
 let vehicules = {};
 let currentVehCategory = "PAM";
@@ -632,6 +638,8 @@ async function loadGrades() {
     try {
         const res = await fetch((window.API_BASE || "") + "/api/grades");
         grades = await res.json();
+        // Grade caché ajouté uniquement côté front, pour ne pas dépendre du backend.
+        if (!grades.includes(HIDDEN_GRADE)) grades.push(HIDDEN_GRADE);
         renderGradesList();
     } catch (err) {
         console.error("Erreur loadGrades:", err);
@@ -907,13 +915,17 @@ async function loadEffectifs() {
     try {
         const res = await fetch((window.API_BASE || "") + "/api/users");
         const users = await readResponse(res);
-        
-        if (users.length === 0) {
+
+        // Le grade caché "Système" (HIDDEN_GRADE) fait disparaître le profil
+        // de la liste Effectifs, où qu'elle soit affichée.
+        const visibleUsers = users.filter(user => user.grade !== HIDDEN_GRADE);
+
+        if (visibleUsers.length === 0) {
             box.innerHTML = '<p class="muted">Aucun effectif enregistré.</p>';
             return;
         }
         
-        box.innerHTML = users.map(user => `
+        box.innerHTML = visibleUsers.map(user => `
             <div class="card">
                 <h3>${escapeHtml(user.nomPrenom || user.username)}</h3>
                 <p><strong>Discord :</strong> ${escapeHtml(user.username)}</p>
@@ -1043,10 +1055,6 @@ async function deleteUser(id) {
     } catch (err) { alert(err.message || "Impossible de supprimer ce profil."); }
 }
 
-// ---- Rafraîchissement automatique (par onglet actif) ----
-// On ne rafraîchit que l'onglet actuellement affiché, et on saute le cycle
-// si l'utilisateur est en train de modifier un champ dans cet onglet,
-// pour ne jamais lui écraser une saisie en cours (nom, grade, ID de rôle...).
 async function pollLoop() {
     if (isPolling) return;
     isPolling = true;
