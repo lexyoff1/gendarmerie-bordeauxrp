@@ -913,6 +913,10 @@ async function loadApps() {
         <p><strong>ID :</strong> ${escapeHtml(app.discordId || 'Non renseigné')}</p>
         <p><strong>Motivation :</strong> ${escapeHtml(app.motivation || "Aucune")}</p>
         <p><strong>Expérience :</strong> ${escapeHtml(app.experience || "Aucune")}</p>
+
+        <label for="appMsg-${app.id}">Message au candidat</label>
+        <textarea id="appMsg-${app.id}" placeholder="Message qui sera envoyé en MP Discord avec la décision"></textarea>
+
         <button onclick="acceptApp(${app.id})">✅ Accepter</button>
         <button class="danger" onclick="rejectApp(${app.id})">❌ Refuser</button>
     </div>
@@ -1022,8 +1026,13 @@ function updateQJFromGrade(id) {
 
 async function acceptApp(id) {
     try {
-        await readResponse(await fetch(`${window.API_BASE || ""}/api/applications/${id}/accept`, { method: "POST" }));
-        alert("Candidature acceptée.");
+        const message = document.getElementById(`appMsg-${id}`)?.value || "";
+        await readResponse(await fetch(`${window.API_BASE || ""}/api/applications/${id}/accept`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ message })
+        }));
+        alert("Candidature acceptée. MP envoyé si possible.");
         loadApps();
         loadEffectifs();
     } catch (err) { alert(err.message || "Impossible d'accepter cette candidature."); }
@@ -1031,8 +1040,13 @@ async function acceptApp(id) {
 
 async function rejectApp(id) {
     try {
-        await readResponse(await fetch(`${window.API_BASE || ""}/api/applications/${id}/reject`, { method: "POST" }));
-        alert("Candidature refusée.");
+        const message = document.getElementById(`appMsg-${id}`)?.value || "";
+        await readResponse(await fetch(`${window.API_BASE || ""}/api/applications/${id}/reject`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ message })
+        }));
+        alert("Candidature refusée. MP envoyé si possible.");
         loadApps();
     } catch (err) { alert(err.message || "Impossible de refuser cette candidature."); }
 }
