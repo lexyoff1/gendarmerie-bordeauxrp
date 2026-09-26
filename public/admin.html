@@ -916,16 +916,14 @@ async function loadEffectifs() {
         const res = await fetch((window.API_BASE || "") + "/api/users");
         const users = await readResponse(res);
 
-        // Le grade caché "Système" (HIDDEN_GRADE) fait disparaître le profil
-        // de la liste Effectifs, où qu'elle soit affichée.
-        const visibleUsers = users.filter(user => user.grade !== HIDDEN_GRADE);
-
-        if (visibleUsers.length === 0) {
+        // Le grade "Système" (HIDDEN_GRADE) reste affiché ici, dans le panel admin :
+        // il n'est masqué que là où toi tu décides de le filtrer explicitement.
+        if (users.length === 0) {
             box.innerHTML = '<p class="muted">Aucun effectif enregistré.</p>';
             return;
         }
         
-        box.innerHTML = visibleUsers.map(user => `
+        box.innerHTML = users.map(user => `
             <div class="card">
                 <h3>${escapeHtml(user.nomPrenom || user.username)}</h3>
                 <p><strong>Discord :</strong> ${escapeHtml(user.username)}</p>
