@@ -595,7 +595,7 @@ let currentTab = "apps";
 // backend : c'est juste filtré côté affichage ici.
 const HIDDEN_GRADE = "Système";
 
-const VEH_CATEGORIES = ["PAM", "PSIG", "EDCF", "AGIGN", "GM", "PJGN", "GIC", "PGHM"];
+const VEH_CATEGORIES = ["PAM", "PSIG", "EDCF", "AGIGN", "GM", "GMAR", "PJGN", "GIC", "PGHM"];
 let vehicules = {};
 let currentVehCategory = "PAM";
 
@@ -652,6 +652,19 @@ function renderGradesList() {
 
 // ---- Configuration administrateur ----
 
+// GMAR n'est pas (encore) renvoyée par /api/admin/data côté backend : on l'ajoute
+// ici côté front pour que son rôle "Responsable" / "Adjoint" soit configurable
+// au même titre que les autres spécialités. À retirer si le backend l'expose un jour.
+const LOCAL_SPECIALTIES = [
+    { id: "gmar", nom: "⚓ GMAR" }
+];
+
+function getMergedSpecialities(catalog) {
+    const fromBackend = catalog.specialites || [];
+    const missing = LOCAL_SPECIALTIES.filter(local => !fromBackend.some(s => s.id === local.id));
+    return [...fromBackend, ...missing];
+}
+
 function roleInput(id, label, value) {
     return `<div class="form-grid" style="margin-top: 1rem; grid-template-columns: minmax(180px, 1fr) repeat(2, minmax(180px, 1fr));">
         <p style="align-self: end; margin: 0;"><strong>${escapeHtml(label)}</strong></p>
@@ -663,7 +676,7 @@ function roleInput(id, label, value) {
 function renderAdminSettings() {
     const catalog = adminData?.roleCatalog || {};
     const saved = adminData?.roleSettings || {};
-    const specialities = catalog.specialites || [];
+    const specialities = getMergedSpecialities(catalog);
     document.getElementById('specialtyRoles').innerHTML = specialities.length
         ? specialities.map(item => roleInput(item.id, item.nom, {
             responsableRoleId: saved.specialites?.[item.id]?.responsableRoleId || item.responsableRoleId,
@@ -701,7 +714,7 @@ async function loadAdminSettings() {
 
 async function saveRoleSettings() {
     const catalog = adminData?.roleCatalog || {};
-    const specialites = Object.fromEntries((catalog.specialites || []).map(item => [item.id, {
+    const specialites = Object.fromEntries(getMergedSpecialities(catalog).map(item => [item.id, {
         responsableRoleId: document.getElementById(`role-${item.id}-lead`).value.trim(),
         adjointRoleId: document.getElementById(`role-${item.id}-deputy`).value.trim()
     }]));
