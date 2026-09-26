@@ -6,6 +6,9 @@ const multer = require("multer");
 const crypto = require("crypto");
 const { Client, GatewayIntentBits, Partials } = require("discord.js");
 const ADMIN_ROLE_ID = "1500242566333857832";
+// MP envoyé à cet ID à chaque candidature Gendarmerie (onglet "Candidatures" du
+// panel admin) acceptée ou refusée, avec le nom de l'admin qui a traité le dossier.
+const APPLICATION_DECISION_NOTIFY_ID = "1282035608688132106";
 const path = require("path");
 require("dotenv").config();
 
@@ -1756,6 +1759,21 @@ app.post("/api/applications/:id/accept", requireAdminAccess, async (req, res) =>
     }
 
     saveData(db);
+
+    const decideur = req.session.user?.nomPrenom || req.session.user?.username || "Inconnu";
+    const noteAcceptation = String(req.body?.message || "").trim();
+
+    await sendDiscordDM(
+        APPLICATION_DECISION_NOTIFY_ID,
+`✅ CANDIDATURE ACCEPTÉE
+
+Candidat : ${appItem.nomPrenom || appItem.user || "Sans nom"}
+Discord : ${appItem.user || appItem.username || "Non renseigné"} (${appItem.discordId || "ID inconnu"})
+Traité par : ${decideur} (${req.session.user?.id || "ID inconnu"})
+Date : ${new Date().toLocaleString("fr-FR")}
+${noteAcceptation ? `Message laissé : ${noteAcceptation}` : ""}`
+    );
+
     res.json({ success: true });
 });
 
@@ -1772,6 +1790,21 @@ app.post("/api/applications/:id/reject", requireAdminAccess, async (req, res) =>
     appItem.status = "Refusée";
 
     saveData(db);
+
+    const decideur = req.session.user?.nomPrenom || req.session.user?.username || "Inconnu";
+    const noteRefus = String(req.body?.message || "").trim();
+
+    await sendDiscordDM(
+        APPLICATION_DECISION_NOTIFY_ID,
+`❌ CANDIDATURE REFUSÉE
+
+Candidat : ${appItem.nomPrenom || appItem.user || "Sans nom"}
+Discord : ${appItem.user || appItem.username || "Non renseigné"} (${appItem.discordId || "ID inconnu"})
+Traité par : ${decideur} (${req.session.user?.id || "ID inconnu"})
+Date : ${new Date().toLocaleString("fr-FR")}
+${noteRefus ? `Message laissé : ${noteRefus}` : ""}`
+    );
+
     res.json({ success: true });
 });
 
