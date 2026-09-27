@@ -139,7 +139,8 @@ const GRADES = [
     "MDL ・ Maréchal des Logis",
     "BRC ・ Brigadier-Chef",
     "BRI ・ Brigadier",
-    "GAV ・ Gendarme Adjoint Volontaire"
+    "GAV ・ Gendarme Adjoint Volontaire",
+    "EGAV ・ Élève Gendarme Adjoint Volontaire"
 ];
 
 const SPECIALITES = [
@@ -868,6 +869,30 @@ app.get("/index.html", (req, res) => {
     res.redirect("/");
 });
 
+// ---- Rôle restreint : Élève Gendarme Adjoint Volontaire (EGAV) ----
+// Grade attribué par défaut à un nouveau membre (première connexion Discord)
+// et à toute candidature Gendarmerie acceptée. Un EGAV n'a accès qu'aux pages
+// listées ci-dessous ; toute autre page protégée le redirige vers /dashboard.
+// Il reste bien visible dans /effectifs (aucun filtre par grade là-bas).
+const STAGIAIRE_GRADE = "EGAV ・ Élève Gendarme Adjoint Volontaire";
+const STAGIAIRE_ALLOWED_PATHS = new Set(["dashboard", "cours", "code-penal"]);
+
+function restrictStagiaire(cleanPath) {
+    return async (req, res, next) => {
+        if (STAGIAIRE_ALLOWED_PATHS.has(cleanPath)) return next();
+        if (await isAdmin(req)) return next();
+
+        const db = getData();
+        const user = db.users.find(u => u.id === req.session.user?.id);
+
+        if (user?.grade === STAGIAIRE_GRADE) {
+            return res.redirect("/dashboard");
+        }
+
+        next();
+    };
+}
+
 const PAGES_PROTEGEES = [
     ["dashboard", "dashboard.html"],
     ["effectifs", "effectifs.html"],
@@ -900,7 +925,7 @@ const PAGES_PROTEGEES = [
 ];
 
 for (const [cleanPath, fileName] of PAGES_PROTEGEES) {
-    app.get(`/${cleanPath}`, requireLogin, requireGNMember, (req, res) => {
+    app.get(`/${cleanPath}`, requireLogin, requireGNMember, restrictStagiaire(cleanPath), (req, res) => {
         res.sendFile(path.join(__dirname, "public", fileName));
     });
     app.get(`/${fileName}`, (req, res) => res.redirect(301, `/${cleanPath}`));
@@ -1245,9 +1270,9 @@ app.get("/auth/discord/callback", async (req, res) => {
                 dateArriveeServeur: member.joined_at,
                 datePremiereConnexion: new Date().toISOString(),
                 estDansServeur: true,
-                grade: "GAV ・ Gendarme Adjoint Volontaire",
+                grade: STAGIAIRE_GRADE,
                 NIGEND: "",
-                qualificationJudiciaire: getDefaultQualificationJudiciaire("GAV ・ Gendarme Adjoint Volontaire"),
+                qualificationJudiciaire: getDefaultQualificationJudiciaire(STAGIAIRE_GRADE),
                 unite: "",
                 specialisation: "",
                 statut: "Actif"
@@ -1749,9 +1774,9 @@ app.post("/api/applications/:id/accept", requireAdminAccess, async (req, res) =>
             dateArriveeServeur: appItem.dateArriveeServeur || null,
             datePremiereConnexion: new Date().toISOString(),
             estDansServeur: !!appItem.estDansServeur,
-            grade: "GAV ・ Gendarme Adjoint Volontaire",
+            grade: STAGIAIRE_GRADE,
             NIGEND: "",
-            qualificationJudiciaire: getDefaultQualificationJudiciaire("GAV ・ Gendarme Adjoint Volontaire"),
+            qualificationJudiciaire: getDefaultQualificationJudiciaire(STAGIAIRE_GRADE),
             unite: "",
             specialisation: "",
             statut: "Actif"
