@@ -364,7 +364,9 @@ function getData() {
     if (!Array.isArray(db.rapports)) db.rapports = [];
 
     db.users.forEach(user => {
-        if (!user.qualificationJudiciaire) {
+        if (hasNoQualificationJudiciaire(user.grade)) {
+            user.qualificationJudiciaire = "N/A";
+        } else if (!user.qualificationJudiciaire) {
             user.qualificationJudiciaire = getDefaultQualificationJudiciaire(user.grade);
         }
 
@@ -458,7 +460,14 @@ async function requireAdminAccess(req, res, next) {
     next();
 }
 
+// EGAV et grade "Système" : aucune qualification judiciaire
+function hasNoQualificationJudiciaire(grade) {
+    const g = String(grade || "");
+    return g.startsWith("EGAV") || g === "Système";
+}
+
 function getDefaultQualificationJudiciaire(grade) {
+    if (hasNoQualificationJudiciaire(grade)) return "N/A";
     if (!grade) return "APJA";
 
     if (
@@ -1415,6 +1424,11 @@ app.get("/api/me", (req, res) => {
     const db = getData();
     const user = db.users.find(u => u.id === req.session.user.id);
 
+    if (user && hasNoQualificationJudiciaire(user.grade) && user.qualificationJudiciaire !== "N/A") {
+        user.qualificationJudiciaire = "N/A";
+        saveData(db);
+    }
+
     if (user && !user.qualificationJudiciaire) {
         user.qualificationJudiciaire = getDefaultQualificationJudiciaire(user.grade);
         saveData(db);
@@ -2067,9 +2081,9 @@ app.post("/api/user/:id/update", requireAdminAccess, async (req, res) => {
         user.nomPrenom = req.body.nomPrenom;
         user.grade = req.body.grade;
         user.NIGEND = req.body.NIGEND;
-        user.qualificationJudiciaire =
-           req.body.qualificationJudiciaire ||
-           getDefaultQualificationJudiciaire(req.body.grade);
+        user.qualificationJudiciaire = hasNoQualificationJudiciaire(req.body.grade)
+            ? "N/A"
+            : (req.body.qualificationJudiciaire || getDefaultQualificationJudiciaire(req.body.grade));
         user.unite = req.body.unite;
         user.specialisation = req.body.specialisation;
         user.statut = req.body.statut;
