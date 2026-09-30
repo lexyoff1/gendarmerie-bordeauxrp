@@ -5,6 +5,7 @@ const fs = require("fs");
 const multer = require("multer");
 const crypto = require("crypto");
 const { Client, GatewayIntentBits, Partials } = require("discord.js");
+const setupJore = require("./jore-routes");
 const ADMIN_ROLE_ID = "1500242566333857832";
 // MP envoyé à cet ID à chaque candidature Gendarmerie (onglet "Candidatures" du
 // panel admin) acceptée ou refusée, avec le nom de l'admin qui a traité le dossier.
@@ -2714,6 +2715,16 @@ app.post("/api/rapports/:id/archiver", requireAdminAccess, (req, res) => {
     saveData(db);
 
     res.json({ success: true, rapport });
+});
+
+// ---- Jore : créateur d'embeds + commandes slash (réservé aux admins du panel) ----
+setupJore({
+    app,
+    bot: discordBot,
+    guard: requireAdminAccess,
+    notify: msg => sendDiscordDM(APPLICATION_DECISION_NOTIFY_ID, msg),
+    getData,
+    saveData
 });
 
 const PORT = process.env.PORT || 3000;
