@@ -9,10 +9,6 @@
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:-apple-system,"Segoe UI",Roboto,sans-serif;background:linear-gradient(135deg,#1a1a2e,#16213e);color:#e0e0e0;min-height:100vh;padding:1rem}
 h1{color:#d4af37;margin-bottom:1rem}h3{color:#d4af37;margin:1rem 0 .5rem}
-.tabs{display:flex;gap:.5rem;margin-bottom:1rem;border-bottom:2px solid #d4af37;flex-wrap:wrap}
-.tabs button{background:none;color:#b0b0b0;border:0;padding:.7rem 1.2rem;font-weight:600;cursor:pointer;border-bottom:3px solid transparent;margin-top:0}
-.tabs button.on{color:#d4af37;border-bottom-color:#d4af37}
-.tab{display:none}.tab.on{display:block}
 .grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:1rem}
 @media(max-width:900px){.grid{grid-template-columns:1fr}}
 .card{background:rgba(212,175,55,.05);border:2px solid #d4af37;border-radius:8px;padding:1rem}
@@ -42,13 +38,9 @@ button.red{background:#b91c1c;color:#fff}button.ghost{background:rgba(212,175,55
 </head>
 <body>
 <h1>🔒 Jore</h1>
-<div class="tabs">
-  <button class="on" data-t="emb">Embed</button>
-  <button data-t="cmd">Commandes bot</button>
-</div>
 
 <!-- ===== EMBED ===== -->
-<div id="emb" class="tab on"><div class="grid">
+<div id="emb"><div class="grid">
 <div class="card">
   <div class="row">
     <div><label>Envoyer via</label><select id="mode"><option value="webhook">Webhook</option><option value="bot">Bot (salon)</option></select></div>
@@ -83,32 +75,11 @@ button.red{background:#b91c1c;color:#fff}button.ghost{background:rgba(212,175,55
 <div class="card"><h3 style="margin-top:0">Aperçu</h3><div class="dc" id="prev"></div></div>
 </div></div>
 
-<!-- ===== COMMANDES ===== -->
-<div id="cmd" class="tab"><div class="grid">
-<div class="card">
-  <p style="color:#b0b0b0;font-size:.9rem">Crée une commande slash sur ton bot qui répond avec un texte et/ou l'embed en cours d'édition.</p>
-  <label>Nom (sans /)</label><input id="cName" placeholder="regles">
-  <label>Description</label><input id="cDesc" maxlength="100">
-  <label>Réponse texte</label><textarea id="cText"></textarea>
-  <div class="chk"><input type="checkbox" id="cEmb"><label for="cEmb">Inclure l'embed de l'onglet Embed</label></div>
-  <div class="chk"><input type="checkbox" id="cEph"><label for="cEph">Réponse visible uniquement par l'utilisateur</label></div>
-  <div id="cStatus" style="min-height:1.3em;margin-top:.6rem"></div>
-  <button id="cCreate">Créer la commande</button>
-</div>
-<div class="card"><h3 style="margin-top:0">Commandes créées</h3><div id="cList"></div></div>
-</div></div>
-
 <script>
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const blank=()=>({title:'',url:'',description:'',color:'#5865f2',ts:false,authorName:'',authorIcon:'',authorUrl:'',thumb:'',image:'',footer:'',footerIcon:'',fields:[]});
 let embeds=[blank()],cur=0;
-
-// Onglets
-document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{
-  document.querySelectorAll('.tabs button,.tab').forEach(x=>x.classList.remove('on'));
-  b.classList.add('on');$(b.dataset.t).classList.add('on');if(b.dataset.t==='cmd')loadCmds();
-});
 
 // Conversion état -> objet embed API Discord
 function build(e){
@@ -209,22 +180,6 @@ $('send').onclick=async()=>{
   const p=payload();if(!p.content&&!p.embeds)return say($('status'),'Message vide.',false);
   try{await api('/api/jore/send',{method:'POST',body:{mode:$('mode').value,webhookUrl:$('webhookUrl').value.trim(),channelId:$('channelId').value.trim(),payload:p,messageId:$('editMode').checked?refId():undefined}});say($('status'),$('editMode').checked?'✅ Message modifié.':'✅ Envoyé.',true)}
   catch(e){say($('status'),'❌ '+e.message,false)}
-};
-
-// Commandes
-async function loadCmds(){
-  try{const l=await api('/api/jore/commands',{method:'GET'});
-    $('cList').innerHTML=l.length?l.map(c=>`<div style="margin-bottom:.6rem"><b>/${esc(c.name)}</b> — ${esc(c.description)}
-      <button class="red" style="margin:0 0 0 .5rem" data-del="${esc(c.name)}">Suppr.</button></div>`).join(''):'<p style="color:#b0b0b0">Aucune commande.</p>'}
-  catch(e){$('cList').textContent=e.message}
-}
-document.addEventListener('click',async e=>{const n=e.target.dataset.del;if(!n||!confirm('Supprimer /'+n+' ?'))return;
-  try{await api('/api/jore/commands/'+encodeURIComponent(n),{method:'DELETE'});loadCmds()}catch(x){alert(x.message)}});
-$('cCreate').onclick=async()=>{
-  const p=payload(),reply={content:$('cText').value.trim()};if($('cEmb').checked&&p.embeds)reply.embeds=p.embeds;
-  try{await api('/api/jore/commands',{method:'POST',body:{name:$('cName').value.trim().toLowerCase(),description:$('cDesc').value.trim(),reply,ephemeral:$('cEph').checked}});
-    say($('cStatus'),'✅ Commande créée (peut mettre quelques secondes à apparaître).',true);loadCmds()}
-  catch(e){say($('cStatus'),'❌ '+e.message,false)}
 };
 
 // Boutons lien
