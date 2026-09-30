@@ -1,1 +1,255 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
+<title>Jore</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,"Segoe UI",Roboto,sans-serif;background:linear-gradient(135deg,#1a1a2e,#16213e);color:#e0e0e0;min-height:100vh;padding:1rem}
+h1{color:#d4af37;margin-bottom:1rem}h3{color:#d4af37;margin:1rem 0 .5rem}
+.tabs{display:flex;gap:.5rem;margin-bottom:1rem;border-bottom:2px solid #d4af37;flex-wrap:wrap}
+.tabs button{background:none;color:#b0b0b0;border:0;padding:.7rem 1.2rem;font-weight:600;cursor:pointer;border-bottom:3px solid transparent;margin-top:0}
+.tabs button.on{color:#d4af37;border-bottom-color:#d4af37}
+.tab{display:none}.tab.on{display:block}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:1rem}
+@media(max-width:900px){.grid{grid-template-columns:1fr}}
+.card{background:rgba(212,175,55,.05);border:2px solid #d4af37;border-radius:8px;padding:1rem}
+label{display:block;margin:.6rem 0 .25rem;color:#d4af37;font-weight:600;font-size:.85rem}
+input,select,textarea{width:100%;padding:.55rem;background:#0f1528;color:#e0e0e0;border:1px solid #d4af37;border-radius:6px;font:inherit;color-scheme:dark}
+textarea{min-height:70px;resize:vertical}
+input[type=color]{padding:2px;height:38px}input[type=checkbox]{width:auto}
+.row{display:flex;gap:.5rem;align-items:end}.row>*{flex:1}
+button{background:linear-gradient(135deg,#d4af37,#c9a227);color:#1a1a2e;border:0;padding:.55rem 1rem;border-radius:6px;font-weight:600;cursor:pointer;margin:.6rem .4rem 0 0}
+button.red{background:#b91c1c;color:#fff}button.ghost{background:rgba(212,175,55,.15);color:#d4af37}
+.chk{display:flex;gap:.4rem;align-items:center;margin-top:.6rem}.chk label{margin:0}
+/* Aperçu façon Discord */
+.dc{background:#313338;border-radius:8px;padding:1rem;color:#dbdee1;font-size:.95rem}
+.dc .u{font-weight:600;color:#fff;margin-bottom:.3rem;display:flex;gap:.5rem;align-items:center}
+.dc .u img{width:36px;height:36px;border-radius:50%}
+.em{background:#2b2d31;border-left:4px solid #5865f2;border-radius:4px;padding:.6rem .8rem;margin-top:.5rem;max-width:520px;position:relative;overflow:hidden}
+.em .a{display:flex;gap:.4rem;align-items:center;font-weight:600;font-size:.85rem;margin-bottom:.3rem}.em .a img{width:22px;height:22px;border-radius:50%}
+.em .t{font-weight:700;color:#fff;margin-bottom:.3rem}.em .t a{color:#00a8fc;text-decoration:none}
+.em .d{white-space:pre-wrap;font-size:.88rem;overflow-wrap:anywhere}
+.em .fs{display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;margin-top:.5rem}
+.em .f{grid-column:span 3;font-size:.85rem}.em .f.in{grid-column:span 1}.em .f b{display:block;color:#fff;margin-bottom:.1rem}
+.em .im{max-width:100%;border-radius:4px;margin-top:.5rem}.em .th{position:absolute;right:.6rem;top:.6rem;width:70px;height:70px;object-fit:cover;border-radius:4px}
+.em .ft{display:flex;gap:.4rem;align-items:center;font-size:.75rem;color:#b5bac1;margin-top:.5rem}.em .ft img{width:18px;height:18px;border-radius:50%}
+.fld{display:grid;grid-template-columns:1fr 1fr auto auto;gap:.4rem;margin-top:.4rem;align-items:center}
+#status{margin-top:.6rem;min-height:1.3em}.ok{color:#86efac}.ko{color:#ff9b9b}
+</style>
+</head>
+<body>
+<h1>🔒 Jore</h1>
+<div class="tabs">
+  <button class="on" data-t="emb">Embed</button>
+  <button data-t="cmd">Commandes bot</button>
+</div>
 
+<!-- ===== EMBED ===== -->
+<div id="emb" class="tab on"><div class="grid">
+<div class="card">
+  <div class="row">
+    <div><label>Envoyer via</label><select id="mode"><option value="webhook">Webhook</option><option value="bot">Bot (salon)</option></select></div>
+    <div id="wh"><label>URL du webhook</label><input id="webhookUrl" placeholder="https://discord.com/api/webhooks/..."></div>
+    <div id="ch" style="display:none"><label>ID du salon</label><input id="channelId" inputmode="numeric"></div>
+  </div>
+  <div class="row"><div><label>Pseudo (webhook)</label><input id="username"></div><div><label>Avatar URL (webhook)</label><input id="avatar_url"></div></div>
+  <label>Texte du message (hors embed)</label><textarea id="content"></textarea>
+
+  <h3>Embed <select id="curSel" style="width:auto;display:inline-block"></select>
+    <button class="ghost" id="addEm">+ Embed</button><button class="red" id="delEm">Suppr.</button></h3>
+  <div class="row"><div><label>Titre</label><input data-k="title"></div><div><label>URL du titre</label><input data-k="url"></div></div>
+  <label>Description</label><textarea data-k="description" style="min-height:110px"></textarea>
+  <div class="row"><div><label>Couleur</label><input type="color" data-k="color" value="#5865f2"></div>
+    <div class="chk"><input type="checkbox" data-k="ts" id="ts"><label for="ts">Horodatage</label></div></div>
+  <div class="row"><div><label>Auteur</label><input data-k="authorName"></div><div><label>Icône auteur</label><input data-k="authorIcon"></div><div><label>URL auteur</label><input data-k="authorUrl"></div></div>
+  <div class="row"><div><label>Miniature (URL)</label><input data-k="thumb"></div><div><label>Grande image (URL)</label><input data-k="image"></div></div>
+  <div class="row"><div><label>Pied de page</label><input data-k="footer"></div><div><label>Icône pied de page</label><input data-k="footerIcon"></div></div>
+  <label>Champs</label><div id="fields"></div><button class="ghost" id="addF">+ Champ</button>
+
+  <label>Boutons lien (max 5) — bot recommandé</label><div id="btns"></div><button class="ghost" id="addB">+ Bouton</button>
+  <h3>Message existant</h3>
+  <div class="row"><input id="msgRef" placeholder="Lien du message ou ID"><button class="ghost" id="loadMsg" style="flex:0;white-space:nowrap">Charger</button></div>
+  <div class="chk"><input type="checkbox" id="editMode"><label for="editMode">Modifier ce message au lieu d'en envoyer un nouveau</label></div>
+  <h3>Modèles (enregistrés sur ce navigateur)</h3>
+  <div class="row"><input id="tplName" placeholder="Nom du modèle"><button class="ghost" id="tplSave" style="flex:0">Sauver</button></div><div id="tpls"></div>
+  <div id="status"></div>
+  <button id="send">📤 Envoyer</button>
+  <button class="ghost" id="exp">Exporter JSON</button><button class="ghost" id="imp">Importer JSON</button>
+  <textarea id="json" placeholder="JSON ici pour importer / exporter" style="margin-top:.6rem"></textarea>
+</div>
+<div class="card"><h3 style="margin-top:0">Aperçu</h3><div class="dc" id="prev"></div></div>
+</div></div>
+
+<!-- ===== COMMANDES ===== -->
+<div id="cmd" class="tab"><div class="grid">
+<div class="card">
+  <p style="color:#b0b0b0;font-size:.9rem">Crée une commande slash sur ton bot qui répond avec un texte et/ou l'embed en cours d'édition.</p>
+  <label>Nom (sans /)</label><input id="cName" placeholder="regles">
+  <label>Description</label><input id="cDesc" maxlength="100">
+  <label>Réponse texte</label><textarea id="cText"></textarea>
+  <div class="chk"><input type="checkbox" id="cEmb"><label for="cEmb">Inclure l'embed de l'onglet Embed</label></div>
+  <div class="chk"><input type="checkbox" id="cEph"><label for="cEph">Réponse visible uniquement par l'utilisateur</label></div>
+  <div id="cStatus" style="min-height:1.3em;margin-top:.6rem"></div>
+  <button id="cCreate">Créer la commande</button>
+</div>
+<div class="card"><h3 style="margin-top:0">Commandes créées</h3><div id="cList"></div></div>
+</div></div>
+
+<script>
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const blank=()=>({title:'',url:'',description:'',color:'#5865f2',ts:false,authorName:'',authorIcon:'',authorUrl:'',thumb:'',image:'',footer:'',footerIcon:'',fields:[]});
+let embeds=[blank()],cur=0;
+
+// Onglets
+document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('.tabs button,.tab').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on');$(b.dataset.t).classList.add('on');if(b.dataset.t==='cmd')loadCmds();
+});
+
+// Conversion état -> objet embed API Discord
+function build(e){
+  const o={},c=parseInt((e.color||'#5865f2').slice(1),16);
+  if(e.title)o.title=e.title;if(e.url)o.url=e.url;if(e.description)o.description=e.description;o.color=c;
+  if(e.authorName)o.author={name:e.authorName,...(e.authorIcon&&{icon_url:e.authorIcon}),...(e.authorUrl&&{url:e.authorUrl})};
+  if(e.thumb)o.thumbnail={url:e.thumb};if(e.image)o.image={url:e.image};
+  if(e.footer)o.footer={text:e.footer,...(e.footerIcon&&{icon_url:e.footerIcon})};
+  if(e.ts)o.timestamp=new Date().toISOString();
+  const f=e.fields.filter(x=>x.name&&x.value);if(f.length)o.fields=f.map(x=>({name:x.name,value:x.value,inline:!!x.inline}));
+  return o;
+}
+const payload=()=>{
+  const p={};['content','username','avatar_url'].forEach(k=>{if($(k).value.trim())p[k]=$(k).value.trim()});
+  const em=embeds.map(build).filter(o=>o.title||o.description||o.author||o.fields||o.image||o.thumbnail||o.footer);
+  if(em.length)p.embeds=em;
+  const b=btns.filter(x=>x.label&&/^https?:\/\//.test(x.url));
+  if(b.length)p.components=[{type:1,components:b.map(x=>({type:2,style:5,label:x.label,url:x.url}))}];return p;
+};
+
+// Formulaire <-> état
+function syncForm(){
+  document.querySelectorAll('[data-k]').forEach(i=>{const v=embeds[cur][i.dataset.k];i.type==='checkbox'?i.checked=!!v:i.value=v??''});
+  $('curSel').innerHTML=embeds.map((_,i)=>`<option value="${i}" ${i===cur?'selected':''}>#${i+1}</option>`).join('');
+  $('fields').innerHTML=embeds[cur].fields.map((f,i)=>`<div class="fld">
+    <input placeholder="Nom" value="${esc(f.name)}" data-f="${i}" data-p="name">
+    <input placeholder="Valeur" value="${esc(f.value)}" data-f="${i}" data-p="value">
+    <span class="chk"><input type="checkbox" ${f.inline?'checked':''} data-f="${i}" data-p="inline"><label>inline</label></span>
+    <span><button class="ghost" style="margin:0 2px 0 0" data-up="${i}">↑</button><button class="ghost" style="margin:0 2px 0 0" data-dn="${i}">↓</button><button class="red" style="margin:0" data-x="${i}">✕</button></span></div>`).join('');
+  render();
+}
+document.addEventListener('input',e=>{
+  const t=e.target;
+  if(t.dataset.k){embeds[cur][t.dataset.k]=t.type==='checkbox'?t.checked:t.value}
+  else if(t.dataset.f!==undefined){embeds[cur].fields[+t.dataset.f][t.dataset.p]=t.type==='checkbox'?t.checked:t.value}
+  render();
+});
+document.addEventListener('click',e=>{const d=e.target.dataset,f=embeds[cur].fields;
+  if(d.x!==undefined){f.splice(+d.x,1);syncForm()}
+  else if(d.up!==undefined&&+d.up>0){[f[+d.up-1],f[+d.up]]=[f[+d.up],f[+d.up-1]];syncForm()}
+  else if(d.dn!==undefined&&+d.dn<f.length-1){[f[+d.dn+1],f[+d.dn]]=[f[+d.dn],f[+d.dn+1]];syncForm()}
+  else if(d.bx!==undefined){btns.splice(+d.bx,1);renderBtns();render()}
+  else if(d.tl){const p=tpls()[d.tl];if(p)importJson(JSON.stringify(p))}
+  else if(d.td){const t=tpls();delete t[d.td];localStorage.setItem(TK,JSON.stringify(t));renderTpls()}});
+$('addF').onclick=()=>{if(embeds[cur].fields.length<25){embeds[cur].fields.push({name:'',value:'',inline:false});syncForm()}};
+$('addEm').onclick=()=>{if(embeds.length<10){embeds.push(blank());cur=embeds.length-1;syncForm()}};
+$('delEm').onclick=()=>{embeds.splice(cur,1);if(!embeds.length)embeds=[blank()];cur=Math.min(cur,embeds.length-1);syncForm()};
+$('curSel').onchange=e=>{cur=+e.target.value;syncForm()};
+$('mode').onchange=e=>{$('wh').style.display=e.target.value==='webhook'?'':'none';$('ch').style.display=e.target.value==='bot'?'':'none'};
+
+// Markdown Discord minimal pour l'aperçu
+const pre=s=>s.replace(/```([\s\S]*?)```/g,'<pre style="background:#1e1f22;padding:.4rem;border-radius:4px;overflow:auto">$1</pre>')
+ .replace(/~~(.+?)~~/g,'<s>$1</s>')
+ .replace(/^&gt; (.*)$/gm,'<span style="border-left:3px solid #4e5058;padding-left:.5rem;display:inline-block">$1</span>')
+ .replace(/^# (.*)$/gm,'<b style="font-size:1.3em">$1</b>').replace(/^## (.*)$/gm,'<b style="font-size:1.15em">$1</b>')
+ .replace(/&lt;@(?:&amp;|!)?\d+&gt;|&lt;#\d+&gt;/g,m=>`<span style="background:#3c4270;color:#c9cdfb;border-radius:3px;padding:0 2px">${m.includes('#')?'#salon':m.includes('&amp;')?'@rôle':'@membre'}</span>`)
+ .replace(/&lt;t:(\d+)(?::\w)?&gt;/g,(m,t)=>new Date(+t*1000).toLocaleString('fr-FR'));
+const md=s=>pre(esc(s)).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/__(.+?)__/g,'<u>$1</u>').replace(/\*(.+?)\*/g,'<i>$1</i>').replace(/`(.+?)`/g,'<code>$1</code>').replace(/\[(.+?)\]\((https?:[^)\s]+)\)/g,'<a href="$2" style="color:#00a8fc">$1</a>');
+function render(){renderBase();btnPrev()}
+function btnPrev(){const c=(payload().components||[])[0];if(c)$('prev').insertAdjacentHTML('beforeend','<div style="display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.5rem">'+c.components.map(b=>`<a href="${esc(b.url)}" style="background:#4e5058;color:#fff;padding:.35rem .8rem;border-radius:4px;text-decoration:none;font-size:.85rem">${esc(b.label)} ↗</a>`).join('')+'</div>')}
+function renderBase(){
+  const p=payload();
+  $('prev').innerHTML=`<div class="u">${p.avatar_url?`<img src="${esc(p.avatar_url)}">`:''}${esc(p.username||'Bot')}</div>`+
+    (p.content?`<div style="white-space:pre-wrap">${md(p.content)}</div>`:'')+
+    (p.embeds||[]).map(o=>`<div class="em" style="border-left-color:#${(o.color||0).toString(16).padStart(6,'0')}">
+      ${o.thumbnail?`<img class="th" src="${esc(o.thumbnail.url)}">`:''}
+      ${o.author?`<div class="a">${o.author.icon_url?`<img src="${esc(o.author.icon_url)}">`:''}${esc(o.author.name)}</div>`:''}
+      ${o.title?`<div class="t">${o.url?`<a href="${esc(o.url)}">${esc(o.title)}</a>`:esc(o.title)}</div>`:''}
+      ${o.description?`<div class="d">${md(o.description)}</div>`:''}
+      ${o.fields?`<div class="fs">${o.fields.map(f=>`<div class="f ${f.inline?'in':''}"><b>${esc(f.name)}</b>${md(f.value)}</div>`).join('')}</div>`:''}
+      ${o.image?`<img class="im" src="${esc(o.image.url)}">`:''}
+      ${o.footer||o.timestamp?`<div class="ft">${o.footer?.icon_url?`<img src="${esc(o.footer.icon_url)}">`:''}${esc(o.footer?.text||'')}${o.timestamp?' • '+new Date().toLocaleString('fr-FR'):''}</div>`:''}
+    </div>`).join('');
+}
+
+// Import / export JSON
+function importJson(text){
+  let j=JSON.parse(text);if(!j.embeds&&(j.title||j.description||j.fields))j={embeds:[j]};
+  ['content','username','avatar_url'].forEach(k=>$(k).value=j[k]||'');
+  embeds=(j.embeds||[]).slice(0,10).map(o=>({...blank(),title:o.title||'',url:o.url||'',description:o.description||'',
+    color:'#'+(o.color??0x5865f2).toString(16).padStart(6,'0'),ts:!!o.timestamp,authorName:o.author?.name||'',authorIcon:o.author?.icon_url||'',
+    authorUrl:o.author?.url||'',thumb:o.thumbnail?.url||'',image:o.image?.url||'',footer:o.footer?.text||'',footerIcon:o.footer?.icon_url||'',
+    fields:(o.fields||[]).map(f=>({name:f.name,value:f.value,inline:!!f.inline}))}));
+  if(!embeds.length)embeds=[blank()];cur=0;
+  btns=((j.components||[])[0]?.components||[]).filter(c=>c.url).map(c=>({label:c.label||'',url:c.url}));renderBtns();syncForm();
+}
+$('exp').onclick=()=>$('json').value=JSON.stringify(payload(),null,2);
+$('imp').onclick=()=>{try{importJson($('json').value)}catch(e){alert('JSON invalide : '+e.message)}};
+
+// Appels API
+async function api(url,opt){
+  const r=await fetch(url,opt&&{...opt,headers:{'Content-Type':'application/json'},body:opt.body&&JSON.stringify(opt.body)});
+  const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.error||r.status);return d;
+}
+function say(el,msg,ok){el.textContent=msg;el.className=ok?'ok':'ko'}
+
+$('send').onclick=async()=>{
+  const p=payload();if(!p.content&&!p.embeds)return say($('status'),'Message vide.',false);
+  try{await api('/api/jore/send',{method:'POST',body:{mode:$('mode').value,webhookUrl:$('webhookUrl').value.trim(),channelId:$('channelId').value.trim(),payload:p,messageId:$('editMode').checked?refId():undefined}});say($('status'),$('editMode').checked?'✅ Message modifié.':'✅ Envoyé.',true)}
+  catch(e){say($('status'),'❌ '+e.message,false)}
+};
+
+// Commandes
+async function loadCmds(){
+  try{const l=await api('/api/jore/commands',{method:'GET'});
+    $('cList').innerHTML=l.length?l.map(c=>`<div style="margin-bottom:.6rem"><b>/${esc(c.name)}</b> — ${esc(c.description)}
+      <button class="red" style="margin:0 0 0 .5rem" data-del="${esc(c.name)}">Suppr.</button></div>`).join(''):'<p style="color:#b0b0b0">Aucune commande.</p>'}
+  catch(e){$('cList').textContent=e.message}
+}
+document.addEventListener('click',async e=>{const n=e.target.dataset.del;if(!n||!confirm('Supprimer /'+n+' ?'))return;
+  try{await api('/api/jore/commands/'+encodeURIComponent(n),{method:'DELETE'});loadCmds()}catch(x){alert(x.message)}});
+$('cCreate').onclick=async()=>{
+  const p=payload(),reply={content:$('cText').value.trim()};if($('cEmb').checked&&p.embeds)reply.embeds=p.embeds;
+  try{await api('/api/jore/commands',{method:'POST',body:{name:$('cName').value.trim().toLowerCase(),description:$('cDesc').value.trim(),reply,ephemeral:$('cEph').checked}});
+    say($('cStatus'),'✅ Commande créée (peut mettre quelques secondes à apparaître).',true);loadCmds()}
+  catch(e){say($('cStatus'),'❌ '+e.message,false)}
+};
+
+// Boutons lien
+let btns=[];
+function renderBtns(){$('btns').innerHTML=btns.map((b,i)=>`<div class="row" style="margin-top:.4rem"><input placeholder="Texte" value="${esc(b.label)}" data-b="${i}" data-p="label"><input placeholder="https://..." value="${esc(b.url)}" data-b="${i}" data-p="url"><button class="red" style="flex:0;margin:0" data-bx="${i}">✕</button></div>`).join('')}
+document.addEventListener('input',e=>{const t=e.target;if(t.dataset.b!==undefined){btns[+t.dataset.b][t.dataset.p]=t.value;render()}});
+$('addB').onclick=()=>{if(btns.length<5){btns.push({label:'',url:''});renderBtns()}};
+
+// Message existant (lien ou ID) : charger / modifier
+const refId=()=>{const m=$('msgRef').value.match(/(\d{17,20})\s*$/);return m?m[1]:''};
+$('loadMsg').onclick=async()=>{
+  const l=$('msgRef').value.trim().match(/channels\/\d+\/(\d+)\/(\d+)/);
+  if(l&&$('mode').value==='bot')$('channelId').value=l[1];
+  try{const d=await api('/api/jore/load',{method:'POST',body:{mode:$('mode').value,webhookUrl:$('webhookUrl').value.trim(),channelId:$('channelId').value.trim(),messageId:l?l[2]:refId()}});
+    importJson(JSON.stringify(d));say($('status'),'✅ Message chargé. Coche « Modifier » pour le mettre à jour.',true)}
+  catch(e){say($('status'),'❌ '+e.message,false)}
+};
+
+// Modèles
+const TK='jore_tpl';
+const tpls=()=>{try{return JSON.parse(localStorage.getItem(TK))||{}}catch{return{}}};
+function renderTpls(){$('tpls').innerHTML=Object.keys(tpls()).map(n=>`<div style="margin-top:.4rem"><b>${esc(n)}</b><button class="ghost" style="margin:0 0 0 .5rem" data-tl="${esc(n)}">Charger</button><button class="red" style="margin:0 0 0 .3rem" data-td="${esc(n)}">✕</button></div>`).join('')}
+$('tplSave').onclick=()=>{const n=$('tplName').value.trim();if(!n)return;const t=tpls();t[n]=payload();localStorage.setItem(TK,JSON.stringify(t));renderTpls()};
+
+renderTpls();renderBtns();syncForm();
+</script>
+</body>
+</html>
