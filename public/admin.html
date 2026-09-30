@@ -1014,7 +1014,7 @@ function getDefaultQualificationJudiciaireFront(grade) {
         grade.startsWith("GDC") ||
         grade.startsWith("GDS") ||
         grade.startsWith("ELG")
-    ) return "APJA";
+    ) return "APJ";
     
     return "APJA";
 }
@@ -1027,12 +1027,21 @@ function updateQJFromGrade(id) {
 async function acceptApp(id) {
     try {
         const message = document.getElementById(`appMsg-${id}`)?.value || "";
-        await readResponse(await fetch(`${window.API_BASE || ""}/api/applications/${id}/accept`, {
+        const data = await readResponse(await fetch(`${window.API_BASE || ""}/api/applications/${id}/accept`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ message })
         }));
-        alert("Candidature acceptée. MP envoyé si possible.");
+
+        const lignes = ["✅ Candidature acceptée."];
+        lignes.push(data.roleAdded
+            ? "✅ Rôle EGAV attribué sur Discord."
+            : `⚠️ Rôle EGAV NON attribué (${data.roleError || "erreur inconnue"}). Donne-le à la main.`);
+        lignes.push(data.dmSent
+            ? "✅ MP envoyé au candidat."
+            : "⚠️ MP non envoyé (le candidat a fermé ses MP).");
+        alert(lignes.join("\n"));
+
         loadApps();
         loadEffectifs();
     } catch (err) { alert(err.message || "Impossible d'accepter cette candidature."); }
@@ -1041,12 +1050,16 @@ async function acceptApp(id) {
 async function rejectApp(id) {
     try {
         const message = document.getElementById(`appMsg-${id}`)?.value || "";
-        await readResponse(await fetch(`${window.API_BASE || ""}/api/applications/${id}/reject`, {
+        const data = await readResponse(await fetch(`${window.API_BASE || ""}/api/applications/${id}/reject`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ message })
         }));
-        alert("Candidature refusée. MP envoyé si possible.");
+
+        alert(data.dmSent
+            ? "❌ Candidature refusée. MP envoyé au candidat (aucun rôle donné)."
+            : "❌ Candidature refusée (aucun rôle donné). ⚠️ MP non envoyé : le candidat a fermé ses MP.");
+
         loadApps();
     } catch (err) { alert(err.message || "Impossible de refuser cette candidature."); }
 }
@@ -1085,7 +1098,7 @@ async function pollLoop() {
     isPolling = true;
 
     try {
-        if (currentTab === "apps") {
+        if (currentTab === "apps" && !isEditingInside("appsContainer")) {
             await loadApps();
         } else if (currentTab === "effectifs" && !isEditingInside("effectifsContainer")) {
             await loadEffectifs();
