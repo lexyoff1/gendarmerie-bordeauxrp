@@ -599,7 +599,7 @@ const VEH_CATEGORIES = ["PAM", "PSIG", "EDCF", "AGIGN", "GM", "GMAR", "PJGN", "G
 let vehicules = {};
 let currentVehCategory = "PAM";
 
-const POLL_INTERVAL_MS = 8000; // fréquence du rafraîchissement auto par onglet
+const POLL_INTERVAL_MS = 5000; // fréquence du rafraîchissement auto par onglet (5 secondes)
 let isPolling = false;
 
 function switchTab(tabName, button) {
