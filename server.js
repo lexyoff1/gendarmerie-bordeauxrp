@@ -668,6 +668,32 @@ async function addGuildRole(userId, roleId) {
     }
 }
 
+// Préfixe du pseudo serveur donné aux candidats acceptés : "EGAV • Nom Prénom"
+const EGAV_NICK_PREFIX = "EGAV • ";
+
+// Change le pseudo d'un membre sur le serveur. Retourne { ok, error? }.
+// Nécessite : permission "Gérer les pseudos" pour le bot, rôle du bot au-dessus
+// du membre. Impossible de renommer le propriétaire du serveur. Limite : 32 caractères.
+async function setGuildNickname(userId, nick) {
+    try {
+        await axios.patch(
+            `https://discord.com/api/v10/guilds/${process.env.GUILD_ID}/members/${userId}`,
+            { nick: String(nick).slice(0, 32) },
+            {
+                headers: {
+                    Authorization: `Bot ${process.env.DISCORD_BOT_TOKEN}`,
+                    "Content-Type": "application/json"
+                }
+            }
+        );
+        return { ok: true };
+    } catch (err) {
+        const detail = err.response?.data?.message || err.message;
+        console.log("Erreur setGuildNickname :", err.response?.data || err.message);
+        return { ok: false, error: detail, status: err.response?.status };
+    }
+}
+
 async function sendDMToRole(roleId, message) {
     try {
         const members = await getAllGuildMembers();
@@ -1850,6 +1876,15 @@ app.post("/api/applications/:id/accept", requireAdminAccess, async (req, res) =>
         roleResult = await addGuildRole(appItem.discordId, EGAV_ROLE_ID);
     }
 
+    // Changement du pseudo serveur : "EGAV • Nom Prénom"
+    let nickResult = { ok: false, error: "ID Discord manquant." };
+    if (appItem.discordId) {
+        nickResult = await setGuildNickname(
+            appItem.discordId,
+            `${EGAV_NICK_PREFIX}${appItem.nomPrenom || appItem.user || ""}`
+        );
+    }
+
     // MP au candidat : accepté
     const dmCandidat = await sendDiscordDM(
         appItem.discordId,
@@ -1880,6 +1915,7 @@ Discord : ${appItem.user || appItem.username || "Non renseigné"} (${appItem.dis
 Traité par : ${decideur} (${req.session.user?.id || "ID inconnu"})
 Date : ${new Date().toLocaleString("fr-FR")}
 Rôle EGAV : ${roleResult.ok ? "attribué ✅" : `ÉCHEC ❌ (${roleResult.error})`}
+Pseudo serveur : ${nickResult.ok ? "modifié ✅" : `ÉCHEC ❌ (${nickResult.error})`}
 MP au candidat : ${dmCandidat ? "envoyé ✅" : "non envoyé ❌ (MP fermés)"}
 ${noteAcceptation ? `Message laissé : ${noteAcceptation}` : ""}`
     );
@@ -1888,6 +1924,8 @@ ${noteAcceptation ? `Message laissé : ${noteAcceptation}` : ""}`
         success: true,
         roleAdded: roleResult.ok,
         roleError: roleResult.ok ? null : roleResult.error,
+        nickSet: nickResult.ok,
+        nickError: nickResult.ok ? null : nickResult.error,
         dmSent: dmCandidat
     });
 });
