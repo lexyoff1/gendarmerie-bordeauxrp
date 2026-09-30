@@ -962,6 +962,10 @@ app.get("/gn-login", (req, res) => {
 app.get("/gn-login.html", (req, res) => res.redirect(301, "/gn-login"));
 
 app.get("/gn-candidature", (req, res) => {
+    // Pas connecté avec Discord (ou session admin "systeme") : on envoie vers Discord d'abord
+    if (!req.session.user || String(req.session.user.id).startsWith("systeme")) {
+        return res.redirect("/auth/discord?returnTo=/gn-candidature");
+    }
     res.sendFile(path.join(__dirname, "public", "gn-candidature.html"));
 });
 app.get("/gn-candidature.html", (req, res) => res.redirect(301, "/gn-candidature"));
