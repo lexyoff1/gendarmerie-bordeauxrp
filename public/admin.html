@@ -1037,6 +1037,9 @@ async function acceptApp(id) {
         lignes.push(data.roleAdded
             ? "✅ Rôle EGAV attribué sur Discord."
             : `⚠️ Rôle EGAV NON attribué (${data.roleError || "erreur inconnue"}). Donne-le à la main.`);
+        lignes.push(data.nickSet
+            ? "✅ Pseudo serveur changé en « EGAV • Nom Prénom »."
+            : `⚠️ Pseudo NON modifié (${data.nickError || "erreur inconnue"}). Change-le à la main.`);
         lignes.push(data.dmSent
             ? "✅ MP envoyé au candidat."
             : "⚠️ MP non envoyé (le candidat a fermé ses MP).");
