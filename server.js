@@ -9,6 +9,8 @@ const ADMIN_ROLE_ID = "1500242566333857832";
 // MP envoyé à cet ID à chaque candidature Gendarmerie (onglet "Candidatures" du
 // panel admin) acceptée ou refusée, avec le nom de l'admin qui a traité le dossier.
 const APPLICATION_DECISION_NOTIFY_ID = "1282035608688132106";
+// Rôle Discord donné automatiquement quand une candidature Gendarmerie est acceptée
+const EGAV_ROLE_ID = "1407804118868824145";
 const path = require("path");
 require("dotenv").config();
 
@@ -353,26 +355,26 @@ function getData() {
     const db = JSON.parse(fs.readFileSync(DATA_FILE, "utf8"));
 
     if (!Array.isArray(db.users)) db.users = [];
-if (!Array.isArray(db.applications)) db.applications = [];
-if (!Array.isArray(db.specialiteApplications)) db.specialiteApplications = [];
-if (!Array.isArray(db.tenues)) db.tenues = [];
-if (!Array.isArray(db.ticketsCommandement)) db.ticketsCommandement =[];
-if (!Array.isArray(db.saisies)) db.saisies = [];
-if (!Array.isArray(db.avis)) db.avis = [];
-if (!Array.isArray(db.rapports)) db.rapports = [];
+    if (!Array.isArray(db.applications)) db.applications = [];
+    if (!Array.isArray(db.specialiteApplications)) db.specialiteApplications = [];
+    if (!Array.isArray(db.tenues)) db.tenues = [];
+    if (!Array.isArray(db.ticketsCommandement)) db.ticketsCommandement = [];
+    if (!Array.isArray(db.saisies)) db.saisies = [];
+    if (!Array.isArray(db.avis)) db.avis = [];
+    if (!Array.isArray(db.rapports)) db.rapports = [];
 
-db.users.forEach(user => {
-    if (!user.qualificationJudiciaire) {
-        user.qualificationJudiciaire = getDefaultQualificationJudiciaire(user.grade);
-    }
+    db.users.forEach(user => {
+        if (!user.qualificationJudiciaire) {
+            user.qualificationJudiciaire = getDefaultQualificationJudiciaire(user.grade);
+        }
 
-    if (!user.NIGEND && user.matricule) {
-        user.NIGEND = user.matricule;
-    }
-});
+        if (!user.NIGEND && user.matricule) {
+            user.NIGEND = user.matricule;
+        }
+    });
 
-saveData(db);
-return db;
+    saveData(db);
+    return db;
 }
 
 function saveData(data) {
@@ -643,6 +645,29 @@ async function sendDiscordDM(userId, message) {
         return false;
     }
 }
+
+// Ajoute un rôle à un membre du serveur. Retourne { ok, error? }.
+// Nécessite : le bot a la permission "Gérer les rôles" et son rôle est
+// placé AU-DESSUS du rôle à donner dans la hiérarchie du serveur.
+async function addGuildRole(userId, roleId) {
+    try {
+        await axios.put(
+            `https://discord.com/api/v10/guilds/${process.env.GUILD_ID}/members/${userId}/roles/${roleId}`,
+            null,
+            {
+                headers: {
+                    Authorization: `Bot ${process.env.DISCORD_BOT_TOKEN}`
+                }
+            }
+        );
+        return { ok: true };
+    } catch (err) {
+        const detail = err.response?.data?.message || err.message;
+        console.log("Erreur addGuildRole :", err.response?.data || err.message);
+        return { ok: false, error: detail, status: err.response?.status };
+    }
+}
+
 async function sendDMToRole(roleId, message) {
     try {
         const members = await getAllGuildMembers();
@@ -942,6 +967,15 @@ app.get("/gn-candidature", (req, res) => {
 app.get("/gn-candidature.html", (req, res) => res.redirect(301, "/gn-candidature"));
 
 app.post("/api/candidatures", async (req, res) => {
+    // Il faut être connecté avec Discord pour candidater
+    if (!req.session.user?.id || req.session.user.id.startsWith("systeme")) {
+        return res.status(401).json({ error: "Connexion Discord requise." });
+    }
+
+    // On ignore ce qu'envoie le client : pseudo et ID viennent de la session (fiables)
+    req.body.email = req.session.user.username;
+    req.body.telephone = req.session.user.id;
+
     const requiredFields = [
         "nom", "prenom", "email", "telephone", "dateNaissance",
         "diplome", "experience", "motivation"
@@ -952,19 +986,25 @@ app.post("/api/candidatures", async (req, res) => {
     }
 
     const db = getData();
-const application = {
-    id: Date.now(),
-    nomPrenom: `${req.body.nom.trim()} ${req.body.prenom.trim()}`,
-    user: req.body.email.trim(),
-    username: req.body.email.trim(),
-    discordId: req.body.telephone.trim(),
-    dateNaissance: req.body.dateNaissance,
-    diplome: req.body.diplome.trim(),
-    experience: req.body.experience.trim(),
-    motivation: req.body.motivation.trim(),
-    status: "En attente",
-    createdAt: new Date().toISOString()
-};
+
+    // Une seule candidature en attente par personne
+    if (db.applications.some(a => a.discordId === req.session.user.id && a.status === "En attente")) {
+        return res.status(409).json({ error: "Vous avez déjà une candidature en attente." });
+    }
+
+    const application = {
+        id: Date.now(),
+        nomPrenom: `${req.body.nom.trim()} ${req.body.prenom.trim()}`,
+        user: req.body.email.trim(),
+        username: req.body.email.trim(),
+        discordId: req.body.telephone.trim(),
+        dateNaissance: req.body.dateNaissance,
+        diplome: req.body.diplome.trim(),
+        experience: req.body.experience.trim(),
+        motivation: req.body.motivation.trim(),
+        status: "En attente",
+        createdAt: new Date().toISOString()
+    };
     db.applications.push(application);
 
     saveData(db);
@@ -1203,7 +1243,13 @@ app.post("/api/admin/delete-user", requireAdmin, (req, res) => {
     res.json({ success: true });
 });
 
+// Seules ces pages peuvent être demandées comme retour après la connexion Discord
+const ALLOWED_RETURN_PATHS = new Set(["/gn-candidature"]);
+
 app.get("/auth/discord", (req, res) => {
+    const returnTo = String(req.query.returnTo || "");
+    req.session.returnTo = ALLOWED_RETURN_PATHS.has(returnTo) ? returnTo : null;
+
     const url =
         `https://discord.com/oauth2/authorize?client_id=${process.env.DISCORD_CLIENT_ID}` +
         `&redirect_uri=${encodeURIComponent(process.env.DISCORD_REDIRECT_URI)}` +
@@ -1254,7 +1300,12 @@ app.get("/auth/discord/callback", async (req, res) => {
             dateArriveeServeur: member ? member.joined_at : null
         };
 
+        const returnTo = req.session.returnTo;
+        delete req.session.returnTo;
+
         if (!member) {
+            // Un candidat pas encore dans le serveur peut revenir sur la page de candidature
+            if (returnTo === "/gn-candidature") return res.redirect(returnTo);
             return res.send(accessDeniedPage());
         }
 
@@ -1287,7 +1338,7 @@ app.get("/auth/discord/callback", async (req, res) => {
 
         saveData(db);
 
-        return res.redirect("/dashboard");
+        return res.redirect(returnTo || "/dashboard");
 
     } catch (err) {
         console.log(err.response?.data || err.message);
@@ -1335,14 +1386,14 @@ app.get("/api/me", (req, res) => {
     const user = db.users.find(u => u.id === req.session.user.id);
 
     if (user && !user.qualificationJudiciaire) {
-    user.qualificationJudiciaire = getDefaultQualificationJudiciaire(user.grade);
-    saveData(db);
-}
+        user.qualificationJudiciaire = getDefaultQualificationJudiciaire(user.grade);
+        saveData(db);
+    }
 
-if (user && !user.NIGEND && user.matricule) {
-    user.NIGEND = user.matricule;
-    saveData(db);
-}
+    if (user && !user.NIGEND && user.matricule) {
+        user.NIGEND = user.matricule;
+        saveData(db);
+    }
 
     if (user) {
         return res.json({
@@ -1422,10 +1473,6 @@ app.post("/api/renfort", requireLogin, requireGNMember, async (req, res) => {
     }
 
     const { nombreMilitaires, unitePatrouille, raison, specialisations } = req.body;
-
-    if (!nombreMilitaires || !unitePatrouille || !raison || !specialisations || specialisations.length === 0) {
-        return res.status(400).json({ error: "Merci de remplir tous les champs." });
-    }
 
     if (!nombreMilitaires || !unitePatrouille || !raison || !specialisations || specialisations.length === 0) {
         return res.status(400).json({ error: "Merci de remplir tous les champs." });
@@ -1751,6 +1798,9 @@ app.get("/api/applications", requireAdminAccess, async (req, res) => {
     }
 });
 
+// ---- Candidature Gendarmerie ACCEPTÉE ----
+// 1) statut "Acceptée"  2) création du profil EGAV  3) rôle EGAV donné sur Discord
+// 4) MP au candidat     5) MP de suivi à APPLICATION_DECISION_NOTIFY_ID
 app.post("/api/applications/:id/accept", requireAdminAccess, async (req, res) => {
     if (!(await isAdmin(req))) return res.status(403).json({ error: "Accès refusé" });
 
@@ -1761,7 +1811,12 @@ app.post("/api/applications/:id/accept", requireAdminAccess, async (req, res) =>
         return res.status(404).json({ error: "Candidature introuvable" });
     }
 
+    const decideur = req.session.user?.nomPrenom || req.session.user?.username || "Inconnu";
+    const noteAcceptation = String(req.body?.message || "").trim();
+
     appItem.status = "Acceptée";
+    appItem.decidedAt = new Date().toISOString();
+    appItem.decidedBy = decideur;
 
     let user = appItem.discordId && db.users.find(u => u.id === appItem.discordId);
 
@@ -1785,9 +1840,33 @@ app.post("/api/applications/:id/accept", requireAdminAccess, async (req, res) =>
 
     saveData(db);
 
-    const decideur = req.session.user?.nomPrenom || req.session.user?.username || "Inconnu";
-    const noteAcceptation = String(req.body?.message || "").trim();
+    // Attribution du rôle EGAV sur Discord
+    let roleResult = { ok: false, error: "ID Discord manquant." };
+    if (appItem.discordId) {
+        roleResult = await addGuildRole(appItem.discordId, EGAV_ROLE_ID);
+    }
 
+    // MP au candidat : accepté
+    const dmCandidat = await sendDiscordDM(
+        appItem.discordId,
+`✅ CANDIDATURE ACCEPTÉE
+
+À l'attention de : ${appItem.nomPrenom}
+
+Après étude de votre dossier, nous avons le plaisir de vous informer que votre candidature à la Gendarmerie Nationale a été acceptée.
+
+${roleResult.ok
+    ? "Le rôle Élève Gendarme Adjoint Volontaire vous a été attribué sur le serveur Discord."
+    : "Votre rôle vous sera attribué prochainement par un membre du commandement."}
+${noteAcceptation ? `\nMessage du commandement :\n${noteAcceptation}\n` : ""}
+Vous pouvez dès maintenant vous connecter au portail avec votre compte Discord.
+
+Félicitations et bienvenue.
+
+Gendarmerie Nationale`
+    );
+
+    // MP de suivi au responsable
     await sendDiscordDM(
         APPLICATION_DECISION_NOTIFY_ID,
 `✅ CANDIDATURE ACCEPTÉE
@@ -1796,12 +1875,20 @@ Candidat : ${appItem.nomPrenom || appItem.user || "Sans nom"}
 Discord : ${appItem.user || appItem.username || "Non renseigné"} (${appItem.discordId || "ID inconnu"})
 Traité par : ${decideur} (${req.session.user?.id || "ID inconnu"})
 Date : ${new Date().toLocaleString("fr-FR")}
+Rôle EGAV : ${roleResult.ok ? "attribué ✅" : `ÉCHEC ❌ (${roleResult.error})`}
+MP au candidat : ${dmCandidat ? "envoyé ✅" : "non envoyé ❌ (MP fermés)"}
 ${noteAcceptation ? `Message laissé : ${noteAcceptation}` : ""}`
     );
 
-    res.json({ success: true });
+    res.json({
+        success: true,
+        roleAdded: roleResult.ok,
+        roleError: roleResult.ok ? null : roleResult.error,
+        dmSent: dmCandidat
+    });
 });
 
+// ---- Candidature Gendarmerie REFUSÉE : aucun rôle, uniquement un MP ----
 app.post("/api/applications/:id/reject", requireAdminAccess, async (req, res) => {
     if (!(await isAdmin(req))) return res.status(403).json({ error: "Accès refusé" });
 
@@ -1812,13 +1899,30 @@ app.post("/api/applications/:id/reject", requireAdminAccess, async (req, res) =>
         return res.status(404).json({ error: "Candidature introuvable" });
     }
 
-    appItem.status = "Refusée";
-
-    saveData(db);
-
     const decideur = req.session.user?.nomPrenom || req.session.user?.username || "Inconnu";
     const noteRefus = String(req.body?.message || "").trim();
 
+    appItem.status = "Refusée";
+    appItem.decidedAt = new Date().toISOString();
+    appItem.decidedBy = decideur;
+
+    saveData(db);
+
+    // MP au candidat : refusé
+    const dmCandidat = await sendDiscordDM(
+        appItem.discordId,
+`❌ CANDIDATURE REFUSÉE
+
+À l'attention de : ${appItem.nomPrenom}
+
+Après examen attentif de votre dossier, nous sommes au regret de vous informer que votre candidature à la Gendarmerie Nationale n'a pas été retenue.
+${noteRefus ? `\nMotif communiqué :\n${noteRefus}\n` : ""}
+Nous vous remercions pour l'intérêt porté à la Gendarmerie Nationale.
+
+Gendarmerie Nationale`
+    );
+
+    // MP de suivi au responsable
     await sendDiscordDM(
         APPLICATION_DECISION_NOTIFY_ID,
 `❌ CANDIDATURE REFUSÉE
@@ -1827,10 +1931,11 @@ Candidat : ${appItem.nomPrenom || appItem.user || "Sans nom"}
 Discord : ${appItem.user || appItem.username || "Non renseigné"} (${appItem.discordId || "ID inconnu"})
 Traité par : ${decideur} (${req.session.user?.id || "ID inconnu"})
 Date : ${new Date().toLocaleString("fr-FR")}
+MP au candidat : ${dmCandidat ? "envoyé ✅" : "non envoyé ❌ (MP fermés)"}
 ${noteRefus ? `Message laissé : ${noteRefus}` : ""}`
     );
 
-    res.json({ success: true });
+    res.json({ success: true, dmSent: dmCandidat });
 });
 
 app.get("/api/users", requireAdminAccess, async (req, res) => {
@@ -1913,8 +2018,6 @@ app.post("/api/tenue/delete", requireAdminAccess, (req, res) => {
 app.post("/api/user/:id/update", requireAdminAccess, async (req, res) => {
     if (!(await isAdmin(req))) return res.status(403).json({ error: "Accès refusé" });
 
-    
-
     const db = getData();
     const user = db.users.find(u => u.id === req.params.id);
 
@@ -1933,8 +2036,6 @@ app.post("/api/user/:id/update", requireAdminAccess, async (req, res) => {
     saveData(db);
     res.json({ success: true });
 });
-
-
 
 app.delete("/api/user/:id", requireAdminAccess, async (req, res) => {
     if (!(await isAdmin(req))) return res.status(403).json({ error: "Accès refusé" });
@@ -1958,7 +2059,6 @@ app.get("/logout", (req, res) => {
 app.post("/api/tickets-commandement/create", requireLogin, requireGNMember, async (req, res) => {
     const db = getData();
     const user = db.users.find(u => u.id === req.session.user.id);
-    
 
     const ticket = {
         id: Date.now(),
@@ -1974,12 +2074,11 @@ app.post("/api/tickets-commandement/create", requireLogin, requireGNMember, asyn
     };
 
     db.ticketsCommandement.push(ticket);
-     saveData(db);
+    saveData(db);
 
-     await notifyCB(ticket);
+    await notifyCB(ticket);
 
-     res.json({ success: true });
-
+    res.json({ success: true });
 });
 
 app.get("/api/tickets-commandement/mine", requireLogin, requireGNMember, (req, res) => {
@@ -2031,12 +2130,12 @@ app.post("/api/tickets-commandement/:id/reply", requireLogin, requireGNMember, a
     }
 
     ticket.reponses.push({
-    auteurId: req.session.user.id,
-    auteur: req.session.user.nomPrenom || req.session.user.username,
-    avatar: req.session.user.avatar || "",
-    message: req.body.message,
-    createdAt: new Date().toISOString()
-});
+        auteurId: req.session.user.id,
+        auteur: req.session.user.nomPrenom || req.session.user.username,
+        avatar: req.session.user.avatar || "",
+        message: req.body.message,
+        createdAt: new Date().toISOString()
+    });
 
     saveData(db);
     res.json({ success: true });
@@ -2105,7 +2204,6 @@ app.get("/api/tickets-commandement/admin",
     res.json(db.ticketsCommandement);
 });
 
-
 app.post("/api/tickets-commandement/:id/archive",
     requireLogin,
     requireGNMember,
@@ -2171,7 +2269,7 @@ app.post("/api/tickets-commandement/:id/claim",
     });
 });
 
-// NOUVELLE ROUTE : suppression d'un ticket commandement (réservée au commandement)
+// Suppression d'un ticket commandement (réservée au commandement)
 app.delete("/api/tickets-commandement/:id/delete",
     requireLogin,
     requireGNMember,
