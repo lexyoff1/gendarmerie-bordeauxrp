@@ -965,6 +965,7 @@ async function loadEffectifs() {
                     <div>
                         <label>Qualification Judiciaire</label>
                         <select id="qj-${user.id}">
+                            <option value="N/A" ${user.qualificationJudiciaire === 'N/A' ? 'selected' : ''}>N/A</option>
                             <option value="OPJ" ${user.qualificationJudiciaire === 'OPJ' ? 'selected' : ''}>OPJ</option>
                             <option value="APJ" ${user.qualificationJudiciaire === 'APJ' ? 'selected' : ''}>APJ</option>
                             <option value="APJA" ${user.qualificationJudiciaire === 'APJA' ? 'selected' : ''}>APJA</option>
@@ -994,8 +995,9 @@ async function loadEffectifs() {
 }
 
 function getDefaultQualificationJudiciaireFront(grade) {
+    if (grade && (grade.startsWith("EGAV") || grade === HIDDEN_GRADE)) return "N/A";
     if (!grade) return "APJA";
-    
+
     if (
         grade.startsWith("COL") ||
         grade.startsWith("LCL") ||
