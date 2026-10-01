@@ -6,6 +6,7 @@ const multer = require("multer");
 const crypto = require("crypto");
 const { Client, GatewayIntentBits, Partials } = require("discord.js");
 const setupJore = require("./jore-routes");
+const setupAvatarSync = require("./avatar-sync");
 const ADMIN_ROLE_ID = "1500242566333857832";
 // MP envoyé à cet ID à chaque candidature Gendarmerie (onglet "Candidatures" du
 // panel admin) acceptée ou refusée, avec le nom de l'admin qui a traité le dossier.
@@ -111,6 +112,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use("/assets", express.static("public/assets"));
+// Avatars Discord synchronisés par Jore (voir avatar-sync.js)
+app.use("/avatars", express.static(process.env.AVATARS_DIR || path.join(__dirname, "public", "assets", "avatars")));
 app.use("/style.css", express.static("public/style.css"));
 app.use("/script.js", express.static("public/script.js"));
 
@@ -1479,6 +1482,7 @@ app.get("/api/effectifs", requireLogin, requireGNMember, async (req, res) => {
 
             return {
                 ...user,
+                avatar: member.user?.avatar || user.avatar || "",
                 commandement
             };
         } catch {
@@ -2715,6 +2719,20 @@ app.post("/api/rapports/:id/archiver", requireAdminAccess, (req, res) => {
     saveData(db);
 
     res.json({ success: true, rapport });
+});
+
+// ---- Jore : synchro des avatars Discord toutes les 2h (voir avatar-sync.js) ----
+const avatarSync = setupAvatarSync({
+    bot: discordBot,
+    getData,
+    saveData,
+    getGuildMember
+});
+
+// Forcer une synchro manuellement (admins uniquement)
+app.post("/api/admin/sync-avatars", requireAdminAccess, (req, res) => {
+    avatarSync.syncAvatars();
+    res.json({ success: true, message: "Synchronisation des avatars lancée." });
 });
 
 // ---- Jore : créateur d'embeds + commandes slash (réservé aux admins du panel) ----
