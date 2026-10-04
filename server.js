@@ -51,14 +51,73 @@ function getClientIp(req) {
 }
 
 // ============================================================
-// CODES DE DÉBLOCAGE
-// Chaque blocage (trop de requêtes ou trop d'échecs de connexion) génère un code
-// unique affiché à la personne bloquée ET envoyé en MP au responsable.
-// Un super-utilisateur / admin tape /debloque <code> sur Discord pour lever le blocage.
+// BLOCAGES PERSISTANTS + CODES DE DÉBLOCAGE
+// - Un blocage (trop de requêtes OU trop d'échecs de connexion) est ENREGISTRÉ SUR DISQUE :
+//   il survit au redémarrage du serveur.
+// - Par défaut (BLOCKS_PERMANENT != "false") il ne se lève JAMAIS tout seul :
+//   seul /debloque <code> sur Discord peut le lever.
+// - Chaque blocage génère un code unique, affiché à la personne bloquée et envoyé en MP au responsable.
 // ============================================================
-const activeBlocks = new Map();     // code -> { blockKey, reason, ip, createdAt, expiresAt, release }
+const BLOCKS_PERMANENT = process.env.BLOCKS_PERMANENT !== "false";
+const PERMANENT_MS = 100 * 365 * 24 * 60 * 60 * 1000;
+const PERMANENT_THRESHOLD_SECONDS = 10 * 365 * 24 * 60 * 60;
+const BLOCKS_FILE = process.env.BLOCKS_FILE_PATH ||
+    (process.env.DATA_FILE_PATH
+        ? path.join(path.dirname(process.env.DATA_FILE_PATH), "blocks.json")
+        : path.join(__dirname, "blocks.json"));
+
+const activeBlocks = new Map();     // code -> { blockKey, keys, reason, ip, createdAt, expiresAt }
 const blockCodeByKey = new Map();   // blockKey -> code
+const failedAttempts = new Map();   // clé -> { count, lockedUntil, lastFailAt }
 let lastBlockDmAt = 0;
+
+function writeBlocksNow() {
+    try {
+        fs.mkdirSync(path.dirname(BLOCKS_FILE), { recursive: true });
+        fs.writeFileSync(BLOCKS_FILE, JSON.stringify({
+            failedAttempts: [...failedAttempts],
+            activeBlocks: [...activeBlocks]
+        }));
+    } catch (err) {
+        console.log("Erreur sauvegarde des blocages :", err.message);
+    }
+}
+
+let blocksSaveTimer = null;
+function saveBlocks() {
+    if (blocksSaveTimer) return;
+    blocksSaveTimer = setTimeout(() => {
+        blocksSaveTimer = null;
+        writeBlocksNow();
+    }, 300);
+}
+
+function loadBlocks() {
+    try {
+        if (!fs.existsSync(BLOCKS_FILE)) return;
+        const raw = JSON.parse(fs.readFileSync(BLOCKS_FILE, "utf8"));
+        const now = Date.now();
+        for (const [key, value] of raw.failedAttempts || []) failedAttempts.set(key, value);
+        for (const [code, value] of raw.activeBlocks || []) {
+            if (value.expiresAt > now) {
+                activeBlocks.set(code, value);
+                blockCodeByKey.set(value.blockKey, code);
+            }
+        }
+        console.log(`Blocages restaurés : ${activeBlocks.size} actif(s).`);
+    } catch (err) {
+        console.log("Erreur lecture des blocages :", err.message);
+    }
+}
+loadBlocks();
+
+// Sauvegarde immédiate à l'arrêt du serveur
+for (const signal of ["SIGINT", "SIGTERM"]) {
+    process.on(signal, () => {
+        writeBlocksNow();
+        process.exit(0);
+    });
+}
 
 function generateUnlockCode() {
     const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
@@ -68,7 +127,7 @@ function generateUnlockCode() {
     return `JORE-${out.slice(0, 4)}-${out.slice(4)}`;
 }
 
-function issueUnlockCode({ blockKey, reason, ip, ttlMs, release }) {
+function issueUnlockCode({ blockKey, keys, reason, ip, ttlMs }) {
     const existing = blockCodeByKey.get(blockKey);
     if (existing && activeBlocks.has(existing)) return existing;
 
@@ -77,12 +136,12 @@ function issueUnlockCode({ blockKey, reason, ip, ttlMs, release }) {
 
     const now = Date.now();
     activeBlocks.set(code, {
-        blockKey, reason, ip,
+        blockKey, keys, reason, ip,
         createdAt: now,
-        expiresAt: now + Math.max(ttlMs || 0, 60 * 1000),
-        release
+        expiresAt: now + Math.max(ttlMs || 0, 60 * 1000)
     });
     blockCodeByKey.set(blockKey, code);
+    saveBlocks();
 
     // MP au responsable (max 1 MP toutes les 15 s pour éviter le spam en cas d'attaque)
     if (now - lastBlockDmAt > 15 * 1000) {
@@ -109,9 +168,10 @@ function releaseUnlockCode(rawCode) {
         activeBlocks.delete(code);
         return null;
     }
-    try { entry.release(); } catch { /* ignore */ }
+    for (const key of entry.keys || []) failedAttempts.delete(key);
     activeBlocks.delete(code);
     blockCodeByKey.delete(entry.blockKey);
+    saveBlocks();
     return entry;
 }
 
@@ -123,94 +183,15 @@ setInterval(() => {
             blockCodeByKey.delete(entry.blockKey);
         }
     }
+    saveBlocks();
 }, 60 * 1000).unref();
 
-function blockedPageHtml(message, code) {
-    return `<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Accès temporairement bloqué</title>
-<style>body{margin:0;min-height:100vh;display:grid;place-items:center;background:#11182e;color:#f4f4f4;font-family:Arial,sans-serif}
-main{width:min(480px,calc(100% - 32px));padding:32px;border:1px solid #d4af37;border-radius:12px;background:#1a1a2e;text-align:center}
-h1{color:#d4af37}code{display:inline-block;margin-top:10px;padding:10px 18px;background:#0f1528;border:1px dashed #d4af37;border-radius:6px;font-size:1.3rem;letter-spacing:2px;color:#d4af37}
-p{color:#b0b0b0;line-height:1.6}</style></head><body><main><h1>🔒 Accès temporairement bloqué</h1>
-<p>${message}</p>${code ? `<p>Communiquez ce code à un responsable pour être débloqué :</p><code>${code}</code>` : ""}</main></body></html>`;
-}
-
-function tooManyRequests(req, res, message, retryAfterSeconds, code) {
-    res.set("Retry-After", String(retryAfterSeconds));
-    const fullMessage = code ? `${message} Code de déblocage : ${code}` : message;
-    const wantsJson = req.originalUrl.startsWith("/api/") || !req.accepts("html");
-    if (wantsJson) {
-        return res.status(429).json({ success: false, error: fullMessage, unlockCode: code || null });
-    }
-    return res.status(429).send(blockedPageHtml(message, code));
-}
-
-// Réponse 429 pour un verrouillage après échecs de connexion. Retourne true si bloqué.
-function lockResponse(req, res, keys, label) {
-    const remaining = getLockRemainingSeconds(...keys);
-    if (remaining <= 0) return false;
-
-    const code = issueUnlockCode({
-        blockKey: `lock:${keys.join("|")}`,
-        reason: `Trop d'échecs - ${label}`,
-        ip: getClientIp(req),
-        ttlMs: remaining * 1000,
-        release: () => clearFailedAttempts(...keys)
-    });
-
-    res.set("Retry-After", String(remaining));
-    res.status(429).json({
-        success: false,
-        error: `Trop d'échecs. Réessayez dans ${formatLockDuration(remaining)} ou donnez ce code à un responsable : ${code}`,
-        unlockCode: code
-    });
-    return true;
-}
-
-function createRateLimiter({ windowMs, max, message, keyFn }) {
-    const hits = new Map();
-    const limiterId = crypto.randomBytes(3).toString("hex");
-
-    setInterval(() => {
-        const now = Date.now();
-        for (const [key, entry] of hits) {
-            if (entry.resetAt <= now) hits.delete(key);
-        }
-    }, Math.min(windowMs, 60 * 1000)).unref();
-
-    return (req, res, next) => {
-        const key = keyFn ? keyFn(req) : getClientIp(req);
-        const now = Date.now();
-        let entry = hits.get(key);
-
-        if (!entry || entry.resetAt <= now) {
-            entry = { count: 0, resetAt: now + windowMs };
-            hits.set(key, entry);
-        }
-
-        entry.count++;
-
-        if (entry.count > max) {
-            const retry = Math.max(1, Math.ceil((entry.resetAt - now) / 1000));
-            const code = issueUnlockCode({
-                blockKey: `rate:${limiterId}:${key}`,
-                reason: `Trop de requêtes (${req.method} ${req.originalUrl.split("?")[0]}) - ${req.session?.user?.username || "non connecté"}`,
-                ip: getClientIp(req),
-                ttlMs: entry.resetAt - now,
-                release: () => hits.delete(key)
-            });
-            return tooManyRequests(req, res, message || "Trop de requêtes. Réessayez plus tard.", retry, code);
-        }
-
-        next();
-    };
-}
-
-// Verrouillage progressif : 5 échecs => 15 min, 10 échecs => 30 min, 15 => 1 h... (max 24 h)
+// ---- Verrouillage progressif après échecs : 5 échecs => 15 min, 10 => 30 min... (max 24 h)
+// ---- En mode permanent : le 5e échec bloque jusqu'à /debloque.
 const MAX_FAILED_ATTEMPTS = 5;
 const BASE_LOCK_MS = 15 * 60 * 1000;
 const MAX_LOCK_MS = 24 * 60 * 60 * 1000;
 const FAILURE_MEMORY_MS = 24 * 60 * 60 * 1000;
-const failedAttempts = new Map();
 
 setInterval(() => {
     const now = Date.now();
@@ -242,16 +223,26 @@ function registerFailedAttempt(...keys) {
 
         if (entry.count % MAX_FAILED_ATTEMPTS === 0) {
             const level = entry.count / MAX_FAILED_ATTEMPTS;
-            const lockMs = Math.min(BASE_LOCK_MS * Math.pow(2, level - 1), MAX_LOCK_MS);
+            const lockMs = BLOCKS_PERMANENT
+                ? PERMANENT_MS
+                : Math.min(BASE_LOCK_MS * Math.pow(2, level - 1), MAX_LOCK_MS);
             entry.lockedUntil = now + lockMs;
         }
 
         failedAttempts.set(key, entry);
     }
+    saveBlocks();
 }
 
 function clearFailedAttempts(...keys) {
     for (const key of keys) failedAttempts.delete(key);
+    saveBlocks();
+}
+
+// Blocage pur (sans compteur d'échecs) utilisé par le limiteur de débit
+function setTimedLock(key, ms) {
+    failedAttempts.set(key, { count: 0, lockedUntil: Date.now() + ms, lastFailAt: 0 });
+    saveBlocks();
 }
 
 function formatLockDuration(seconds) {
@@ -260,22 +251,127 @@ function formatLockDuration(seconds) {
     return `${seconds} seconde(s)`;
 }
 
+function blockedPageHtml(message, code) {
+    return `<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Accès bloqué</title>
+<style>body{margin:0;min-height:100vh;display:grid;place-items:center;background:#11182e;color:#f4f4f4;font-family:Arial,sans-serif}
+main{width:min(480px,calc(100% - 32px));padding:32px;border:1px solid #d4af37;border-radius:12px;background:#1a1a2e;text-align:center}
+h1{color:#d4af37}code{display:inline-block;margin-top:10px;padding:10px 18px;background:#0f1528;border:1px dashed #d4af37;border-radius:6px;font-size:1.3rem;letter-spacing:2px;color:#d4af37}
+p{color:#b0b0b0;line-height:1.6}</style></head><body><main><h1>🔒 Accès bloqué</h1>
+<p>${message}</p>${code ? `<p>Communiquez ce code à un responsable pour être débloqué :</p><code>${code}</code>` : ""}</main></body></html>`;
+}
+
+function tooManyRequests(req, res, message, retryAfterSeconds, code) {
+    if (retryAfterSeconds && retryAfterSeconds < PERMANENT_THRESHOLD_SECONDS) {
+        res.set("Retry-After", String(retryAfterSeconds));
+    }
+    const fullMessage = code ? `${message} Code de déblocage : ${code}` : message;
+    const wantsJson = req.originalUrl.startsWith("/api/") || !req.accepts("html");
+    if (wantsJson) {
+        return res.status(429).json({ success: false, error: fullMessage, unlockCode: code || null });
+    }
+    return res.status(429).send(blockedPageHtml(message, code));
+}
+
+// Réponse 429 pour un verrouillage après échecs de connexion. Retourne true si bloqué.
+function lockResponse(req, res, keys, label) {
+    const remaining = getLockRemainingSeconds(...keys);
+    if (remaining <= 0) return false;
+
+    const code = issueUnlockCode({
+        blockKey: `lock:${keys.join("|")}`,
+        keys,
+        reason: `Trop d'échecs - ${label}`,
+        ip: getClientIp(req),
+        ttlMs: remaining * 1000
+    });
+
+    const permanent = remaining >= PERMANENT_THRESHOLD_SECONDS;
+    if (!permanent) res.set("Retry-After", String(remaining));
+
+    res.status(429).json({
+        success: false,
+        error: permanent
+            ? `Accès bloqué après trop d'échecs. Donnez ce code à un responsable pour être débloqué : ${code}`
+            : `Trop d'échecs. Réessayez dans ${formatLockDuration(remaining)} ou donnez ce code à un responsable : ${code}`,
+        unlockCode: code
+    });
+    return true;
+}
+
+function createRateLimiter({ name, windowMs, max, message, keyFn, permanent = BLOCKS_PERMANENT, banMs: customBanMs }) {
+    const hits = new Map();
+
+    setInterval(() => {
+        const now = Date.now();
+        for (const [key, entry] of hits) {
+            if (entry.resetAt <= now) hits.delete(key);
+        }
+    }, Math.min(windowMs, 60 * 1000)).unref();
+
+    const blockResponse = (req, res, banKey, remainingSeconds) => {
+        const code = issueUnlockCode({
+            blockKey: banKey,
+            keys: [banKey],
+            reason: `Trop de requêtes (${req.method} ${req.originalUrl.split("?")[0]}) - ${req.session?.user?.username || "non connecté"}`,
+            ip: getClientIp(req),
+            ttlMs: remainingSeconds * 1000
+        });
+        const text = permanent
+            ? "Accès bloqué pour activité suspecte (trop de requêtes)."
+            : (message || "Trop de requêtes. Réessayez plus tard.");
+        return tooManyRequests(req, res, text, remainingSeconds, code);
+    };
+
+    return (req, res, next) => {
+        const key = keyFn ? keyFn(req) : getClientIp(req);
+        const banKey = `rate:${name}:${key}`;
+
+        // Déjà bloqué (y compris après un redémarrage du serveur)
+        const banRemaining = getLockRemainingSeconds(banKey);
+        if (banRemaining > 0) return blockResponse(req, res, banKey, banRemaining);
+
+        const now = Date.now();
+        let entry = hits.get(key);
+
+        if (!entry || entry.resetAt <= now) {
+            entry = { count: 0, resetAt: now + windowMs };
+            hits.set(key, entry);
+        }
+
+        entry.count++;
+
+        if (entry.count > max) {
+            const banMs = permanent
+                ? PERMANENT_MS
+                : (customBanMs || Math.max(1000, entry.resetAt - now));
+            setTimedLock(banKey, banMs);
+            hits.delete(key);
+            return blockResponse(req, res, banKey, Math.ceil(banMs / 1000));
+        }
+
+        next();
+    };
+}
+
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
 // Limiteurs préconfigurés
 const apiLimiter = createRateLimiter({
+    name: "api",
     windowMs: 60 * 1000,
     max: 300,
     message: "Trop de requêtes. Ralentissez un instant."
 });
 
 const adminLoginLimiter = createRateLimiter({
+    name: "adminLogin",
     windowMs: 15 * 60 * 1000,
     max: 20,
     message: "Trop de tentatives de connexion. Réessayez dans quelques minutes."
 });
 
 const adminAccessLimiter = createRateLimiter({
+    name: "adminAccess",
     windowMs: 15 * 60 * 1000,
     max: 20,
     message: "Trop de tentatives. Réessayez dans quelques minutes.",
@@ -283,22 +379,27 @@ const adminAccessLimiter = createRateLimiter({
 });
 
 const oauthLimiter = createRateLimiter({
+    name: "oauth",
     windowMs: 15 * 60 * 1000,
     max: 40,
     message: "Trop de tentatives de connexion Discord. Réessayez plus tard."
 });
 
 const candidatureLimiter = createRateLimiter({
+    name: "candidature",
     windowMs: 60 * 60 * 1000,
     max: 10,
     message: "Trop de candidatures envoyées. Réessayez plus tard."
 });
 
-const passwordSetupAttempts = createRateLimiter({
-    windowMs: 10 * 60 * 1000,
-    max: 10,
-    message: "Trop de tentatives.",
-    keyFn: req => req.key
+// F5 en boucle : 5 chargements max par 30 s, le 6e bloque
+const pageLimiter = createRateLimiter({
+    name: "page",
+    windowMs: 30 * 1000,
+    max: 5,
+    permanent: false,        // mets true pour bloquer jusqu'à /debloque
+    banMs: 5 * 60 * 1000,    // 5 min de blocage
+    message: "Trop de rafraîchissements. Réessayez dans quelques minutes."
 });
 
 async function notifyCB(ticket) {
@@ -481,6 +582,15 @@ if (!process.env.SESSION_SECRET) {
 
 // Limite globale sur toutes les routes API (par IP)
 app.use("/api", apiLimiter);
+
+// on ne compte que les pages HTML, pas les api ni les fichiers statiques
+app.use((req, res, next) => {
+    if (req.method !== "GET") return next();
+    if (req.path.startsWith("/api/") || req.path.startsWith("/auth/")) return next();
+    if (!String(req.headers.accept || "").includes("text/html")) return next();
+    if (isSuperUser(req)) return next();
+    return pageLimiter(req, res, next);
+});
 
 const GRADES = [
     "COL ・ Colonel",
