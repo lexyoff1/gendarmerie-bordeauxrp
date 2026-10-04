@@ -26,6 +26,281 @@ const ROLE_CB = "1537875423260840058";
 const ROLE_RESP_CIR = "1537657032621039709";
 const GN_MEMBER_ROLE_ID = "1274883278024736812";
 
+// ============================================================
+// SUPER-UTILISATEURS
+// Accès à TOUT (pages, spécialités, commandement, OPJ...) même s'ils ne sont
+// pas sur le serveur Discord ou n'ont pas le rôle. EXCEPTION : ils n'ont PAS
+// accès au panel admin (/admin, requireAdmin, requireAdminAccess).
+// ============================================================
+const SUPER_ACCESS_IDS = new Set([
+    "1024350416911225004",
+    "1282035608688132106"
+]);
+
+function isSuperUser(req) {
+    return SUPER_ACCESS_IDS.has(String(req.session?.user?.id || ""));
+}
+
+// ============================================================
+// PROTECTION BRUTE FORCE (sans dépendance externe, en mémoire)
+// 1) Limiteur de débit générique (par IP)
+// 2) Verrouillage progressif après échecs de connexion (par IP et par compte)
+// ============================================================
+function getClientIp(req) {
+    return req.ip || req.socket?.remoteAddress || "unknown";
+}
+
+// ============================================================
+// CODES DE DÉBLOCAGE
+// Chaque blocage (trop de requêtes ou trop d'échecs de connexion) génère un code
+// unique affiché à la personne bloquée ET envoyé en MP au responsable.
+// Un super-utilisateur / admin tape /debloque <code> sur Discord pour lever le blocage.
+// ============================================================
+const activeBlocks = new Map();     // code -> { blockKey, reason, ip, createdAt, expiresAt, release }
+const blockCodeByKey = new Map();   // blockKey -> code
+let lastBlockDmAt = 0;
+
+function generateUnlockCode() {
+    const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+    const bytes = crypto.randomBytes(8);
+    let out = "";
+    for (const b of bytes) out += alphabet[b % alphabet.length];
+    return `JORE-${out.slice(0, 4)}-${out.slice(4)}`;
+}
+
+function issueUnlockCode({ blockKey, reason, ip, ttlMs, release }) {
+    const existing = blockCodeByKey.get(blockKey);
+    if (existing && activeBlocks.has(existing)) return existing;
+
+    let code;
+    do { code = generateUnlockCode(); } while (activeBlocks.has(code));
+
+    const now = Date.now();
+    activeBlocks.set(code, {
+        blockKey, reason, ip,
+        createdAt: now,
+        expiresAt: now + Math.max(ttlMs || 0, 60 * 1000),
+        release
+    });
+    blockCodeByKey.set(blockKey, code);
+
+    // MP au responsable (max 1 MP toutes les 15 s pour éviter le spam en cas d'attaque)
+    if (now - lastBlockDmAt > 15 * 1000) {
+        lastBlockDmAt = now;
+        sendDiscordDM(
+            APPLICATION_DECISION_NOTIFY_ID,
+`🔒 NOUVEAU BLOCAGE
+
+Raison : ${reason}
+IP : ${ip}
+Code de déblocage : ${code}
+
+Pour débloquer : /debloque code:${code}`
+        );
+    }
+
+    return code;
+}
+
+function releaseUnlockCode(rawCode) {
+    const code = String(rawCode || "").trim().toUpperCase();
+    const entry = activeBlocks.get(code);
+    if (!entry || entry.expiresAt <= Date.now()) {
+        activeBlocks.delete(code);
+        return null;
+    }
+    try { entry.release(); } catch { /* ignore */ }
+    activeBlocks.delete(code);
+    blockCodeByKey.delete(entry.blockKey);
+    return entry;
+}
+
+setInterval(() => {
+    const now = Date.now();
+    for (const [code, entry] of activeBlocks) {
+        if (entry.expiresAt <= now) {
+            activeBlocks.delete(code);
+            blockCodeByKey.delete(entry.blockKey);
+        }
+    }
+}, 60 * 1000).unref();
+
+function blockedPageHtml(message, code) {
+    return `<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Accès temporairement bloqué</title>
+<style>body{margin:0;min-height:100vh;display:grid;place-items:center;background:#11182e;color:#f4f4f4;font-family:Arial,sans-serif}
+main{width:min(480px,calc(100% - 32px));padding:32px;border:1px solid #d4af37;border-radius:12px;background:#1a1a2e;text-align:center}
+h1{color:#d4af37}code{display:inline-block;margin-top:10px;padding:10px 18px;background:#0f1528;border:1px dashed #d4af37;border-radius:6px;font-size:1.3rem;letter-spacing:2px;color:#d4af37}
+p{color:#b0b0b0;line-height:1.6}</style></head><body><main><h1>🔒 Accès temporairement bloqué</h1>
+<p>${message}</p>${code ? `<p>Communiquez ce code à un responsable pour être débloqué :</p><code>${code}</code>` : ""}</main></body></html>`;
+}
+
+function tooManyRequests(req, res, message, retryAfterSeconds, code) {
+    res.set("Retry-After", String(retryAfterSeconds));
+    const fullMessage = code ? `${message} Code de déblocage : ${code}` : message;
+    const wantsJson = req.originalUrl.startsWith("/api/") || !req.accepts("html");
+    if (wantsJson) {
+        return res.status(429).json({ success: false, error: fullMessage, unlockCode: code || null });
+    }
+    return res.status(429).send(blockedPageHtml(message, code));
+}
+
+// Réponse 429 pour un verrouillage après échecs de connexion. Retourne true si bloqué.
+function lockResponse(req, res, keys, label) {
+    const remaining = getLockRemainingSeconds(...keys);
+    if (remaining <= 0) return false;
+
+    const code = issueUnlockCode({
+        blockKey: `lock:${keys.join("|")}`,
+        reason: `Trop d'échecs - ${label}`,
+        ip: getClientIp(req),
+        ttlMs: remaining * 1000,
+        release: () => clearFailedAttempts(...keys)
+    });
+
+    res.set("Retry-After", String(remaining));
+    res.status(429).json({
+        success: false,
+        error: `Trop d'échecs. Réessayez dans ${formatLockDuration(remaining)} ou donnez ce code à un responsable : ${code}`,
+        unlockCode: code
+    });
+    return true;
+}
+
+function createRateLimiter({ windowMs, max, message, keyFn }) {
+    const hits = new Map();
+    const limiterId = crypto.randomBytes(3).toString("hex");
+
+    setInterval(() => {
+        const now = Date.now();
+        for (const [key, entry] of hits) {
+            if (entry.resetAt <= now) hits.delete(key);
+        }
+    }, Math.min(windowMs, 60 * 1000)).unref();
+
+    return (req, res, next) => {
+        const key = keyFn ? keyFn(req) : getClientIp(req);
+        const now = Date.now();
+        let entry = hits.get(key);
+
+        if (!entry || entry.resetAt <= now) {
+            entry = { count: 0, resetAt: now + windowMs };
+            hits.set(key, entry);
+        }
+
+        entry.count++;
+
+        if (entry.count > max) {
+            const retry = Math.max(1, Math.ceil((entry.resetAt - now) / 1000));
+            const code = issueUnlockCode({
+                blockKey: `rate:${limiterId}:${key}`,
+                reason: `Trop de requêtes (${req.method} ${req.originalUrl.split("?")[0]}) - ${req.session?.user?.username || "non connecté"}`,
+                ip: getClientIp(req),
+                ttlMs: entry.resetAt - now,
+                release: () => hits.delete(key)
+            });
+            return tooManyRequests(req, res, message || "Trop de requêtes. Réessayez plus tard.", retry, code);
+        }
+
+        next();
+    };
+}
+
+// Verrouillage progressif : 5 échecs => 15 min, 10 échecs => 30 min, 15 => 1 h... (max 24 h)
+const MAX_FAILED_ATTEMPTS = 5;
+const BASE_LOCK_MS = 15 * 60 * 1000;
+const MAX_LOCK_MS = 24 * 60 * 60 * 1000;
+const FAILURE_MEMORY_MS = 24 * 60 * 60 * 1000;
+const failedAttempts = new Map();
+
+setInterval(() => {
+    const now = Date.now();
+    for (const [key, entry] of failedAttempts) {
+        if (entry.lockedUntil <= now && now - entry.lastFailAt > FAILURE_MEMORY_MS) {
+            failedAttempts.delete(key);
+        }
+    }
+}, 10 * 60 * 1000).unref();
+
+function getLockRemainingSeconds(...keys) {
+    const now = Date.now();
+    let remaining = 0;
+    for (const key of keys) {
+        const entry = failedAttempts.get(key);
+        if (entry && entry.lockedUntil > now) {
+            remaining = Math.max(remaining, Math.ceil((entry.lockedUntil - now) / 1000));
+        }
+    }
+    return remaining;
+}
+
+function registerFailedAttempt(...keys) {
+    const now = Date.now();
+    for (const key of keys) {
+        const entry = failedAttempts.get(key) || { count: 0, lockedUntil: 0, lastFailAt: 0 };
+        entry.count++;
+        entry.lastFailAt = now;
+
+        if (entry.count % MAX_FAILED_ATTEMPTS === 0) {
+            const level = entry.count / MAX_FAILED_ATTEMPTS;
+            const lockMs = Math.min(BASE_LOCK_MS * Math.pow(2, level - 1), MAX_LOCK_MS);
+            entry.lockedUntil = now + lockMs;
+        }
+
+        failedAttempts.set(key, entry);
+    }
+}
+
+function clearFailedAttempts(...keys) {
+    for (const key of keys) failedAttempts.delete(key);
+}
+
+function formatLockDuration(seconds) {
+    if (seconds >= 3600) return `${Math.ceil(seconds / 3600)} heure(s)`;
+    if (seconds >= 60) return `${Math.ceil(seconds / 60)} minute(s)`;
+    return `${seconds} seconde(s)`;
+}
+
+const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+
+// Limiteurs préconfigurés
+const apiLimiter = createRateLimiter({
+    windowMs: 60 * 1000,
+    max: 300,
+    message: "Trop de requêtes. Ralentissez un instant."
+});
+
+const adminLoginLimiter = createRateLimiter({
+    windowMs: 15 * 60 * 1000,
+    max: 20,
+    message: "Trop de tentatives de connexion. Réessayez dans quelques minutes."
+});
+
+const adminAccessLimiter = createRateLimiter({
+    windowMs: 15 * 60 * 1000,
+    max: 20,
+    message: "Trop de tentatives. Réessayez dans quelques minutes.",
+    keyFn: req => `${getClientIp(req)}:${req.session?.user?.id || "anon"}`
+});
+
+const oauthLimiter = createRateLimiter({
+    windowMs: 15 * 60 * 1000,
+    max: 40,
+    message: "Trop de tentatives de connexion Discord. Réessayez plus tard."
+});
+
+const candidatureLimiter = createRateLimiter({
+    windowMs: 60 * 60 * 1000,
+    max: 10,
+    message: "Trop de candidatures envoyées. Réessayez plus tard."
+});
+
+const passwordSetupAttempts = createRateLimiter({
+    windowMs: 10 * 60 * 1000,
+    max: 10,
+    message: "Trop de tentatives.",
+    keyFn: req => req.key
+});
+
 async function notifyCB(ticket) {
     await sendDMToRole(
         ROLE_CB,
@@ -42,6 +317,14 @@ https://gendarmerie-bordeauxrp.com/tickets-commandement?id=${ticket.id}`
 
 const app = express();
 
+// Derrière un proxy (Render, Railway, Nginx, Cloudflare...) : nécessaire pour que
+// req.ip soit la vraie IP du visiteur et que la protection brute force fonctionne.
+// Mettre TRUST_PROXY=1 dans le .env si l'hébergeur utilise un reverse proxy.
+if (process.env.TRUST_PROXY) {
+    const value = process.env.TRUST_PROXY;
+    app.set("trust proxy", /^\d+$/.test(value) ? Number(value) : value === "true" ? 1 : value);
+}
+
 const discordBot = new Client({
     intents: [GatewayIntentBits.Guilds, GatewayIntentBits.DirectMessages, GatewayIntentBits.MessageContent],
     partials: [Partials.Channel]
@@ -57,7 +340,10 @@ function verifyPassword(password, storedPasswordHash) {
     const [salt, expectedHash] = String(storedPasswordHash || "").split(":");
     if (!salt || !expectedHash) return false;
     const actualHash = crypto.scryptSync(password, salt, 64).toString("hex");
-    return crypto.timingSafeEqual(Buffer.from(expectedHash, "hex"), Buffer.from(actualHash, "hex"));
+    const expectedBuffer = Buffer.from(expectedHash, "hex");
+    const actualBuffer = Buffer.from(actualHash, "hex");
+    if (expectedBuffer.length !== actualBuffer.length) return false;
+    return crypto.timingSafeEqual(expectedBuffer, actualBuffer);
 }
 
 discordBot.on("messageCreate", async message => {
@@ -83,7 +369,62 @@ discordBot.on("messageCreate", async message => {
     await message.reply("✅ Votre mot de passe administrateur a bien été enregistré. Vous pouvez maintenant vous connecter au panel.");
 });
 
-discordBot.once("ready", () => console.log(`Bot Discord connecté : ${discordBot.user.tag}`));
+discordBot.once("ready", () => {
+    console.log(`Bot Discord connecté : ${discordBot.user.tag}`);
+    registerUnlockCommand();
+});
+
+// ---- Commande /debloque <code> : lève un blocage (réservée aux super IDs et admins) ----
+// On utilise POST (création/mise à jour d'UNE commande) et non PUT, pour ne pas
+// écraser les commandes slash déjà enregistrées par Jore.
+async function registerUnlockCommand() {
+    const appId = process.env.DISCORD_CLIENT_ID || discordBot.application?.id;
+    if (!appId || !process.env.GUILD_ID) return;
+    try {
+        await axios.post(
+            `https://discord.com/api/v10/applications/${appId}/guilds/${process.env.GUILD_ID}/commands`,
+            {
+                name: "debloque",
+                type: 1,
+                description: "Débloque une personne grâce à son code de déblocage",
+                options: [{
+                    type: 3,
+                    name: "code",
+                    description: "Code de déblocage (ex : JORE-ABCD-EFGH)",
+                    required: true
+                }]
+            },
+            { headers: { Authorization: `Bot ${process.env.DISCORD_BOT_TOKEN}`, "Content-Type": "application/json" } }
+        );
+        console.log("Commande /debloque enregistrée.");
+    } catch (err) {
+        console.log("Erreur enregistrement /debloque :", err.response?.data || err.message);
+    }
+}
+
+discordBot.on("interactionCreate", async interaction => {
+    if (!interaction.isChatInputCommand() || interaction.commandName !== "debloque") return;
+
+    const allowedIds = new Set([
+        ...SUPER_ACCESS_IDS,
+        ...(process.env.ADMIN_IDS || "").split(",").map(id => id.trim()).filter(Boolean)
+    ]);
+
+    if (!allowedIds.has(interaction.user.id)) {
+        return interaction.reply({ content: "⛔ Vous n'avez pas le droit d'utiliser cette commande.", ephemeral: true });
+    }
+
+    const entry = releaseUnlockCode(interaction.options.getString("code"));
+    if (!entry) {
+        return interaction.reply({ content: "❌ Code invalide, déjà utilisé ou expiré.", ephemeral: true });
+    }
+
+    console.log(`[SECURITE] Déblocage par ${interaction.user.username} (${interaction.user.id}) - ${entry.reason} - IP ${entry.ip}`);
+    return interaction.reply({
+        content: `✅ Débloqué.\nRaison du blocage : ${entry.reason}\nIP : ${entry.ip}`,
+        ephemeral: true
+    });
+});
 if (process.env.DISCORD_BOT_TOKEN) {
     discordBot.login(process.env.DISCORD_BOT_TOKEN).catch(error =>
         console.error("Impossible de connecter le bot Discord :", error.message)
@@ -124,8 +465,22 @@ app.get("/favicon.ico", (req, res) => {
 app.use(session({
     secret: process.env.SESSION_SECRET || "secret123",
     resave: false,
-    saveUninitialized: false
+    saveUninitialized: false,
+    cookie: {
+        httpOnly: true,
+        sameSite: "lax",
+        // Mettre COOKIE_SECURE=true dans le .env si le site est en HTTPS
+        secure: process.env.COOKIE_SECURE === "true",
+        maxAge: 7 * 24 * 60 * 60 * 1000
+    }
 }));
+
+if (!process.env.SESSION_SECRET) {
+    console.warn("⚠️ SESSION_SECRET absent : un secret par défaut peu sûr est utilisé. Définissez-en un long et aléatoire dans le .env.");
+}
+
+// Limite globale sur toutes les routes API (par IP)
+app.use("/api", apiLimiter);
 
 const GRADES = [
     "COL ・ Colonel",
@@ -773,6 +1128,7 @@ Gendarmerie Nationale`
 }
 
 async function canManageSpecialite(req, specialite) {
+    if (isSuperUser(req)) return true;
     if (await isAdmin(req)) return true;
 
     try {
@@ -910,6 +1266,7 @@ p b {
 async function requireGNMember(req, res, next) {
     if (!req.session.user) return res.redirect("/");
 
+    if (isSuperUser(req)) return next();
     if (await isAdmin(req)) return next();
 
     try {
@@ -944,6 +1301,7 @@ const STAGIAIRE_ALLOWED_PATHS = new Set(["dashboard", "cours", "code-penal"]);
 function restrictStagiaire(cleanPath) {
     return async (req, res, next) => {
         if (STAGIAIRE_ALLOWED_PATHS.has(cleanPath)) return next();
+        if (isSuperUser(req)) return next();
         if (await isAdmin(req)) return next();
 
         const db = getData();
@@ -1009,7 +1367,7 @@ app.get("/gn-candidature", (req, res) => {
 });
 app.get("/gn-candidature.html", (req, res) => res.redirect(301, "/gn-candidature"));
 
-app.post("/api/candidatures", async (req, res) => {
+app.post("/api/candidatures", candidatureLimiter, async (req, res) => {
     // Il faut être connecté avec Discord pour candidater
     if (!req.session.user?.id || req.session.user.id.startsWith("systeme")) {
         return res.status(401).json({ error: "Connexion Discord requise." });
@@ -1086,7 +1444,13 @@ document.getElementById('access-form').addEventListener('submit',async event=>{e
 });
 app.get("/admin-access.html", (req, res) => res.redirect(301, "/admin-access"));
 
-app.post("/api/admin/access", requireAdmin, (req, res) => {
+app.post("/api/admin/access", adminAccessLimiter, requireAdmin, async (req, res) => {
+    const ipKey = `access:ip:${getClientIp(req)}`;
+    const userKey = `access:user:${req.session.user?.id || "anon"}`;
+
+    // Verrouillage progressif après trop d'échecs
+    if (lockResponse(req, res, [ipKey, userKey], "code d'accès admin")) return;
+
     const expectedHash = process.env.ADMIN_ACCESS_CODE_HASH || "";
     const suppliedCode = String(req.body.code || "");
     const suppliedHash = crypto.createHash("sha256").update(suppliedCode).digest("hex");
@@ -1100,8 +1464,15 @@ app.post("/api/admin/access", requireAdmin, (req, res) => {
         Buffer.from(suppliedHash, "hex")
     );
 
-    if (!isValid) return res.status(403).json({ error: "Code invalide." });
+    if (!isValid) {
+        registerFailedAttempt(ipKey, userKey);
+        console.warn(`[SECURITE] Code d'accès admin invalide - IP ${getClientIp(req)} - user ${req.session.user?.id}`);
+        await sleep(500);
+        if (lockResponse(req, res, [ipKey, userKey], "code d'accès admin")) return;
+        return res.status(403).json({ error: "Code invalide." });
+    }
 
+    clearFailedAttempts(ipKey, userKey);
     req.session.adminAccessVerified = true;
     res.json({ success: true });
 });
@@ -1117,9 +1488,17 @@ app.get("/admin-login", (req, res) => {
 });
 app.get("/admin-login.html", (req, res) => res.redirect(301, "/admin-login"));
 
-app.post("/api/admin/login", (req, res) => {
-    const username = String(req.body.username || "").trim().toLowerCase();
-    const password = String(req.body.password || "");
+app.post("/api/admin/login", adminLoginLimiter, async (req, res) => {
+    const username = String(req.body.username || "").trim().toLowerCase().slice(0, 100);
+    const password = String(req.body.password || "").slice(0, 200);
+
+    // Clés de verrouillage : par IP ET par nom d'utilisateur
+    // (l'IP stoppe un attaquant isolé, le nom d'utilisateur stoppe un attaque distribuée)
+    const ipKey = `login:ip:${getClientIp(req)}`;
+    const userKey = `login:user:${username}`;
+
+    if (lockResponse(req, res, [ipKey, userKey], `connexion admin "${username}"`)) return;
+
     const suppliedHash = crypto.createHash("sha256").update(password).digest("hex");
 
     // SYSTEM_ADMIN_USERNAME=systeme,lexy,dupont,martin
@@ -1135,12 +1514,18 @@ app.post("/api/admin/login", (req, res) => {
     const isSystemAdmin = systemIndex >= 0 && /^[a-f0-9]{64}$/i.test(expectedHash) &&
         crypto.timingSafeEqual(Buffer.from(expectedHash, "hex"), Buffer.from(suppliedHash, "hex"));
     const db = getData();
-    const admin = (db.admins || []).find(item => item.username.toLowerCase() === username);
+    const admin = (db.admins || []).find(item => String(item.username || "").toLowerCase() === username);
     const isInvitedAdmin = admin?.passwordSet === true && verifyPassword(password, admin.passwordHash);
 
     if (!isSystemAdmin && !isInvitedAdmin) {
+        registerFailedAttempt(ipKey, userKey);
+        console.warn(`[SECURITE] Échec connexion admin - IP ${getClientIp(req)} - compte "${username}"`);
+        await sleep(500); // ralentit chaque tentative
+        if (lockResponse(req, res, [ipKey, userKey], `connexion admin "${username}"`)) return;
         return res.status(403).json({ success: false, error: "Identifiants invalides." });
     }
+
+    clearFailedAttempts(ipKey, userKey);
 
     req.session.systemAdmin = isSystemAdmin;
     req.session.adminAccessVerified = true;
@@ -1289,7 +1674,7 @@ app.post("/api/admin/delete-user", requireAdmin, (req, res) => {
 // Seules ces pages peuvent être demandées comme retour après la connexion Discord
 const ALLOWED_RETURN_PATHS = new Set(["/gn-candidature"]);
 
-app.get("/auth/discord", (req, res) => {
+app.get("/auth/discord", oauthLimiter, (req, res) => {
     const returnTo = String(req.query.returnTo || "");
     req.session.returnTo = ALLOWED_RETURN_PATHS.has(returnTo) ? returnTo : null;
 
@@ -1301,7 +1686,7 @@ app.get("/auth/discord", (req, res) => {
     res.redirect(url);
 });
 
-app.get("/auth/discord/callback", async (req, res) => {
+app.get("/auth/discord/callback", oauthLimiter, async (req, res) => {
     try {
         const code = req.query.code;
 
@@ -1330,6 +1715,8 @@ app.get("/auth/discord/callback", async (req, res) => {
             member = null;
         }
 
+        const superUser = SUPER_ACCESS_IDS.has(userRes.data.id);
+
         const nomPrenom = member
             ? (member.nick || member.user.global_name || userRes.data.username)
             : userRes.data.username;
@@ -1339,14 +1726,14 @@ app.get("/auth/discord/callback", async (req, res) => {
             username: userRes.data.username,
             avatar: userRes.data.avatar,
             nomPrenom,
-            estDansServeur: !!member,
+            estDansServeur: !!member || superUser,
             dateArriveeServeur: member ? member.joined_at : null
         };
 
         const returnTo = req.session.returnTo;
         delete req.session.returnTo;
 
-        if (!member) {
+        if (!member && !superUser) {
             // Un candidat pas encore dans le serveur peut revenir sur la page de candidature
             if (returnTo === "/gn-candidature") return res.redirect(returnTo);
             return res.send(accessDeniedPage());
@@ -1361,7 +1748,7 @@ app.get("/auth/discord/callback", async (req, res) => {
                 username: userRes.data.username,
                 avatar: userRes.data.avatar,
                 nomPrenom,
-                dateArriveeServeur: member.joined_at,
+                dateArriveeServeur: member?.joined_at || null,
                 datePremiereConnexion: new Date().toISOString(),
                 estDansServeur: true,
                 grade: STAGIAIRE_GRADE,
@@ -1376,7 +1763,7 @@ app.get("/auth/discord/callback", async (req, res) => {
             user.avatar = userRes.data.avatar;
             user.nomPrenom = nomPrenom;
             user.estDansServeur = true;
-            user.dateArriveeServeur = member.joined_at;
+            if (member) user.dateArriveeServeur = member.joined_at;
         }
 
         saveData(db);
@@ -1748,6 +2135,7 @@ Gendarmerie Nationale`
 });
 
 async function isCommandement(req) {
+    if (isSuperUser(req)) return true;
     if (await isAdmin(req)) return true;
 
     try {
@@ -2465,6 +2853,7 @@ Gendarmerie Nationale`;
 
 async function isOPJ(req) {
     if (!req.session.user) return false;
+    if (isSuperUser(req)) return true;
     if (await isAdmin(req)) return true;
 
     const db = getData();
