@@ -668,9 +668,6 @@ function renderGradesList() {
 // GMAR n'est pas (encore) renvoyée par /api/admin/data côté backend : on l'ajoute
 // ici côté front pour que son rôle "Responsable" / "Adjoint" soit configurable
 // au même titre que les autres spécialités. À retirer si le backend l'expose un jour.
-const LOCAL_SPECIALTIES = [
-    { id: "gmar", nom: "⚓ GMAR" }
-];
 
 function getMergedSpecialities(catalog) {
     const fromBackend = catalog.specialites || [];
