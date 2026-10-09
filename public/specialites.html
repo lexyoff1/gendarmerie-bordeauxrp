@@ -403,29 +403,6 @@ footer p {
 <script>
 let specialites = [];
 
-const localSpecialites = [
-    {
-        id: "gmar",
-        nom: "⚓ GMAR",
-        titre: "Gendarmerie Maritime",
-        description: "Surveillance, intervention et patrouille sur les voies navigables. Déposez votre candidature pour rejoindre l'unité.",
-        canManage: false,
-        questions: [
-            { type: "text", question: "Nom RP :" },
-            { type: "text", question: "Prénom RP :" },
-            { type: "text", question: "Grade :" },
-            { type: "text", question: "Matricule :" },
-            "1. Pourquoi souhaitez-vous rejoindre la GMAR ?",
-            "2. Quelles sont les principales missions de la GMAR selon vous ?",
-            "3. Avez-vous déjà de l'expérience en navigation ou en patrouille nautique sur Roblox RP ?",
-            "4. Comment réagiriez-vous face à une embarcation qui refuse de s'arrêter ?",
-            "5. Quelles sont vos disponibilités ?",
-            "6. Pourquoi devrions-nous vous accepter ?",
-            { type: "text", question: "Signature :" }
-        ]
-    }
-];
-
 async function loadSpecialites() {
     let apiSpecialites = [];
 
