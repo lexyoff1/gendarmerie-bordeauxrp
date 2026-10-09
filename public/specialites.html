@@ -414,7 +414,7 @@ async function loadSpecialites() {
         console.error("Erreur:", error);
     }
 
-    specialites = [...apiSpecialites, ...localSpecialites];
+    specialites = apiSpecialites;
 
     const box = document.getElementById("specialites");
     box.innerHTML = "";
