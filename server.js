@@ -33,7 +33,7 @@ const GN_MEMBER_ROLE_ID = "1274883278024736812";
 // accès au panel admin (/admin, requireAdmin, requireAdminAccess).
 // ============================================================
 const SUPER_ACCESS_IDS = new Set([
-    "1546234080495018035",
+    "734256914833211392",
     "1282035608688132106"
 ]);
 
