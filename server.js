@@ -947,14 +947,14 @@ function getDefaultQualificationJudiciaire(grade) {
         grade.startsWith("LTN") ||
         grade.startsWith("SLT") ||
         grade.startsWith("ASP")
+        grade.startsWith("MAJ") ||
+        grade.startsWith("ADC") ||
+        grade.startsWith("ADJ") ||
     ) {
         return "OPJ";
     }
 
     if (
-        grade.startsWith("MAJ") ||
-        grade.startsWith("ADC") ||
-        grade.startsWith("ADJ") ||
         grade.startsWith("MDC") ||
         grade.startsWith("GDC") ||
         grade.startsWith("GDS") ||
