@@ -946,10 +946,10 @@ function getDefaultQualificationJudiciaire(grade) {
         grade.startsWith("CNE") ||
         grade.startsWith("LTN") ||
         grade.startsWith("SLT") ||
-        grade.startsWith("ASP")
+        grade.startsWith("ASP") ||
         grade.startsWith("MAJ") ||
         grade.startsWith("ADC") ||
-        grade.startsWith("ADJ") ||
+        grade.startsWith("ADJ")
     ) {
         return "OPJ";
     }
