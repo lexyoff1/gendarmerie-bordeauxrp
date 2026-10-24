@@ -625,6 +625,7 @@ app.use("/assets", express.static("public/assets"));
 // Avatars Discord synchronisés par Jore (voir avatar-sync.js)
 app.use("/avatars", express.static(process.env.AVATARS_DIR || path.join(__dirname, "public", "assets", "avatars")));
 app.use("/site-theme.css", express.static(path.join(__dirname, "public", "site-theme.css")));
+app.use("/header-navigation.js", express.static(path.join(__dirname, "public", "header-navigation.js")));
 app.use("/style.css", express.static("public/style.css"));
 app.use("/script.js", express.static("public/script.js"));
 
@@ -2064,33 +2065,19 @@ app.get("/auth/discord/callback", oauthLimiter, async (req, res) => {
         }
 
         const db = getData();
-        let user = db.users.find(u => u.id === userRes.data.id);
+        const user = db.users.find(u => u.id === userRes.data.id);
 
-        if (!user) {
-            db.users.push({
-                id: userRes.data.id,
-                username: userRes.data.username,
-                avatar: userRes.data.avatar,
-                nomPrenom,
-                dateArriveeServeur: member?.joined_at || null,
-                datePremiereConnexion: new Date().toISOString(),
-                estDansServeur: true,
-                grade: STAGIAIRE_GRADE,
-                NIGEND: "",
-                qualificationJudiciaire: getDefaultQualificationJudiciaire(STAGIAIRE_GRADE),
-                unite: "",
-                specialisation: "",
-                statut: "Actif"
-            });
-        } else {
+        // La connexion Discord ouvre une session, mais ne crée pas de profil.
+        // Les profils des membres existants restent synchronisés à la connexion;
+        // un nouveau profil EGAV est créé uniquement lors de l'acceptation.
+        if (user) {
             user.username = userRes.data.username;
             user.avatar = userRes.data.avatar;
             user.nomPrenom = nomPrenom;
             user.estDansServeur = true;
             if (member) user.dateArriveeServeur = member.joined_at;
+            saveData(db);
         }
-
-        saveData(db);
 
         return res.redirect(returnTo || "/dashboard");
 
@@ -2588,6 +2575,81 @@ app.get("/api/applications", requireAdminAccess, async (req, res) => {
 // ---- Candidature Gendarmerie ACCEPTÉE ----
 // 1) statut "Acceptée"  2) création du profil EGAV  3) rôle EGAV donné sur Discord
 // 4) MP au candidat     5) MP de suivi à APPLICATION_DECISION_NOTIFY_ID
+app.post("/api/applications/:id/ai-detection", requireAdminAccess, async (req, res) => {
+    if (!(await isAdmin(req))) return res.status(403).json({ error: "Accès refusé" });
+
+    const email = process.env.ZEROGPT_EMAIL;
+    const password = process.env.ZEROGPT_PASSWORD;
+    const apiKey = process.env.ZEROGPT_API_KEY;
+    if (!email || !password || !apiKey) {
+        return res.status(503).json({
+            error: "ZeroGPT n'est pas configuré. Ajoutez ZEROGPT_EMAIL, ZEROGPT_PASSWORD et ZEROGPT_API_KEY aux variables d'environnement."
+        });
+    }
+
+    const db = getData();
+    const application = db.applications.find(item => String(item.id) === req.params.id);
+    if (!application) return res.status(404).json({ error: "Candidature introuvable." });
+
+    const text = [
+        application.experience,
+        application.motivation,
+        application.roleplay,
+        application.disponibilites,
+        application.miseEnSituation
+    ].filter(value => typeof value === "string" && value.trim())
+        .map(value => value.trim())
+        .join("\n\n");
+
+    if (text.length > 15000) {
+        return res.status(400).json({ error: "Le texte dépasse la limite de 15 000 caractères de ZeroGPT." });
+    }
+    if (text.split(/\s+/).filter(Boolean).length < 30) {
+        return res.status(400).json({ error: "Il faut au moins 30 mots de réponse pour lancer l'analyse." });
+    }
+
+    try {
+        const login = await axios.post("https://api.zerogpt.com/api/auth/login", {
+            email,
+            password
+        }, { timeout: 15000 });
+        const token = login.data?.data?.token || login.data?.token || login.data?.data?.access_token;
+        if (typeof token !== "string" || !token) {
+            return res.status(502).json({ error: "ZeroGPT n'a pas fourni de jeton d'accès valide." });
+        }
+
+        const detection = await axios.post("https://api.zerogpt.com/api/detect/detectText", {
+            input_text: text
+        }, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+                ApiKey: apiKey,
+                "Content-Type": "application/json"
+            },
+            timeout: 30000
+        });
+
+        const result = detection.data?.data || detection.data;
+        const fakePercentage = Number(result?.fakePercentage);
+        if (!Number.isFinite(fakePercentage) || fakePercentage < 0 || fakePercentage > 100) {
+            return res.status(502).json({ error: "ZeroGPT n'a pas renvoyé de pourcentage exploitable." });
+        }
+
+        application.aiDetection = {
+            provider: "ZeroGPT",
+            fakePercentage,
+            aiWords: Number.isFinite(Number(result.aiWords)) ? Number(result.aiWords) : null,
+            textWords: Number.isFinite(Number(result.textWords)) ? Number(result.textWords) : null,
+            checkedAt: new Date().toISOString()
+        };
+        saveData(db);
+        return res.json({ aiDetection: application.aiDetection });
+    } catch (error) {
+        console.warn("Échec de l'analyse ZeroGPT.", { status: error.response?.status });
+        return res.status(502).json({ error: "ZeroGPT n'a pas pu analyser cette candidature. Vérifiez la configuration et le quota API." });
+    }
+});
+
 app.post("/api/applications/:id/accept", requireAdminAccess, async (req, res) => {
     if (!(await isAdmin(req))) return res.status(403).json({ error: "Accès refusé" });
 
