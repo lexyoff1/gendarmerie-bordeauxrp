@@ -1,396 +1,578 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Candidature - Gendarmerie Nationale</title>
-    <style>
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Candidature - Gendarmerie Nationale</title>
+<style>
+:root {
+  --bg-0: #050a18;
+  --bg-1: #0a1330;
+  --panel: rgba(12, 22, 52, 0.78);
+  --panel-line: rgba(212, 175, 55, 0.22);
+  --gold: #d4af37;
+  --gold-soft: #e6c866;
+  --gold-deep: #b48f1f;
+  --white: #f4f6fb;
+  --muted: #9aa6c4;
+  --field: rgba(255, 255, 255, 0.04);
+  --field-line: rgba(255, 255, 255, 0.14);
+  --danger: #ff8a8a;
+  --danger-bg: rgba(220, 70, 70, 0.12);
+  --ok: #8fe0a8;
+  --ok-bg: rgba(60, 170, 100, 0.14);
 }
 
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
 body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-  color: #e0e0e0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  color: var(--white);
   line-height: 1.6;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  background:
+    radial-gradient(900px 500px at 15% -10%, rgba(40, 80, 190, 0.28), transparent 60%),
+    radial-gradient(700px 420px at 100% 0%, rgba(212, 175, 55, 0.10), transparent 60%),
+    linear-gradient(180deg, var(--bg-1) 0%, var(--bg-0) 100%);
+  background-attachment: fixed;
 }
 
+a { color: inherit; }
+
+.skip-link {
+  position: absolute; left: -999px; top: 0;
+  background: var(--gold); color: #0a1330;
+  padding: .6rem 1rem; z-index: 200; font-weight: 600; border-radius: 0 0 8px 0;
+}
+.skip-link:focus { left: 0; }
+
+/* ---------- En-tête ---------- */
 header {
-  background: rgba(0, 0, 0, 0.5);
-  border-bottom: 3px solid #d4af37;
-  padding: 2rem;
+  position: relative;
+  border-bottom: 1px solid var(--panel-line);
+  background: rgba(5, 10, 24, 0.7);
   backdrop-filter: blur(10px);
-  position: sticky;
-  top: 0;
-  z-index: 100;
 }
-
-.brand {
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
-  max-width: 1200px;
-  margin: 0 auto;
+header::after {
+  content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  opacity: .7;
 }
-
-.logo {
-  width: 80px;
-  height: 80px;
-  object-fit: contain;
-  filter: drop-shadow(0 0 8px rgba(212, 175, 55, 0.5));
+.header-inner {
+  max-width: 1100px; margin: 0 auto; padding: 1rem 1.5rem;
+  display: flex; align-items: center; gap: 1rem;
 }
-
-.brand h1 {
-  font-size: 2.5rem;
-  color: #d4af37;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
-}
+.logo { width: 56px; height: 56px; object-fit: contain; filter: drop-shadow(0 2px 8px rgba(212,175,55,.35)); }
+.brand-text { display: flex; flex-direction: column; line-height: 1.2; }
+.brand-text strong { font-size: 1.05rem; letter-spacing: .08em; text-transform: uppercase; color: var(--gold-soft); }
+.brand-text span { font-size: .8rem; color: var(--muted); letter-spacing: .04em; }
+.flag { display: inline-flex; width: 22px; height: 14px; border-radius: 2px; overflow: hidden; margin-left: .6rem; vertical-align: middle; opacity: .85; box-shadow: 0 0 0 1px rgba(255,255,255,.15); }
+.flag i { flex: 1; display: block; }
+.flag i:nth-child(1) { background: #1f3f9e; }
+.flag i:nth-child(2) { background: #f4f6fb; }
+.flag i:nth-child(3) { background: #d2343f; }
 
 .back-btn {
-  display: inline-block;
-  margin-left: auto;
-  background: rgba(212, 175, 55, 0.1);
-  color: #d4af37;
-  border: 2px solid #d4af37;
-  padding: 0.6rem 1.5rem;
-  border-radius: 6px;
-  text-decoration: none;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  font-weight: 600;
+  margin-left: auto; text-decoration: none; font-size: .9rem; font-weight: 600;
+  color: var(--gold-soft); border: 1px solid var(--panel-line); padding: .5rem 1rem; border-radius: 8px;
+  transition: background .25s, border-color .25s, color .25s;
 }
+.back-btn:hover { background: rgba(212,175,55,.12); border-color: var(--gold); }
 
-.back-btn:hover {
-  background: #d4af37;
-  color: #1a1a2e;
-  transform: translateY(-2px);
-}
+/* ---------- Contenu ---------- */
+main { flex: 1; width: 100%; max-width: 860px; margin: 0 auto; padding: 3rem 1.5rem 3.5rem; }
 
-main {
-  flex: 1;
-  padding: 3rem 2rem;
-  max-width: 800px;
-  width: 100%;
-  margin: 0 auto;
-}
+.hero { text-align: center; margin-bottom: 2rem; }
+.hero h1 { font-size: clamp(1.8rem, 4.5vw, 2.6rem); font-weight: 700; letter-spacing: .01em; }
+.hero h1 span { background: linear-gradient(135deg, var(--gold-soft), var(--gold)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.hero p { color: var(--muted); margin-top: .4rem; font-size: 1.05rem; }
+.divider { width: 90px; height: 2px; margin: 1.1rem auto 0; background: linear-gradient(90deg, transparent, var(--gold), transparent); }
 
-h1 {
-  font-size: 2.5rem;
-  color: #d4af37;
-  margin-bottom: 2rem;
-  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
-}
-
-.form-group {
-  margin-bottom: 1.5rem;
-}
-
-label {
-  display: block;
-  margin-bottom: 0.5rem;
-  color: #d4af37;
-  font-weight: 600;
-}
-
-input,
-textarea,
-select {
-  width: 100%;
-  padding: 0.8rem;
-  border: 2px solid #d4af37;
-  border-radius: 6px;
-  background: rgba(212, 175, 55, 0.05);
-  color: #e0e0e0;
-  font-family: inherit;
-  font-size: 1rem;
-  transition: all 0.3s ease;
-}
-
-input:focus,
-textarea:focus,
-select:focus {
-  outline: none;
-  background: rgba(212, 175, 55, 0.15);
-  box-shadow: 0 0 8px rgba(212, 175, 55, 0.3);
-}
-
-select option {
-  background: #1a1a2e;
-  color: #f4f4f4;
-}
-
-select {
-  color-scheme: dark;
-}
-
-select option:checked,
-select option:hover {
-  background: #8f731d;
-  color: #ffffff;
-}
-
-textarea {
-  resize: vertical;
-  min-height: 120px;
-}
-
-.form-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1.5rem;
-}
-
-.submit-btn {
-  background: linear-gradient(135deg, #d4af37 0%, #c9a227 100%);
-  color: #1a1a2e;
-  border: none;
-  padding: 1rem 2.5rem;
-  font-size: 1.1rem;
-  font-weight: 600;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  box-shadow: 0 8px 24px rgba(212, 175, 55, 0.3);
-  width: 100%;
-}
-
-.submit-btn:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 12px 32px rgba(212, 175, 55, 0.4);
-}
-
-.submit-btn:active {
-  transform: translateY(-1px);
-}
-
-.success-message {
-  background: rgba(76, 175, 80, 0.2);
-  border: 2px solid #4CAF50;
-  color: #90EE90;
-  padding: 1rem;
-  border-radius: 6px;
-  margin-bottom: 2rem;
-  display: none;
-  text-align: center;
-}
-
-footer {
-  background: rgba(0, 0, 0, 0.7);
-  border-top: 2px solid #d4af37;
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--panel-line);
+  border-radius: 16px;
   padding: 2rem;
-  text-align: center;
-  color: #b0b0b0;
-  font-size: 0.9rem;
-  margin-top: auto;
+  box-shadow: 0 24px 60px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.04);
+  backdrop-filter: blur(6px);
 }
 
-footer p {
-  margin: 0.5rem 0;
+.notice {
+  display: flex; gap: .8rem; align-items: flex-start;
+  background: rgba(212,175,55,.07); border: 1px solid rgba(212,175,55,.25);
+  border-radius: 10px; padding: .9rem 1rem; margin-bottom: 1.6rem; font-size: .92rem; color: #d9deee;
 }
+.notice svg { flex: none; width: 20px; height: 20px; color: var(--gold); margin-top: 2px; }
 
-@media (max-width: 768px) {
-  header {
-    padding: 1.5rem;
-  }
-
-  .brand {
-    flex-direction: column;
-    text-align: center;
-  }
-
-  .back-btn {
-    margin-left: 0;
-    margin-top: 1rem;
-    width: 100%;
-    text-align: center;
-  }
-
-  .brand h1 {
-    font-size: 1.8rem;
-  }
-
-  main {
-    padding: 2rem 1.5rem;
-  }
-
-  h1 {
-    font-size: 1.8rem;
-  }
-
-  .form-row {
-    grid-template-columns: 1fr;
-  }
+.section-title {
+  display: flex; align-items: center; gap: .7rem;
+  font-size: .8rem; letter-spacing: .16em; text-transform: uppercase; color: var(--gold-soft);
+  margin: 1.8rem 0 1rem;
 }
+.section-title:first-of-type { margin-top: 0; }
+.section-title::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, var(--panel-line), transparent); }
 
-@media (max-width: 480px) {
-  header {
-    padding: 1rem;
-  }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; }
+.form-group { margin-bottom: 1.2rem; }
 
-  .brand h1 {
-    font-size: 1.5rem;
-  }
+label { display: flex; justify-content: flex-start; align-items: baseline; gap: .5rem; margin-bottom: .4rem; font-size: .92rem; font-weight: 600; color: var(--white); }
+label .req { color: var(--gold); margin-left: .2rem; }
+label .opt { font-weight: 400; color: var(--muted); font-size: .8rem; margin-left: auto; }
 
-  .logo {
-    width: 60px;
-    height: 60px;
-  }
+.control { position: relative; }
+.control > svg.icon { position: absolute; left: .85rem; top: 50%; transform: translateY(-50%); width: 18px; height: 18px; color: var(--muted); pointer-events: none; transition: color .2s; }
+.control.area > svg.icon { top: 1.05rem; transform: none; }
 
-  main {
-    padding: 1.5rem 1rem;
-  }
-
-  h1 {
-    font-size: 1.5rem;
-    margin-bottom: 1.5rem;
-  }
-
-  input,
-  textarea,
-  select {
-    padding: 0.7rem;
-  }
-
-  .submit-btn {
-    padding: 0.8rem 1.5rem;
-    font-size: 1rem;
-  }
-
-  footer {
-    padding: 1.5rem;
-  }
-
-  footer p {
-    font-size: 0.85rem;
-  }
+input, textarea, select {
+  width: 100%; font: inherit; font-size: 1rem; color: var(--white);
+  background: var(--field); border: 1px solid var(--field-line); border-radius: 10px;
+  padding: .75rem .9rem .75rem 2.65rem;
+  transition: border-color .2s, box-shadow .2s, background .2s;
 }
-    </style>
+textarea { padding-left: .9rem; resize: vertical; min-height: 110px; }
+.control.area > svg.icon { display: none; }
+input::placeholder, textarea::placeholder { color: rgba(154,166,196,.6); }
+input:hover, textarea:hover, select:hover { border-color: rgba(212,175,55,.45); }
+input:focus, textarea:focus, select:focus {
+  outline: none; border-color: var(--gold); background: rgba(212,175,55,.06);
+  box-shadow: 0 0 0 3px rgba(212,175,55,.18);
+}
+.control:focus-within > svg.icon { color: var(--gold); }
+select { color-scheme: dark; appearance: none; cursor: pointer; }
+select option { background: #0a1330; color: var(--white); }
+.control.select::after {
+  content: ""; position: absolute; right: 1rem; top: 50%; width: 8px; height: 8px;
+  border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted);
+  transform: translateY(-70%) rotate(45deg); pointer-events: none;
+}
+input[type="date"] { min-height: 46px; }
+
+.field-foot { display: flex; justify-content: space-between; gap: 1rem; margin-top: .35rem; min-height: 1.1rem; }
+.hint { font-size: .8rem; color: var(--muted); }
+.error { font-size: .82rem; color: var(--danger); }
+.counter { font-size: .78rem; color: var(--muted); margin-left: auto; font-variant-numeric: tabular-nums; }
+.counter.near { color: var(--gold-soft); }
+.counter.full { color: var(--danger); }
+.invalid { border-color: var(--danger) !important; background: var(--danger-bg) !important; }
+.invalid:focus { box-shadow: 0 0 0 3px rgba(255,138,138,.2) !important; }
+
+/* ---------- Messages ---------- */
+.alert { display: none; align-items: flex-start; gap: .7rem; padding: .9rem 1rem; border-radius: 10px; margin-bottom: 1.4rem; font-size: .95rem; }
+.alert.show { display: flex; }
+.alert svg { flex: none; width: 20px; height: 20px; margin-top: 2px; }
+.alert.success { background: var(--ok-bg); border: 1px solid rgba(143,224,168,.45); color: var(--ok); }
+.alert.failure { background: var(--danger-bg); border: 1px solid rgba(255,138,138,.45); color: var(--danger); }
+
+/* ---------- Bouton ---------- */
+.submit-btn {
+  width: 100%; margin-top: .6rem; position: relative;
+  display: inline-flex; align-items: center; justify-content: center; gap: .7rem;
+  font: inherit; font-size: 1rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+  color: #0a1330; background: linear-gradient(135deg, var(--gold-soft) 0%, var(--gold) 55%, var(--gold-deep) 100%);
+  border: 1px solid rgba(255,255,255,.25); border-radius: 12px; padding: 1rem 1.5rem; cursor: pointer;
+  box-shadow: 0 10px 26px rgba(212,175,55,.28);
+  transition: transform .2s, box-shadow .2s, filter .2s;
+}
+.submit-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 14px 34px rgba(212,175,55,.4); filter: brightness(1.05); }
+.submit-btn:active:not(:disabled) { transform: translateY(0); }
+.submit-btn:focus-visible { outline: 3px solid var(--white); outline-offset: 3px; }
+.submit-btn:disabled { cursor: not-allowed; filter: saturate(.7) brightness(.9); }
+.spinner { display: none; width: 18px; height: 18px; border: 2px solid rgba(10,19,48,.3); border-top-color: #0a1330; border-radius: 50%; animation: spin .8s linear infinite; }
+.submit-btn.loading .spinner { display: inline-block; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ---------- Pied de page ---------- */
+footer { border-top: 1px solid var(--panel-line); background: rgba(5,10,24,.7); text-align: center; padding: 1.5rem; color: var(--muted); font-size: .88rem; }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 680px) {
+  .form-row { grid-template-columns: 1fr; gap: 0; }
+  .panel { padding: 1.3rem 1.1rem; border-radius: 14px; }
+  main { padding: 2rem 1rem 2.5rem; }
+  .header-inner { padding: .8rem 1rem; }
+  .logo { width: 46px; height: 46px; }
+  .brand-text span { display: none; }
+  .back-btn { padding: .45rem .8rem; font-size: .85rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  * { animation-duration: .01ms !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
+}
+</style>
+<link rel="stylesheet" href="/site-theme.css">
 </head>
 <body>
+<a class="skip-link" href="#candidatureForm">Aller au formulaire</a>
 
 <header>
-    <div class="brand">
-        <img src="/assets/logo-gendarmerie.png" class="logo" alt="Logo Gendarmerie">
-        <h1>Gendarmerie Nationale</h1>
-        <a href="/" class="back-btn">← Retour</a>
+  <div class="header-inner">
+    <img src="/assets/logo-gendarmerie.png" class="logo" alt="Logo de la Gendarmerie Nationale">
+    <div class="brand-text">
+      <strong>Gendarmerie Nationale
+        <span class="flag" aria-hidden="true"><i></i><i></i><i></i></span>
+      </strong>
+      <span>Recrutement</span>
     </div>
+    <a href="/" class="back-btn">← Retour</a>
+  </div>
 </header>
 
 <main>
-    <h1>Formulaire de Candidature</h1>
-    
-    <div class="success-message" id="successMessage">
-        ✓ Votre candidature a été envoyée avec succès. Redirection en cours...
+  <div class="hero">
+    <h1><span>Formulaire de candidature</span></h1>
+    <p>Rejoignez la Gendarmerie Nationale</p>
+    <div class="divider"></div>
+  </div>
+
+  <div class="panel">
+    <div class="notice" role="note">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>
+      <p>Constituez votre dossier avec sérieux et honnêteté. Les champs marqués d'un <strong>*</strong> sont obligatoires. Votre candidature sera étudiée par l'état-major, qui vous répondra par Discord. Le temps écoulé depuis votre première saisie et les champs où le navigateur détecte un collage seront visibles par les administrateurs ; le contenu du presse-papiers n'est jamais lu. Ces indicateurs ne prouvent ni fraude ni usage d'une IA.</p>
     </div>
 
-    <form id="candidatureForm">
-        <div class="form-row">
-            <div class="form-group">
-                <label for="nom">Nom *</label>
-                <input type="text" id="nom" name="nom" required>
-            </div>
-            <div class="form-group">
-                <label for="prenom">Prénom *</label>
-                <input type="text" id="prenom" name="prenom" required>
-            </div>
-        </div>
+    <div class="alert success" id="successMessage" role="status" aria-live="polite" tabindex="-1">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></svg>
+      <span>Votre dossier a bien été transmis à l'état-major. Redirection en cours…</span>
+    </div>
+    <div class="alert failure" id="errorMessage" role="alert" tabindex="-1">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>
+      <span id="errorText"></span>
+    </div>
 
-        <div class="form-row">
-            <div class="form-group">
-                <label for="email">Pseudo Discord *</label>
-                <input type="text" id="email" name="email" placeholder="Ex: lexy_off1" required>
-            </div>
-            <div class="form-group">
-                <label for="telephone">ID Discord *</label>
-                <input type="text" id="telephone" name="telephone" placeholder="Ex: 123456789012345678" required>
-            </div>
-        </div>
+    <form id="candidatureForm" novalidate>
 
+      <h2 class="section-title">Identité</h2>
+      <div class="form-row">
         <div class="form-group">
-            <label for="dateNaissance">Date de naissance *</label>
-            <input type="date" id="dateNaissance" name="dateNaissance" required>
+          <label for="nom">Nom <span class="req" aria-hidden="true">*</span></label>
+          <div class="control">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>
+            <input type="text" id="nom" name="nom" maxlength="50" autocomplete="family-name" required aria-describedby="nom-err">
+          </div>
+          <div class="field-foot"><span class="error" id="nom-err"></span></div>
         </div>
-
         <div class="form-group">
-            <label for="diplome">Diplôme le plus élevé</label>
+          <label for="prenom">Prénom <span class="req" aria-hidden="true">*</span></label>
+          <div class="control">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>
+            <input type="text" id="prenom" name="prenom" maxlength="50" autocomplete="given-name" required aria-describedby="prenom-err">
+          </div>
+          <div class="field-foot"><span class="error" id="prenom-err"></span></div>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="email">Pseudo Discord <span class="req" aria-hidden="true">*</span></label>
+          <div class="control">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"/></svg>
+            <input type="text" id="email" name="email" maxlength="40" placeholder="Chargement du compte Discord…" autocomplete="off" required readonly aria-describedby="email-err">
+          </div>
+          <div class="field-foot"><span class="error" id="email-err"></span></div>
+        </div>
+        <div class="form-group">
+          <label for="telephone">ID Discord <span class="req" aria-hidden="true">*</span></label>
+          <div class="control">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 9h14M5 15h14M10 4 8 20M16 4l-2 16"/></svg>
+            <input type="text" id="telephone" name="telephone" inputmode="numeric" maxlength="20" placeholder="Chargement du compte Discord…" autocomplete="off" required readonly aria-describedby="telephone-hint telephone-err">
+          </div>
+          <div class="field-foot"><span class="error" id="telephone-err"></span></div>
+          <span class="hint" id="telephone-hint">Identifiant numérique (17 à 20 chiffres).</span>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="dateNaissance">Date de naissance <span class="req" aria-hidden="true">*</span></label>
+          <div class="control">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/></svg>
+            <input type="date" id="dateNaissance" name="dateNaissance" min="1900-01-01" autocomplete="bday" required aria-describedby="dateNaissance-err">
+          </div>
+          <div class="field-foot"><span class="error" id="dateNaissance-err"></span></div>
+        </div>
+        <div class="form-group">
+          <label for="diplome">Diplôme le plus élevé <span class="opt">Facultatif</span></label>
+          <div class="control select">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 9 9-5 9 5-9 5z"/><path d="M7 11.5V16c0 1.5 2.2 3 5 3s5-1.5 5-3v-4.5"/></svg>
             <select id="diplome" name="diplome">
-                <option value="">-- Sélectionner --</option>
-                <option value="aucun">Aucun diplôme</option>
-                <option value="bac">Baccalauréat</option>
-                <option value="bac-pro-securite">Bac Pro Sécurité</option>
-                <option value="bac+2">Bac+2</option>
-                <option value="bac+3">Bac+3</option>
-                <option value="bac+5">Bac+5 ou plus</option>
+              <option value="">— Sélectionner —</option>
+              <option value="aucun">Aucun diplôme</option>
+              <option value="bac">Baccalauréat</option>
+              <option value="bac-pro-securite">Bac Pro Sécurité</option>
+              <option value="bac+2">Bac+2</option>
+              <option value="bac+3">Bac+3</option>
+              <option value="bac+5">Bac+5 ou plus</option>
             </select>
+          </div>
+          <div class="field-foot"></div>
         </div>
+      </div>
 
-        <div class="form-group">
-            <label for="experience">Expérience professionnelle *</label>
-            <textarea id="experience" name="experience" placeholder="Décrivez votre expérience..." required></textarea>
+      <h2 class="section-title">Parcours et motivation</h2>
+
+      <div class="form-group">
+        <label for="experience">Expérience professionnelle <span class="req" aria-hidden="true">*</span></label>
+        <div class="control area">
+          <textarea id="experience" name="experience" maxlength="1000" placeholder="Décrivez votre parcours professionnel…" required aria-describedby="experience-err" data-counter></textarea>
         </div>
+        <div class="field-foot"><span class="error" id="experience-err"></span><span class="counter" aria-hidden="true"></span></div>
+      </div>
 
-        <div class="form-group">
-            <label for="motivation">Lettre de motivation *</label>
-            <textarea id="motivation" name="motivation" placeholder="Pourquoi souhaitez-vous rejoindre la Gendarmerie Nationale ?" required></textarea>
+      <div class="form-group">
+        <label for="motivation">Lettre de motivation <span class="req" aria-hidden="true">*</span></label>
+        <div class="control area">
+          <textarea id="motivation" name="motivation" maxlength="2000" rows="6" placeholder="Pourquoi souhaitez-vous rejoindre la Gendarmerie Nationale ?" required aria-describedby="motivation-err" data-counter></textarea>
         </div>
+        <div class="field-foot"><span class="error" id="motivation-err"></span><span class="counter" aria-hidden="true"></span></div>
+      </div>
 
-        <button type="submit" class="submit-btn">Envoyer ma candidature</button>
+      <h2 class="section-title">Mise en situation</h2>
+
+      <div class="form-group">
+        <label for="roleplay">Expériences antérieures <span class="req" aria-hidden="true">*</span></label>
+        <div class="control area">
+          <textarea id="roleplay" name="roleplay" maxlength="600" placeholder="Avez-vous déjà servi dans une autre unité, un autre corps ou une autre institution ? Lesquels, et pendant combien de temps ?" required aria-describedby="roleplay-err" data-counter></textarea>
+        </div>
+        <div class="field-foot"><span class="error" id="roleplay-err"></span><span class="counter" aria-hidden="true"></span></div>
+      </div>
+
+      <div class="form-group">
+        <label for="disponibilites">Disponibilités de service <span class="req" aria-hidden="true">*</span></label>
+        <div class="control area">
+          <textarea id="disponibilites" name="disponibilites" maxlength="300" rows="3" style="min-height:80px" placeholder="Ex : en semaine de 20h à 23h, le week-end l'après-midi (heure de France)" required aria-describedby="disponibilites-err" data-counter></textarea>
+        </div>
+        <div class="field-foot"><span class="error" id="disponibilites-err"></span><span class="counter" aria-hidden="true"></span></div>
+      </div>
+
+      <div class="form-group">
+        <label for="miseEnSituation">Mise en situation <span class="req" aria-hidden="true">*</span></label>
+        <p class="hint" style="margin-bottom:.45rem">Comment réagiriez-vous face à un individu qui refuse d'obtempérer ?</p>
+        <div class="control area">
+          <textarea id="miseEnSituation" name="miseEnSituation" maxlength="600" rows="4" placeholder="Décrivez votre réaction, comme si vous étiez sur le terrain…" required aria-describedby="miseEnSituation-err" data-counter></textarea>
+        </div>
+        <div class="field-foot"><span class="error" id="miseEnSituation-err"></span><span class="counter" aria-hidden="true"></span></div>
+      </div>
+
+      <button type="submit" class="submit-btn" id="submitBtn">
+        <span class="spinner" aria-hidden="true"></span>
+        <span id="submitLabel">Envoyer ma candidature</span>
+      </button>
     </form>
+  </div>
 </main>
 
 <footer>
-    <p>© 2026 lexy_off1 — Tous droits réservés</p>
+  <p>© 2026 lexy_off1 — Tous droits réservés</p>
 </footer>
 
 <script>
-document.getElementById('candidatureForm').addEventListener('submit', function(e) {
+(function () {
+  'use strict';
+
+  // Les 8 champs d'origine : noms et sens inchangés.
+  // Les 3 nouveaux champs sont pris en charge et enregistrés par le serveur.
+  var SEND_NEW_FIELDS = true;
+  var API_URL = '/api/candidatures';
+  var REDIRECT_URL = '/';
+  var REDIRECT_DELAY = 3500;
+  var TIMEOUT_MS = 20000;
+
+  var CORE = ['nom', 'prenom', 'email', 'telephone', 'dateNaissance', 'diplome', 'experience', 'motivation'];
+  var EXTRA = ['roleplay', 'disponibilites', 'miseEnSituation'];
+
+  var form = document.getElementById('candidatureForm');
+  var btn = document.getElementById('submitBtn');
+  var label = document.getElementById('submitLabel');
+  var okBox = document.getElementById('successMessage');
+  var errBox = document.getElementById('errorMessage');
+  var errText = document.getElementById('errorText');
+  var sending = false;
+  var identityReady = false;
+  var firstInteractionAt = null;
+  var pastedFields = new Set();
+
+  // Date de naissance : pas de date future
+  var today = new Date();
+  var iso = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
+  document.getElementById('dateNaissance').max = iso;
+
+  function el(id) { return document.getElementById(id); }
+
+  // ---- Compteurs ----
+  function updateCounter(ta) {
+    var c = ta.closest('.form-group').querySelector('.counter');
+    if (!c) return;
+    var max = ta.maxLength, len = ta.value.length;
+    c.textContent = len + ' / ' + max;
+    c.className = 'counter' + (len >= max ? ' full' : len >= max * 0.9 ? ' near' : '');
+  }
+  Array.prototype.forEach.call(form.querySelectorAll('textarea[data-counter]'), function (ta) {
+    updateCounter(ta);
+    ta.addEventListener('input', function () { updateCounter(ta); });
+  });
+
+  // ---- Validation ----
+  function validate(id) {
+    var input = el(id), v = input.value.trim(), msg = '';
+    if (id === 'diplome') return '';
+    if (!v) {
+      msg = 'Ce champ est obligatoire.';
+    } else if (id === 'telephone' && !/^\d{17,20}$/.test(v)) {
+      msg = 'L\'ID Discord doit contenir 17 à 20 chiffres.';
+    } else if (id === 'dateNaissance') {
+      var d = new Date(v + 'T00:00:00.000Z');
+      if (isNaN(d.getTime()) || d.toISOString().slice(0, 10) !== v || v < '1900-01-01') msg = 'Date de naissance invalide.';
+      else if (v > iso) msg = 'La date de naissance ne peut pas être dans le futur.';
+    } else if ((id === 'experience' || id === 'motivation' || id === 'roleplay' || id === 'miseEnSituation') && v.length < 10) {
+      msg = 'Merci de développer un peu votre réponse (10 caractères minimum).';
+    }
+    return msg;
+  }
+
+  function showFieldError(id, msg) {
+    var input = el(id), out = el(id + '-err');
+    if (!out) return;
+    out.textContent = msg;
+    input.classList.toggle('invalid', !!msg);
+    if (msg) input.setAttribute('aria-invalid', 'true'); else input.removeAttribute('aria-invalid');
+  }
+
+  var allIds = CORE.concat(EXTRA);
+  function startCompletionTimer() {
+    if (firstInteractionAt === null) firstInteractionAt = Date.now();
+  }
+
+  form.addEventListener('input', startCompletionTimer);
+  form.addEventListener('paste', function (event) {
+    startCompletionTimer();
+    var field = event.target;
+    if (field && allIds.indexOf(field.id) !== -1) pastedFields.add(field.id);
+  });
+
+  allIds.forEach(function (id) {
+    var input = el(id);
+    input.addEventListener('blur', function () { if (input.value !== '' || input.classList.contains('invalid')) showFieldError(id, validate(id)); });
+    input.addEventListener('input', function () { if (input.classList.contains('invalid')) showFieldError(id, validate(id)); });
+  });
+
+  // ---- Messages ----
+  function hideAlerts() { okBox.classList.remove('show'); errBox.classList.remove('show'); }
+  function showError(text) {
+    hideAlerts();
+    errText.textContent = text;
+    errBox.classList.add('show');
+    errBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    errBox.focus({ preventScroll: true });
+  }
+  function setLoading(on) {
+    sending = on;
+    btn.disabled = on;
+    btn.classList.toggle('loading', on);
+    btn.setAttribute('aria-busy', on ? 'true' : 'false');
+    label.textContent = on ? 'Envoi en cours…' : 'Envoyer ma candidature';
+  }
+
+  // ---- Envoi ----
+  form.addEventListener('submit', function (e) {
     e.preventDefault();
-    
-    const formData = {
-        nom: document.getElementById('nom').value,
-        prenom: document.getElementById('prenom').value,
-        email: document.getElementById('email').value,
-        telephone: document.getElementById('telephone').value,
-        dateNaissance: document.getElementById('dateNaissance').value,
-        diplome: document.getElementById('diplome').value,
-        experience: document.getElementById('experience').value,
-        motivation: document.getElementById('motivation').value
-    };
+    if (sending) return;
+    hideAlerts();
 
-    fetch("/api/candidatures", {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(formData)
-    })
-    .then(async res => {
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || "Impossible d'envoyer la candidature.");
-        return data;
-    })
-    .then(data => {
-        document.getElementById('successMessage').style.display = 'block';
-        document.getElementById('candidatureForm').reset();
-        
-        setTimeout(() => {
-            window.location.href = '/';
-        }, 3000);
-    })
-    .catch(err => {
-        console.error('Erreur:', err);
-        alert('Une erreur est survenue. Veuillez réessayer.');
+    if (!identityReady) {
+      showError('Impossible de vérifier votre compte Discord. Reconnectez-vous puis rechargez la page.');
+      return;
+    }
+
+    var firstBad = null;
+    allIds.forEach(function (id) {
+      var m = validate(id);
+      showFieldError(id, m);
+      if (m && !firstBad) firstBad = id;
     });
-});
-</script>
+    if (firstBad) {
+      showError('Veuillez corriger les champs signalés avant d\'envoyer votre candidature.');
+      el(firstBad).focus();
+      return;
+    }
 
+    var payload = {};
+    CORE.forEach(function (id) { payload[id] = el(id).value.trim(); });
+    if (SEND_NEW_FIELDS) EXTRA.forEach(function (id) { payload[id] = el(id).value.trim(); });
+    payload.pastedFields = Array.from(pastedFields);
+    payload.completionTimeSeconds = firstInteractionAt === null
+      ? 0
+      : Math.min(86400, Math.max(0, Math.floor((Date.now() - firstInteractionAt) / 1000)));
+
+    setLoading(true);
+
+    var ctrl = new AbortController();
+    var timer = setTimeout(function () { ctrl.abort(); }, TIMEOUT_MS);
+
+    fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(payload),
+      signal: ctrl.signal
+    })
+    .then(function (res) {
+      return res.text().then(function (txt) {
+        var data = null;
+        try { data = txt ? JSON.parse(txt) : null; } catch (_) { data = null; }
+        if (!res.ok) {
+          var m = (data && (data.error || data.message)) || null;
+          if (!m) {
+            if (res.status === 429) m = 'Trop de tentatives. Merci de patienter avant de réessayer.';
+            else if (res.status >= 500) m = 'Le serveur rencontre un problème. Merci de réessayer dans quelques instants.';
+            else m = 'Votre candidature n\'a pas pu être acceptée (erreur ' + res.status + ').';
+          }
+          throw new Error(m);
+        }
+        return data;
+      });
+    })
+    .then(function () {
+      clearTimeout(timer);
+      okBox.classList.add('show');
+      okBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      okBox.focus({ preventScroll: true });
+      form.reset();
+      Array.prototype.forEach.call(form.querySelectorAll('textarea[data-counter]'), updateCounter);
+      btn.disabled = true; // reste bloqué jusqu'à la redirection
+      label.textContent = 'Candidature envoyée';
+      btn.classList.remove('loading');
+      setTimeout(function () { window.location.href = REDIRECT_URL; }, REDIRECT_DELAY);
+    })
+    .catch(function (err) {
+      clearTimeout(timer);
+      console.error('Erreur candidature :', err);
+      var m = err && err.name === 'AbortError'
+        ? 'Le serveur met trop de temps à répondre. Vérifiez votre connexion et réessayez.'
+        : (err instanceof TypeError ? 'Impossible de joindre le serveur. Vérifiez votre connexion et réessayez.' : err.message);
+      showError(m);
+      setLoading(false);
+    });
+  });
+
+  fetch('/api/me', { headers: { 'Accept': 'application/json' } })
+    .then(function (res) {
+      if (!res.ok) throw new Error('Compte Discord indisponible.');
+      return res.json();
+    })
+    .then(function (user) {
+      if (!user || typeof user.username !== 'string' || !/^\d{17,20}$/.test(String(user.id || ''))) {
+        throw new Error('Session Discord invalide.');
+      }
+      el('email').value = user.username;
+      el('telephone').value = String(user.id);
+      identityReady = true;
+    })
+    .catch(function () {
+      showError('Impossible de récupérer votre compte Discord. Reconnectez-vous puis rechargez la page.');
+    });
+})();
+</script>
 </body>
 </html>
