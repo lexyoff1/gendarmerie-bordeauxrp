@@ -275,12 +275,17 @@ function formatLockDuration(seconds) {
 }
 
 function blockedPageHtml(message, code) {
-    return `<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Accès bloqué</title>
-<style>body{margin:0;min-height:100vh;display:grid;place-items:center;background:#11182e;color:#f4f4f4;font-family:Arial,sans-serif}
-main{width:min(480px,calc(100% - 32px));padding:32px;border:1px solid #d4af37;border-radius:12px;background:#1a1a2e;text-align:center}
-h1{color:#d4af37}code{display:inline-block;margin-top:10px;padding:10px 18px;background:#0f1528;border:1px dashed #d4af37;border-radius:6px;font-size:1.3rem;letter-spacing:2px;color:#d4af37}
-p{color:#b0b0b0;line-height:1.6}</style></head><body><main><h1>🔒 Accès bloqué</h1>
-<p>${message}</p>${code ? `<p>Communiquez ce code à un responsable pour être débloqué :</p><code>${code}</code>` : ""}</main></body></html>`;
+    const codeBlock = code
+        ? "<p>Communiquez ce code &agrave; un responsable pour demander le d&eacute;blocage :</p><div class=\"code\">" + code + "</div>"
+        : "";
+    return [
+        "<!doctype html><html lang=\"fr\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><meta name=\"theme-color\" content=\"#0a1330\"><title>Acc&egrave;s bloqu&eacute; - Gendarmerie Nationale</title>",
+        "<style>*{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;padding:24px;background:radial-gradient(900px 500px at 15% -10%,rgba(40,80,190,.28),transparent 60%),radial-gradient(700px 420px at 100% 0%,rgba(212,175,55,.1),transparent 60%),linear-gradient(180deg,#0a1330 0%,#050a18 100%);color:#f4f6fb;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif}",
+        "main{width:min(520px,100%);padding:clamp(24px,6vw,36px);border:1px solid rgba(212,175,55,.3);border-radius:16px;background:rgba(12,22,52,.88);box-shadow:0 18px 48px rgba(0,0,0,.32);text-align:center}.brand{display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:28px;text-align:left}.brand-mark{display:grid;place-items:center;width:54px;height:54px;border:2px solid #d4af37;border-radius:50%;color:#e6c866;font-weight:800;letter-spacing:.08em;box-shadow:0 0 20px rgba(212,175,55,.18)}.brand-title{margin:0;color:#e6c866;font-size:1.05rem}.brand-subtitle{margin:4px 0 0;color:#9aa6c4;font-size:.85rem}",
+        ".status{display:inline-block;margin-bottom:12px;padding:6px 12px;border:1px solid rgba(212,175,55,.32);border-radius:999px;background:rgba(212,175,55,.08);color:#e6c866;font-size:.82rem;font-weight:700}h1{margin:0 0 12px;color:#f4f6fb;font-size:1.6rem}p{color:#b9c3da;line-height:1.65}.code{display:inline-block;margin-top:6px;padding:12px 18px;border:1px dashed #d4af37;border-radius:8px;background:#0a1330;color:#e6c866;font-family:inherit;font-size:1.25rem;font-weight:800;letter-spacing:2px;overflow-wrap:anywhere}@media(max-width:480px){body{padding:16px}main{padding:24px 20px}h1{font-size:1.4rem}}</style></head><body><main>",
+        "<div class=\"brand\"><div class=\"brand-mark\" aria-hidden=\"true\">GN</div><div><p class=\"brand-title\">Gendarmerie Nationale</p><p class=\"brand-subtitle\">Portail s&eacute;curis&eacute;</p></div></div>",
+        "<span class=\"status\">Protection du site</span><h1>Acc&egrave;s bloqu&eacute;</h1><p>" + message + "</p>" + codeBlock + "</main></body></html>"
+    ].join("");
 }
 
 function tooManyRequests(req, res, message, retryAfterSeconds, code) {
@@ -1681,19 +1686,21 @@ app.get("/test123", (req, res) => {
     res.send("TEST OK");
 });
 
+function adminAuthPage({ title, heading, description, form, script }) {
+    return `<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#0a1330"><title>${title}</title><link rel="stylesheet" href="/site-theme.css"></head>
+<body class="auth-page"><main class="auth-card">
+<div class="auth-brand"><img src="/assets/logo-gendarmerie.png" alt="Logo de la Gendarmerie"><div><h1>Gendarmerie Nationale</h1><p>Administration s&eacute;curis&eacute;e</p></div></div>
+<h2>${heading}</h2><p class="auth-description">${description}</p>${form}<p id="error" class="auth-error" role="alert"></p></main><script>${script}</script></body></html>`;
+}
+
 app.get("/admin-access", requireAdmin, (req, res) => {
     if (hasAdminAccess(req)) return res.redirect("/admin");
 
-    res.send(`<!doctype html>
-<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Verrou administrateur</title><style>
-body{margin:0;min-height:100vh;display:grid;place-items:center;background:#11182e;color:#f4f4f4;font-family:Arial,sans-serif}
-main{width:min(420px,calc(100% - 32px));padding:32px;border:1px solid #d4af37;border-radius:12px;background:#1a1a2e}
-h1{color:#d4af37;font-size:1.5rem}input,button{box-sizing:border-box;width:100%;padding:12px;border-radius:6px;font:inherit}input{border:1px solid #d4af37;background:#0f1528;color:#fff}button{margin-top:16px;border:0;background:#d4af37;color:#11182e;font-weight:bold;cursor:pointer}#error{min-height:1.4em;color:#ff9b9b}
-</style></head><body><main><h1>Verrou administrateur</h1><p>Saisis ton code d'accès personnel.</p><form id="access-form"><input id="code" type="password" autocomplete="one-time-code" required autofocus><button>Déverrouiller</button></form><p id="error" role="alert"></p></main><script>
-document.getElementById('access-form').addEventListener('submit',async event=>{event.preventDefault();const response=await fetch('/api/admin/access',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code:document.getElementById('code').value})});if(response.ok)return location.assign('/admin');const data=await response.json();document.getElementById('error').textContent=data.error||'Code invalide.';});
-</script></body></html>`);
+    const form = '<form id="access-form"><input id="code" type="password" autocomplete="one-time-code" placeholder="Code d&#39;acc&egrave;s" required autofocus><button type="submit">D&eacute;verrouiller</button></form>';
+    const script = "document.getElementById('access-form').addEventListener('submit',async event=>{event.preventDefault();const response=await fetch('/api/admin/access',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code:document.getElementById('code').value})});if(response.ok)return location.assign('/admin');const data=await response.json();document.getElementById('error').textContent=data.error||'Code invalide.';});";
+    res.send(adminAuthPage({ title: "V&eacute;rification administrateur", heading: "Verrou administrateur", description: "Saisis ton code d'acc&egrave;s personnel.", form, script }));
 });
+
 app.get("/admin-access.html", (req, res) => res.redirect(301, "/admin-access"));
 
 app.post("/api/admin/access", adminAccessLimiter, requireAdmin, async (req, res) => {
@@ -1736,8 +1743,11 @@ app.get("/admin", async (req, res) => {
 app.get("/admin.html", (req, res) => res.redirect(301, "/admin"));
 
 app.get("/admin-login", (req, res) => {
-    res.send(`<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Connexion admin</title><style>body{margin:0;min-height:100vh;display:grid;place-items:center;background:#11182e;color:#f4f4f4;font:16px Arial,sans-serif}main{width:min(400px,calc(100% - 32px));padding:32px;background:#1a1a2e;border:1px solid #d4af37;border-radius:12px}h1{color:#d4af37}input,button{box-sizing:border-box;width:100%;margin-top:12px;padding:12px;border-radius:6px;font:inherit}input{border:1px solid #d4af37;background:#0f1528;color:#fff}button{border:0;background:#d4af37;color:#11182e;font-weight:bold;cursor:pointer}#error{min-height:1.4em;color:#ff9b9b}</style></head><body><main><h1>Connexion administrateur</h1><form id="login"><input id="username" placeholder="Pseudo Discord" required autofocus><input id="password" type="password" placeholder="Mot de passe" required><button>Se connecter</button></form><p id="error"></p></main><script>document.getElementById('login').addEventListener('submit',async e=>{e.preventDefault();const r=await fetch('/api/admin/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:username.value,password:password.value})});if(r.ok)return location.assign('/admin');const d=await r.json();error.textContent=d.error||'Identifiants invalides.';});</script></body></html>`);
+    const form = '<form id="login"><input id="username" name="username" placeholder="Pseudo Discord" autocomplete="username" required autofocus><input id="password" name="password" type="password" placeholder="Mot de passe" autocomplete="current-password" required><button type="submit">Se connecter</button></form>';
+    const script = "document.getElementById('login').addEventListener('submit',async event=>{event.preventDefault();const response=await fetch('/api/admin/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:document.getElementById('username').value,password:document.getElementById('password').value})});if(response.ok)return location.assign('/admin');const data=await response.json();document.getElementById('error').textContent=data.error||'Identifiants invalides.';});";
+    res.send(adminAuthPage({ title: "Connexion administrateur", heading: "Connexion administrateur", description: "Connecte-toi avec ton compte administrateur.", form, script }));
 });
+
 app.get("/admin-login.html", (req, res) => res.redirect(301, "/admin-login"));
 
 app.post("/api/admin/login", adminLoginLimiter, async (req, res) => {
@@ -2601,12 +2611,7 @@ app.post("/api/applications/:id/ai-detection", requireAdminAccess, async (req, r
         .map(value => value.trim())
         .join("\n\n");
 
-    if (text.length > 15000) {
-        return res.status(400).json({ error: "Le texte dépasse la limite de 15 000 caractères de ZeroGPT." });
-    }
-    if (text.split(/\s+/).filter(Boolean).length < 30) {
-        return res.status(400).json({ error: "Il faut au moins 30 mots de réponse pour lancer l'analyse." });
-    }
+    if (!text) return res.status(400).json({ error: "Aucune réponse à analyser." });
 
     try {
         const login = await axios.post("https://api.zerogpt.com/api/auth/login", {
