@@ -78,6 +78,7 @@ button.red{background:#b91c1c;color:#fff}button.ghost{background:rgba(212,175,55
 <script>
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const safeHttpUrl=value=>{try{const url=new URL(String(value||''));return ['http:','https:'].includes(url.protocol)?url.href:''}catch{return ''}};
 const blank=()=>({title:'',url:'',description:'',color:'#5865f2',ts:false,authorName:'',authorIcon:'',authorUrl:'',thumb:'',image:'',footer:'',footerIcon:'',fields:[]});
 let embeds=[blank()],cur=0;
 
@@ -139,7 +140,7 @@ const pre=s=>s.replace(/```([\s\S]*?)```/g,'<pre style="background:#1e1f22;paddi
  .replace(/&lt;t:(\d+)(?::\w)?&gt;/g,(m,t)=>new Date(+t*1000).toLocaleString('fr-FR'));
 const md=s=>pre(esc(s)).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/__(.+?)__/g,'<u>$1</u>').replace(/\*(.+?)\*/g,'<i>$1</i>').replace(/`(.+?)`/g,'<code>$1</code>').replace(/\[(.+?)\]\((https?:[^)\s]+)\)/g,'<a href="$2" style="color:#00a8fc">$1</a>');
 function render(){renderBase();btnPrev()}
-function btnPrev(){const c=(payload().components||[])[0];if(c)$('prev').insertAdjacentHTML('beforeend','<div style="display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.5rem">'+c.components.map(b=>`<a href="${esc(b.url)}" style="background:#4e5058;color:#fff;padding:.35rem .8rem;border-radius:4px;text-decoration:none;font-size:.85rem">${esc(b.label)} ↗</a>`).join('')+'</div>')}
+function btnPrev(){const c=(payload().components||[])[0];if(c)$('prev').insertAdjacentHTML('beforeend','<div style="display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.5rem">'+c.components.map(b=>{const url=safeHttpUrl(b.url);return url?`<a href="${esc(url)}" style="background:#4e5058;color:#fff;padding:.35rem .8rem;border-radius:4px;text-decoration:none;font-size:.85rem">${esc(b.label)} ↗</a>`:`<span>${esc(b.label)}</span>`}).join('')+'</div>')}
 function renderBase(){
   const p=payload();
   $('prev').innerHTML=`<div class="u">${p.avatar_url?`<img src="${esc(p.avatar_url)}">`:''}${esc(p.username||'Bot')}</div>`+
@@ -147,7 +148,7 @@ function renderBase(){
     (p.embeds||[]).map(o=>`<div class="em" style="border-left-color:#${(o.color||0).toString(16).padStart(6,'0')}">
       ${o.thumbnail?`<img class="th" src="${esc(o.thumbnail.url)}">`:''}
       ${o.author?`<div class="a">${o.author.icon_url?`<img src="${esc(o.author.icon_url)}">`:''}${esc(o.author.name)}</div>`:''}
-      ${o.title?`<div class="t">${o.url?`<a href="${esc(o.url)}">${esc(o.title)}</a>`:esc(o.title)}</div>`:''}
+      ${o.title?`<div class="t">${safeHttpUrl(o.url)?`<a href="${esc(safeHttpUrl(o.url))}">${esc(o.title)}</a>`:esc(o.title)}</div>`:''}
       ${o.description?`<div class="d">${md(o.description)}</div>`:''}
       ${o.fields?`<div class="fs">${o.fields.map(f=>`<div class="f ${f.inline?'in':''}"><b>${esc(f.name)}</b>${md(f.value)}</div>`).join('')}</div>`:''}
       ${o.image?`<img class="im" src="${esc(o.image.url)}">`:''}
