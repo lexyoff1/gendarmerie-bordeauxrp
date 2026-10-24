@@ -486,6 +486,7 @@ footer p {
   }
 }
     </style>
+<link rel="stylesheet" href="/site-theme.css">
 </head>
 <body>
 
@@ -902,6 +903,25 @@ async function deleteVehicle(name) {
 
 async function loadApps() {
     const box = document.getElementById('appsContainer');
+    const pasteFieldLabels = {
+        nom: 'Nom',
+        prenom: 'Prénom',
+        email: 'Pseudo Discord',
+        telephone: 'ID Discord',
+        dateNaissance: 'Date de naissance',
+        diplome: 'Diplôme',
+        experience: 'Expérience professionnelle',
+        motivation: 'Motivation',
+        roleplay: 'Expériences antérieures',
+        disponibilites: 'Disponibilités',
+        miseEnSituation: 'Mise en situation'
+    };
+    const formatCompletionTime = seconds => {
+        if (!Number.isInteger(seconds) || seconds < 0 || seconds > 86400) return 'Non mesurée';
+        const minutes = Math.floor(seconds / 60);
+        const remainingSeconds = seconds % 60;
+        return minutes ? `${minutes} min ${remainingSeconds} s` : `${remainingSeconds} s`;
+    };
     
     try {
         const res = await fetch((window.API_BASE || "") + "/api/applications");
@@ -917,10 +937,19 @@ async function loadApps() {
         box.innerHTML = pending.map(app => `
     <div class="card">
         <h3>${escapeHtml(app.nomPrenom || app.user || 'Sans nom')}</h3>
+        <p><strong>Temps écoulé depuis la première saisie :</strong> ${escapeHtml(formatCompletionTime(app.completionTimeSeconds))}</p>
+        <p><strong>Collage signalé par le navigateur :</strong> ${Array.isArray(app.pastedFields) && app.pastedFields.length
+            ? escapeHtml([...new Set(app.pastedFields.filter(field => Object.hasOwn(pasteFieldLabels, field)))].map(field => pasteFieldLabels[field]).join(', '))
+            : 'Aucun signal enregistré'}</p>
+        <p class="muted">Ces signaux sont indicatifs et peuvent être contournés ou déclenchés par erreur ; ils ne prouvent pas une fraude ni l’usage d’une IA. Aucun détecteur d’IA fiable n’est activé.</p>
         <p><strong>Discord :</strong> ${escapeHtml(app.user || app.username || 'Non renseigné')}</p>
         <p><strong>ID :</strong> ${escapeHtml(app.discordId || 'Non renseigné')}</p>
         <p><strong>Motivation :</strong> ${escapeHtml(app.motivation || "Aucune")}</p>
         <p><strong>Expérience :</strong> ${escapeHtml(app.experience || "Aucune")}</p>
+        <p><strong>Expériences antérieures :</strong> ${escapeHtml(app.roleplay || "Aucune")}</p>
+        <p><strong>Disponibilités :</strong> ${escapeHtml(app.disponibilites || "Non renseignées")}</p>
+        <p><strong>Mise en situation :</strong> ${escapeHtml(app.miseEnSituation || "Aucune")}</p>
+        <p><strong>Diplôme :</strong> ${escapeHtml(app.diplome || "Non renseigné")}</p>
 
         <label for="appMsg-${app.id}">Message au candidat</label>
         <textarea id="appMsg-${app.id}" placeholder="Message qui sera envoyé en MP Discord avec la décision"></textarea>
