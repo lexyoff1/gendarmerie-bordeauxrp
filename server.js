@@ -1738,7 +1738,8 @@ app.post("/api/admin/access", adminAccessLimiter, requireAdmin, async (req, res)
 
 app.get("/admin", async (req, res) => {
     if (!(await isAdmin(req)) || req.session?.adminPanelAuthenticated !== true) return res.redirect("/admin-login");
-    res.sendFile(__dirname + "/public/admin.html");
+    res.set("Content-Type", "text/html; charset=utf-8");
+    res.sendFile(path.join(__dirname, "public", "admin.html"));
 });
 app.get("/admin.html", (req, res) => res.redirect(301, "/admin"));
 
