@@ -486,7 +486,7 @@ function renderTenues() {
                 <div class="card grid-item">
                     <h3>${escapeHtml(t.nom)}</h3>
                     <p>${escapeHtml(t.description || "")}</p>
-                    <img src="${t.image}" alt="${escapeHtml(t.nom)}" class="course-image">
+                    <img src="${escapeHtml(t.image || "")}" alt="${escapeHtml(t.nom)}" class="course-image">
 
                     <div class="tenue-admin" style="display:${editMode ? "block" : "none"};">
                         <hr>
@@ -498,7 +498,7 @@ function renderTenues() {
                         <input id="categorie-${t.id}" type="text" value="${escapeHtml(t.categorie)}">
 
                         <label for="image-${t.id}">Image</label>
-                        <input id="image-${t.id}" type="text" value="${t.image}">
+                        <input id="image-${t.id}" type="text" value="${escapeHtml(t.image || "")}">
 
                         <label for="description-${t.id}">Description</label>
                         <input id="description-${t.id}" type="text" value="${escapeHtml(t.description || "")}">
@@ -639,21 +639,21 @@ async function addTenue() {
     }
 }
 
-function escapeHtml(text) {
+function escapeHtml(value) {
     const map = {
-        '&': '&',
-        '<': '<',
-        '>': '>',
-        '"': '"',
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
         "'": '&#039;'
     };
-    return text.replace(/[&<>"']/g, m => map[m]);
+    return String(value ?? "").replace(/[&<>"']/g, character => map[character]);
 }
 
 function logout() {
     localStorage.removeItem("adminToken");
     localStorage.removeItem("adminUserId");
-    window.location.href = "/dashboard.html";
+    window.location.href = "/logout";
 }
 
 async function init() {
