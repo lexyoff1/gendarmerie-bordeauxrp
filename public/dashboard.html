@@ -103,6 +103,10 @@ section {
   margin-bottom: 2rem;
 }
 
+.profile-section-card {
+  padding: 2.5rem;
+}
+
 .card h2 {
   font-size: 1.8rem;
   color: #d4af37;
@@ -294,6 +298,10 @@ footer p {
     margin-bottom: 1.5rem;
   }
 
+  .profile-section-card {
+    padding: 2rem;
+  }
+
   .grid {
     grid-template-columns: 1fr;
     gap: 1rem;
@@ -338,6 +346,7 @@ footer p {
 }
     </style>
 <link rel="stylesheet" href="/site-theme.css">
+    <script src="/header-navigation.js" defer></script>
 </head>
 <body>
 
@@ -359,7 +368,7 @@ footer p {
 
 </header>
 
-<section class="card">
+<section class="card profile-section-card">
     <h2>Carte professionnelle</h2>
     <div id="profile">Chargement...</div>
 </section>
@@ -456,6 +465,16 @@ footer p {
                     box.innerHTML = `
                         <p>Tu n'es pas connecté.</p>
                         <a href="/auth/discord"><button>Connexion Discord</button></a>
+                    `;
+                    return;
+                }
+
+                if (user.candidat) {
+                    box.innerHTML = `
+                        <h2>Compte Discord connecté</h2>
+                        <p>Ton profil Gendarmerie sera créé après l'acceptation de ta candidature.</p>
+                        <p>Discord : ${escapeHtml(user.username)}</p>
+                        <a href="/gn-candidature"><button>Accéder à ma candidature</button></a>
                     `;
                     return;
                 }
