@@ -2,7 +2,7 @@
   "name": "project-back-3",
   "version": "1.0.0",
   "description": "",
-  "main": "alta-gn/gendarmerie-rp/server.js",
+  "main": "server.js",
   "dependencies": {
     "accepts": "^2.0.0",
     "body-parser": "^2.3.0",
@@ -86,8 +86,8 @@
     "ws": "^8.21.3"
   },
   "scripts": {
-    "start": "npm --prefix alta-gn/gendarmerie-rp start",
-    "dev": "npm --prefix alta-gn/gendarmerie-rp run dev",
+    "start": "node server.js",
+    "dev": "node --watch server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
