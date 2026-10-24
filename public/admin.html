@@ -261,6 +261,46 @@ button.cat-btn.active {
   margin-top: 0;
 }
 
+.effectifs-category {
+  margin: 1.5rem 0 2rem;
+}
+
+.effectifs-category-title {
+  color: #d4af37;
+  font-size: 1.25rem;
+  margin: 0 0 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid rgba(212, 175, 55, 0.45);
+}
+
+.effectifs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 360px), 1fr));
+  gap: 1rem;
+  align-items: start;
+}
+
+.effectif-admin-card {
+  margin: 0;
+  padding: 1.25rem;
+  min-width: 0;
+}
+
+.effectif-admin-card .form-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.6rem;
+}
+
+.effectif-admin-card label {
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 480px) {
+  .effectif-admin-card .form-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 .form-full {
   grid-column: 1 / -1;
 }
@@ -977,8 +1017,19 @@ async function loadEffectifs() {
             return;
         }
         
-        box.innerHTML = users.map(user => `
-            <div class="card">
+        const categories = [
+            { title: "Système", matches: grade => grade === HIDDEN_GRADE },
+            { title: "OFS · Officiers Supérieurs", matches: grade => /^(COL|LCL|CEN)\b/.test(grade) },
+            { title: "OFB · Officiers Subalternes", matches: grade => /^(CNE|LTN|SLT|ASP)\b/.test(grade) },
+            { title: "SOP · Sous-Officiers Supérieurs", matches: grade => /^(MAJ|ADC|ADJ)\b/.test(grade) },
+            { title: "SOB · Sous-Officiers Subalternes", matches: grade => /^(MDC|GDC|GDS|ELG)\b/.test(grade) },
+            { title: "GAV · Gendarmes Adjoints Volontaires", matches: grade => /^(MDL|BRC|BRI|GAV)\b/.test(grade) },
+            { title: "EGAV · Élèves Gendarmes Adjoints Volontaires", matches: grade => grade.startsWith("EGAV") },
+            { title: "Autres profils", matches: () => true }
+        ];
+
+        const cardForUser = user => `
+            <div class="card effectif-admin-card">
                 <h3>${escapeHtml(user.nomPrenom || user.username)}</h3>
                 <p><strong>Discord :</strong> ${escapeHtml(user.username)}</p>
                 <p><strong>ID :</strong> ${escapeHtml(user.id)}</p>
@@ -1025,7 +1076,24 @@ async function loadEffectifs() {
                 <button onclick="saveUser('${user.id}')">💾 Sauvegarder</button>
                 <button class="danger" onclick="deleteUser('${user.id}')">🗑️ Supprimer</button>
             </div>
-        `).join('');
+        `;
+
+        const remainingUsers = [...users];
+        box.innerHTML = categories.map((category, index) => {
+            const categoryUsers = remainingUsers.filter(user => category.matches(String(user.grade || "")));
+            if (!categoryUsers.length) return "";
+            for (const user of categoryUsers) {
+                const userIndex = remainingUsers.indexOf(user);
+                if (userIndex !== -1) remainingUsers.splice(userIndex, 1);
+            }
+
+            return `
+                <section class="effectifs-category${index === 0 ? " system-category" : ""}">
+                    <h3 class="effectifs-category-title">${escapeHtml(category.title)}</h3>
+                    <div class="effectifs-grid">${categoryUsers.map(cardForUser).join("")}</div>
+                </section>
+            `;
+        }).join("");
     } catch (err) {
         box.innerHTML = `<p class="muted">Erreur JS/API : ${escapeHtml(err.message)}</p>`;
     }
