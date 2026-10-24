@@ -257,6 +257,29 @@ button.cat-btn.active {
   gap: 1rem;
 }
 
+.ai-detection-box {
+  margin: 1.25rem 0;
+  padding: 1.25rem;
+  border: 1px solid rgba(212, 175, 55, 0.5);
+  border-radius: 10px;
+  background: rgba(12, 22, 52, 0.82);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.22);
+}
+
+.ai-detection-box > strong {
+  color: #e6c866;
+}
+
+.ai-detection-box p {
+  margin: 0.5rem 0;
+}
+
+.ai-detection-box small {
+  display: block;
+  color: #b0b0b0;
+  margin-top: 0.5rem;
+}
+
 .form-grid label {
   margin-top: 0;
 }
@@ -527,6 +550,7 @@ footer p {
 }
     </style>
 <link rel="stylesheet" href="/site-theme.css">
+    <script src="/header-navigation.js" defer></script>
 </head>
 <body>
 
@@ -542,45 +566,45 @@ footer p {
         <nav>
             <a href="/">Accueil</a>
             <a href="/dashboard.html">Dashboard</a>
-            <a href="/logout">Déconnexion</a>
+            <a href="/logout">DÃ©connexion</a>
         </nav>
     </div>
 </header>
 
 <main>
-    <h2>⚙️ Administration</h2>
+    <h2>âš™ï¸ Administration</h2>
 
     <div class="tabs">
         <button class="tab-btn active" onclick="switchTab('apps', this)">Candidatures</button>
         <button class="tab-btn" onclick="switchTab('effectifs', this)">Effectifs</button>
-        <button class="tab-btn" onclick="switchTab('patrouilles', this)">Véhicules</button>
+        <button class="tab-btn" onclick="switchTab('patrouilles', this)">VÃ©hicules</button>
         <button class="tab-btn" onclick="switchTab('roles', this)">Configuration</button>
         <button class="tab-btn" onclick="switchTab('jore', this)">Embed / Commandes</button>
     </div>
 
     <!-- TAB CANDIDATURES -->
     <div id="apps" class="tab-content active">
-        <h2 class="section-title">📋 Candidatures en Attente</h2>
+        <h2 class="section-title">ðŸ“‹ Candidatures en Attente</h2>
         <div id="appsContainer">Chargement...</div>
     </div>
 
     <!-- TAB EFFECTIFS -->
     <div id="effectifs" class="tab-content">
-        <h2 class="section-title">👥 Effectifs du Site</h2>
-        <p class="live-note">Le rafraîchissement automatique se met en pause tant que tu modifies un champ, pour ne pas écraser ta saisie.</p>
+        <h2 class="section-title">ðŸ‘¥ Effectifs du Site</h2>
+        <p class="live-note">Le rafraÃ®chissement automatique se met en pause tant que tu modifies un champ, pour ne pas Ã©craser ta saisie.</p>
         <div id="effectifsContainer">Chargement...</div>
     </div>
 
     <!-- TAB VEHICULES (ex Patrouilles) -->
     <div id="patrouilles" class="tab-content">
-        <h2 class="section-title">🚗 Gestion Véhicules</h2>
+        <h2 class="section-title">ðŸš— Gestion VÃ©hicules</h2>
 
         <div class="cat-tabs" id="vehCatTabs"></div>
 
-        <h3 id="vehCategoryTitle" style="color:#d4af37; margin-bottom: 1rem;">Catégorie : PAM</h3>
+        <h3 id="vehCategoryTitle" style="color:#d4af37; margin-bottom: 1rem;">CatÃ©gorie : PAM</h3>
 
         <div class="card">
-            <label>Ajouter un véhicule à cette catégorie</label>
+            <label>Ajouter un vÃ©hicule Ã  cette catÃ©gorie</label>
             <div class="vehicle-row">
                 <input type="text" id="newVehicleName" placeholder="Ex: 2024 Falcon eStallion">
                 <input type="color" id="newVehicleColor" value="#3f51b5">
@@ -593,19 +617,19 @@ footer p {
 
     <!-- TAB CONFIGURATION -->
     <div id="roles" class="tab-content">
-        <h2 class="section-title">Configuration des rôles Discord</h2>
+        <h2 class="section-title">Configuration des rÃ´les Discord</h2>
 
         <div class="card">
-            <h3>Spécialités</h3>
-            <p>Renseignez les identifiants des rôles Discord autorisés à gérer chaque spécialité.</p>
+            <h3>SpÃ©cialitÃ©s</h3>
+            <p>Renseignez les identifiants des rÃ´les Discord autorisÃ©s Ã  gÃ©rer chaque spÃ©cialitÃ©.</p>
             <div id="specialtyRoles"><p class="muted">Chargement...</p></div>
         </div>
 
         <div class="card">
             <h3>Renforts</h3>
-            <p>Associez chaque spécialité de renfort à son rôle Discord.</p>
+            <p>Associez chaque spÃ©cialitÃ© de renfort Ã  son rÃ´le Discord.</p>
             <div id="renfortRoles"><p class="muted">Chargement...</p></div>
-            <button onclick="saveRoleSettings()">Enregistrer les rôles</button>
+            <button onclick="saveRoleSettings()">Enregistrer les rÃ´les</button>
         </div>
 
         <div class="card">
@@ -615,21 +639,21 @@ footer p {
                 <div><label for="adminUsername">Pseudo Discord</label><input id="adminUsername" type="text" placeholder="Pseudo"></div>
                 <div><label for="adminGrade">Grade (facultatif)</label><input id="adminGrade" type="text" placeholder="Ex. LTN"></div>
             </div>
-            <button onclick="addAdmin()">Inviter l’administrateur</button>
+            <button onclick="addAdmin()">Inviter lâ€™administrateur</button>
             <div id="adminsList" style="margin-top: 1.5rem;"><p class="muted">Chargement...</p></div>
         </div>
     </div>
 
     <!-- TAB EMBED / COMMANDES (Jore) -->
     <div id="jore" class="tab-content">
-        <h2 class="section-title">🧩 Créateur d'embeds et commandes</h2>
+        <h2 class="section-title">ðŸ§© CrÃ©ateur d'embeds et commandes</h2>
         <iframe id="joreFrame" data-src="/admin/jore" style="width:100%;height:130vh;border:0;border-radius:8px"></iframe>
     </div>
 
 </main>
 
 <footer>
-    <p>© 2026 lexy_off1 — Tous droits réservés</p>
+    <p>Â© 2026 lexy_off1 â€” Tous droits rÃ©servÃ©s</p>
 </footer>
 
 <script>
@@ -637,17 +661,17 @@ let grades = [];
 let adminData = null;
 let currentTab = "apps";
 
-// Grade spécial "gag" pour compte de test : sélectionnable dans le menu Grade,
-// mais tout profil portant ce grade est masqué de la liste Effectifs (et donc
-// de tout ce qui s'appuie sur cette liste). Il n'est retiré de nulle part côté
-// backend : c'est juste filtré côté affichage ici.
-const HIDDEN_GRADE = "Système";
+// Grade spÃ©cial "gag" pour compte de test : sÃ©lectionnable dans le menu Grade,
+// mais tout profil portant ce grade est masquÃ© de la liste Effectifs (et donc
+// de tout ce qui s'appuie sur cette liste). Il n'est retirÃ© de nulle part cÃ´tÃ©
+// backend : c'est juste filtrÃ© cÃ´tÃ© affichage ici.
+const HIDDEN_GRADE = "SystÃ¨me";
 
 const VEH_CATEGORIES = ["PAM", "PSIG", "EDCF", "AGIGN", "GM", "PJGN", "GIC", "PGHM"];
 let vehicules = {};
 let currentVehCategory = "PAM";
 
-const POLL_INTERVAL_MS = 5000; // fréquence du rafraîchissement auto par onglet (5 secondes)
+const POLL_INTERVAL_MS = 5000; // frÃ©quence du rafraÃ®chissement auto par onglet (5 secondes)
 let isPolling = false;
 
 function switchTab(tabName, button) {
@@ -658,7 +682,7 @@ function switchTab(tabName, button) {
     button.classList.add('active');
     currentTab = tabName;
 
-    // L'iframe Jore ne se charge qu'à la première ouverture de l'onglet
+    // L'iframe Jore ne se charge qu'Ã  la premiÃ¨re ouverture de l'onglet
     if (tabName === 'jore') {
         const frame = document.getElementById('joreFrame');
         if (!frame.getAttribute('src')) frame.setAttribute('src', frame.dataset.src);
@@ -677,14 +701,15 @@ async function readResponse(response) {
     return data;
 }
 
-// Empêche le rafraîchissement auto d'écraser un champ (input/select/textarea)
-// que l'utilisateur est en train de modifier à l'intérieur d'un conteneur donné.
+// EmpÃªche le rafraÃ®chissement auto d'Ã©craser un champ (input/select/textarea)
+// que l'utilisateur est en train de modifier Ã  l'intÃ©rieur d'un conteneur donnÃ©.
 function isEditingInside(containerId) {
+    const container = document.getElementById(containerId);
+    if (container?.querySelector('[data-keep-render="true"]')) return true;
     const el = document.activeElement;
     if (!el) return false;
     const tag = el.tagName;
     if (tag !== "INPUT" && tag !== "TEXTAREA" && tag !== "SELECT") return false;
-    const container = document.getElementById(containerId);
     return container ? container.contains(el) : false;
 }
 
@@ -692,7 +717,7 @@ async function loadGrades() {
     try {
         const res = await fetch((window.API_BASE || "") + "/api/grades");
         grades = await res.json();
-        // Grade caché ajouté uniquement côté front, pour ne pas dépendre du backend.
+        // Grade cachÃ© ajoutÃ© uniquement cÃ´tÃ© front, pour ne pas dÃ©pendre du backend.
         if (!grades.includes(HIDDEN_GRADE)) grades.push(HIDDEN_GRADE);
         renderGradesList();
     } catch (err) {
@@ -701,7 +726,7 @@ async function loadGrades() {
 }
 
 function renderGradesList() {
-    // Les grades sont définis par le règlement côté serveur et alimentent les listes d'effectifs.
+    // Les grades sont dÃ©finis par le rÃ¨glement cÃ´tÃ© serveur et alimentent les listes d'effectifs.
 }
 
 // ---- Configuration administrateur ----
@@ -713,8 +738,8 @@ function getMergedSpecialities(catalog) {
 function roleInput(id, label, value) {
     return `<div class="form-grid" style="margin-top: 1rem; grid-template-columns: minmax(180px, 1fr) repeat(2, minmax(180px, 1fr));">
         <p style="align-self: end; margin: 0;"><strong>${escapeHtml(label)}</strong></p>
-        <div><label for="role-${id}-lead">Responsable</label><input id="role-${id}-lead" type="text" inputmode="numeric" value="${escapeHtml(value.responsableRoleId || '')}" placeholder="ID du rôle"></div>
-        <div><label for="role-${id}-deputy">Adjoint</label><input id="role-${id}-deputy" type="text" inputmode="numeric" value="${escapeHtml(value.adjointRoleId || '')}" placeholder="ID du rôle"></div>
+        <div><label for="role-${id}-lead">Responsable</label><input id="role-${id}-lead" type="text" inputmode="numeric" value="${escapeHtml(value.responsableRoleId || '')}" placeholder="ID du rÃ´le"></div>
+        <div><label for="role-${id}-deputy">Adjoint</label><input id="role-${id}-deputy" type="text" inputmode="numeric" value="${escapeHtml(value.adjointRoleId || '')}" placeholder="ID du rÃ´le"></div>
     </div>`;
 }
 
@@ -727,23 +752,23 @@ function renderAdminSettings() {
             responsableRoleId: saved.specialites?.[item.id]?.responsableRoleId || item.responsableRoleId,
             adjointRoleId: saved.specialites?.[item.id]?.adjointRoleId || item.adjointRoleId
         })).join('')
-        : '<p class="muted">Aucune spécialité configurée.</p>';
+        : '<p class="muted">Aucune spÃ©cialitÃ© configurÃ©e.</p>';
 
     const renforts = catalog.renfortRoles || {};
     document.getElementById('renfortRoles').innerHTML = Object.entries(renforts).map(([name, defaultId]) => {
         const value = saved.renfortRoles?.[name] || defaultId;
         return `<div class="form-grid" style="margin-top: 1rem; grid-template-columns: minmax(180px, 1fr) minmax(250px, 1fr);">
             <p style="align-self: end; margin: 0;"><strong>${escapeHtml(name)}</strong></p>
-            <div><label for="renfort-${escapeHtml(name)}">ID du rôle</label><input id="renfort-${escapeHtml(name)}" type="text" inputmode="numeric" value="${escapeHtml(value)}"></div>
+            <div><label for="renfort-${escapeHtml(name)}">ID du rÃ´le</label><input id="renfort-${escapeHtml(name)}" type="text" inputmode="numeric" value="${escapeHtml(value)}"></div>
         </div>`;
-    }).join('') || '<p class="muted">Aucun rôle de renfort configuré.</p>';
+    }).join('') || '<p class="muted">Aucun rÃ´le de renfort configurÃ©.</p>';
 
     const admins = adminData?.admins || [];
     document.getElementById('adminsList').innerHTML = admins.length ? admins.map(admin => `
-        <div class="vehicle-row"><span style="flex: 1;"><strong>${escapeHtml(admin.username)}</strong><br><small>${escapeHtml(admin.discordId)}${admin.grade ? ` · ${escapeHtml(admin.grade)}` : ''}</small></span>
+        <div class="vehicle-row"><span style="flex: 1;"><strong>${escapeHtml(admin.username)}</strong><br><small>${escapeHtml(admin.discordId)}${admin.grade ? ` Â· ${escapeHtml(admin.grade)}` : ''}</small></span>
         <span class="status-badge ${admin.passwordSet ? 'status-active' : 'status-pending'}">${admin.passwordSet ? 'Actif' : 'Invitation en attente'}</span>
         <button class="danger" onclick="deleteAdmin('${escapeHtml(admin.id)}')">Retirer</button></div>`).join('')
-        : '<p class="muted">Aucun administrateur invité.</p>';
+        : '<p class="muted">Aucun administrateur invitÃ©.</p>';
 }
 
 async function loadAdminSettings() {
@@ -771,7 +796,7 @@ async function saveRoleSettings() {
             method: 'POST', headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ specialites, renfortRoles })
         }));
-        alert('Configuration des rôles enregistrée.');
+        alert('Configuration des rÃ´les enregistrÃ©e.');
         await loadAdminSettings();
     } catch (error) { alert(error.message); }
 }
@@ -780,7 +805,7 @@ async function addAdmin() {
     const discordId = document.getElementById('adminDiscordId').value.trim();
     const username = document.getElementById('adminUsername').value.trim();
     const grade = document.getElementById('adminGrade').value.trim();
-    if (!discordId || !username) return alert('L’ID Discord et le pseudo sont requis.');
+    if (!discordId || !username) return alert('Lâ€™ID Discord et le pseudo sont requis.');
     try {
         await readResponse(await fetch('/api/admin/add-user', {
             method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -789,7 +814,7 @@ async function addAdmin() {
         document.getElementById('adminDiscordId').value = '';
         document.getElementById('adminUsername').value = '';
         document.getElementById('adminGrade').value = '';
-        alert('Invitation envoyée par message privé Discord.');
+        alert('Invitation envoyÃ©e par message privÃ© Discord.');
         await loadAdminSettings();
     } catch (error) { alert(error.message); }
 }
@@ -804,7 +829,7 @@ async function deleteAdmin(userId) {
     } catch (error) { alert(error.message); }
 }
 
-// ---- Gestion Véhicules ----
+// ---- Gestion VÃ©hicules ----
 
 function renderVehCatTabs() {
     const box = document.getElementById('vehCatTabs');
@@ -815,7 +840,7 @@ function renderVehCatTabs() {
 
 function selectVehCategory(cat) {
     currentVehCategory = cat;
-    document.getElementById('vehCategoryTitle').textContent = 'Catégorie : ' + cat;
+    document.getElementById('vehCategoryTitle').textContent = 'CatÃ©gorie : ' + cat;
     renderVehCatTabs();
     renderVehiclesList();
 }
@@ -825,7 +850,7 @@ function renderVehiclesList() {
     const list = vehicules[currentVehCategory] || [];
 
     if (list.length === 0) {
-        box.innerHTML = '<p class="muted">Aucun véhicule dans cette catégorie.</p>';
+        box.innerHTML = '<p class="muted">Aucun vÃ©hicule dans cette catÃ©gorie.</p>';
         return;
     }
 
@@ -844,15 +869,15 @@ function renderVehiclesList() {
 }
 
 async function loadVehicules() {
-    // On affiche les catégories tout de suite, avant même la réponse de l'API :
-    // comme ça les boutons sont toujours visibles, même si le backend n'est pas encore prêt.
+    // On affiche les catÃ©gories tout de suite, avant mÃªme la rÃ©ponse de l'API :
+    // comme Ã§a les boutons sont toujours visibles, mÃªme si le backend n'est pas encore prÃªt.
     renderVehCatTabs();
 
     try {
         const res = await fetch((window.API_BASE || "") + "/api/vehicules");
 
         if (!res.ok) {
-            document.getElementById('vehiclesList').innerHTML = '<p class="muted">Erreur : le serveur a répondu ' + res.status + '. Vérifie que /api/vehicules existe côté backend.</p>';
+            document.getElementById('vehiclesList').innerHTML = '<p class="muted">Erreur : le serveur a rÃ©pondu ' + res.status + '. VÃ©rifie que /api/vehicules existe cÃ´tÃ© backend.</p>';
             return;
         }
 
@@ -860,7 +885,7 @@ async function loadVehicules() {
         renderVehiclesList();
     } catch (err) {
         console.error("Erreur loadVehicules:", err);
-        document.getElementById('vehiclesList').innerHTML = '<p class="muted">Impossible de contacter le serveur (' + escapeHtml(err.message) + '). Les boutons de catégorie restent visibles mais aucun véhicule ne peut être chargé/ajouté tant que /api/vehicules ne répond pas.</p>';
+        document.getElementById('vehiclesList').innerHTML = '<p class="muted">Impossible de contacter le serveur (' + escapeHtml(err.message) + '). Les boutons de catÃ©gorie restent visibles mais aucun vÃ©hicule ne peut Ãªtre chargÃ©/ajoutÃ© tant que /api/vehicules ne rÃ©pond pas.</p>';
     }
 }
 
@@ -871,7 +896,7 @@ async function addVehicle() {
     const color = colorInput.value;
 
     if (!name) {
-        alert("Entrez un nom de véhicule.");
+        alert("Entrez un nom de vÃ©hicule.");
         return;
     }
 
@@ -902,7 +927,7 @@ async function updateVehicle(index) {
     const color = document.getElementById(`vehColor-${currentVehCategory}-${index}`).value;
 
     if (!name) {
-        alert("Le nom ne peut pas être vide.");
+        alert("Le nom ne peut pas Ãªtre vide.");
         return;
     }
 
@@ -917,7 +942,7 @@ async function updateVehicle(index) {
         if (data.success) {
             await loadVehicules();
         } else {
-            alert(data.error || "Erreur lors de la mise à jour.");
+            alert(data.error || "Erreur lors de la mise Ã  jour.");
         }
     } catch (err) {
         console.error("Erreur updateVehicle:", err);
@@ -925,7 +950,7 @@ async function updateVehicle(index) {
 }
 
 async function deleteVehicle(name) {
-    if (!confirm(`Supprimer le véhicule "${name}" ?`)) return;
+    if (!confirm(`Supprimer le vÃ©hicule "${name}" ?`)) return;
 
     try {
         await fetch((window.API_BASE || "") + "/api/vehicules/delete", {
@@ -941,23 +966,35 @@ async function deleteVehicle(name) {
 
 // ---- Candidatures / Effectifs ----
 
+function formatAIDetectionResult(aiDetection) {
+    if (!aiDetection) return "Aucune analyse lancee.";
+    const score = Number(aiDetection.score ?? aiDetection.fakePercentage);
+    if (!Number.isFinite(score)) return "Dernier resultat IA enregistre.";
+
+    const provider = aiDetection.provider || "Detecteur IA";
+    const confidence = aiDetection.confidence ? " (confiance " + aiDetection.confidence + ")" : "";
+    const range = aiDetection.range ? "; fourchette " + aiDetection.range.low + "-" + aiDetection.range.high + "/100" : "";
+    const checkedAt = aiDetection.checkedAt ? new Date(aiDetection.checkedAt).toLocaleString("fr-FR") : "date inconnue";
+    return "Dernier score " + provider + " : " + score.toFixed(1) + "/100" + range + confidence + ". Analyse : " + checkedAt + ".";
+}
+
 async function loadApps() {
     const box = document.getElementById('appsContainer');
     const pasteFieldLabels = {
         nom: 'Nom',
-        prenom: 'Prénom',
+        prenom: 'PrÃ©nom',
         email: 'Pseudo Discord',
         telephone: 'ID Discord',
         dateNaissance: 'Date de naissance',
-        diplome: 'Diplôme',
-        experience: 'Expérience professionnelle',
+        diplome: 'DiplÃ´me',
+        experience: 'ExpÃ©rience professionnelle',
         motivation: 'Motivation',
-        roleplay: 'Expériences antérieures',
-        disponibilites: 'Disponibilités',
+        roleplay: 'ExpÃ©riences antÃ©rieures',
+        disponibilites: 'DisponibilitÃ©s',
         miseEnSituation: 'Mise en situation'
     };
     const formatCompletionTime = seconds => {
-        if (!Number.isInteger(seconds) || seconds < 0 || seconds > 86400) return 'Non mesurée';
+        if (!Number.isInteger(seconds) || seconds < 0 || seconds > 86400) return 'Non mesurÃ©e';
         const minutes = Math.floor(seconds / 60);
         const remainingSeconds = seconds % 60;
         return minutes ? `${minutes} min ${remainingSeconds} s` : `${remainingSeconds} s`;
@@ -977,29 +1014,73 @@ async function loadApps() {
         box.innerHTML = pending.map(app => `
     <div class="card">
         <h3>${escapeHtml(app.nomPrenom || app.user || 'Sans nom')}</h3>
-        <p><strong>Temps écoulé depuis la première saisie :</strong> ${escapeHtml(formatCompletionTime(app.completionTimeSeconds))}</p>
-        <p><strong>Collage signalé par le navigateur :</strong> ${Array.isArray(app.pastedFields) && app.pastedFields.length
+        <p><strong>Temps Ã©coulÃ© depuis la premiÃ¨re saisie :</strong> ${escapeHtml(formatCompletionTime(app.completionTimeSeconds))}</p>
+        <p><strong>Collage signalÃ© par le navigateur :</strong> ${Array.isArray(app.pastedFields) && app.pastedFields.length
             ? escapeHtml([...new Set(app.pastedFields.filter(field => Object.hasOwn(pasteFieldLabels, field)))].map(field => pasteFieldLabels[field]).join(', '))
-            : 'Aucun signal enregistré'}</p>
-        <p class="muted">Ces signaux sont indicatifs et peuvent être contournés ou déclenchés par erreur ; ils ne prouvent pas une fraude ni l’usage d’une IA. Aucun détecteur d’IA fiable n’est activé.</p>
-        <p><strong>Discord :</strong> ${escapeHtml(app.user || app.username || 'Non renseigné')}</p>
-        <p><strong>ID :</strong> ${escapeHtml(app.discordId || 'Non renseigné')}</p>
+            : 'Aucun signal enregistrÃ©'}</p>
+        <p class="muted">Le score est un indice de ressemblance avec du texte IA, pas la proportion exacte ecrite par IA. Il peut se tromper et ne prouve rien a lui seul : une relecture humaine reste necessaire.</p>
+        <p><strong>Discord :</strong> ${escapeHtml(app.user || app.username || 'Non renseignÃ©')}</p>
+        <p><strong>ID :</strong> ${escapeHtml(app.discordId || 'Non renseignÃ©')}</p>
         <p><strong>Motivation :</strong> ${escapeHtml(app.motivation || "Aucune")}</p>
-        <p><strong>Expérience :</strong> ${escapeHtml(app.experience || "Aucune")}</p>
-        <p><strong>Expériences antérieures :</strong> ${escapeHtml(app.roleplay || "Aucune")}</p>
-        <p><strong>Disponibilités :</strong> ${escapeHtml(app.disponibilites || "Non renseignées")}</p>
+        <p><strong>ExpÃ©rience :</strong> ${escapeHtml(app.experience || "Aucune")}</p>
+        <p><strong>ExpÃ©riences antÃ©rieures :</strong> ${escapeHtml(app.roleplay || "Aucune")}</p>
+        <p><strong>DisponibilitÃ©s :</strong> ${escapeHtml(app.disponibilites || "Non renseignÃ©es")}</p>
         <p><strong>Mise en situation :</strong> ${escapeHtml(app.miseEnSituation || "Aucune")}</p>
-        <p><strong>Diplôme :</strong> ${escapeHtml(app.diplome || "Non renseigné")}</p>
+        <p><strong>DiplÃ´me :</strong> ${escapeHtml(app.diplome || "Non renseignÃ©")}</p>
+
+        <div class="ai-detection-box">
+            <strong>Analyse IA avec WrittenCheck</strong>
+            <p id="aiDetectionResult-${app.id}" class="muted">${escapeHtml(formatAIDetectionResult(app.aiDetection))}</p>
+            <button id="aiDetectionButton-${app.id}" type="button" onclick="detectApplicationAI(${app.id})">Analyser les reponses</button>
+            <small>AI detection by <a href="https://writtencheck.com" target="_blank" rel="noopener noreferrer">WrittenCheck</a>. Les reponses sont envoyees au service et le quota gratuit s'applique.</small>
+        </div>
 
         <label for="appMsg-${app.id}">Message au candidat</label>
-        <textarea id="appMsg-${app.id}" placeholder="Message qui sera envoyé en MP Discord avec la décision"></textarea>
+        <textarea id="appMsg-${app.id}" placeholder="Message qui sera envoyÃ© en MP Discord avec la dÃ©cision"></textarea>
 
-        <button onclick="acceptApp(${app.id})">✅ Accepter</button>
-        <button class="danger" onclick="rejectApp(${app.id})">❌ Refuser</button>
+        <button onclick="acceptApp(${app.id})">âœ… Accepter</button>
+        <button class="danger" onclick="rejectApp(${app.id})">âŒ Refuser</button>
     </div>
 `).join('');
     } catch (err) {
         box.innerHTML = `<p class="muted">Erreur JS/API : ${escapeHtml(err.message)}</p>`;
+    }
+}
+
+async function detectApplicationAI(applicationId) {
+    const button = document.getElementById(`aiDetectionButton-${applicationId}`);
+    const result = document.getElementById(`aiDetectionResult-${applicationId}`);
+    if (!button || !result) return;
+
+    button.disabled = true;
+    button.dataset.keepRender = "true";
+    const originalLabel = button.textContent;
+    button.textContent = "Analyse en cours...";
+    result.textContent = "Envoi des reponses a WrittenCheck...";
+
+    try {
+        const response = await fetch(`${window.API_BASE || ""}/api/applications/${applicationId}/ai-detection`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: "{}"
+        });
+        const data = await readResponse(response);
+        const score = Number(data.aiDetection?.score);
+        if (!Number.isFinite(score)) throw new Error("WrittenCheck n'a pas renvoye de score.");
+
+        const range = data.aiDetection.range;
+        const rangeText = range ? ` Fourchette estimee : ${range.low}-${range.high}/100.` : "";
+        const confidence = data.aiDetection.confidence ? ` Confiance : ${data.aiDetection.confidence}.` : "";
+        const checkedAt = new Date(data.aiDetection.checkedAt).toLocaleString("fr-FR");
+        result.textContent = `WrittenCheck : score ${score.toFixed(1)}/100, indice de ressemblance a l'IA.${rangeText}${confidence} Analyse : ${checkedAt}.`;
+    } catch (error) {
+        result.textContent = error.message || "L'analyse IA a Ã©chouÃ©.";
+    } finally {
+        if (button.isConnected) {
+            button.disabled = false;
+            button.textContent = originalLabel;
+            delete button.dataset.keepRender;
+        }
     }
 }
 
@@ -1010,21 +1091,21 @@ async function loadEffectifs() {
         const res = await fetch((window.API_BASE || "") + "/api/users");
         const users = await readResponse(res);
 
-        // Le grade "Système" (HIDDEN_GRADE) reste affiché ici, dans le panel admin :
-        // il n'est masqué que là où toi tu décides de le filtrer explicitement.
+        // Le grade "SystÃ¨me" (HIDDEN_GRADE) reste affichÃ© ici, dans le panel admin :
+        // il n'est masquÃ© que lÃ  oÃ¹ toi tu dÃ©cides de le filtrer explicitement.
         if (users.length === 0) {
-            box.innerHTML = '<p class="muted">Aucun effectif enregistré.</p>';
+            box.innerHTML = '<p class="muted">Aucun effectif enregistrÃ©.</p>';
             return;
         }
         
         const categories = [
-            { title: "Système", matches: grade => grade === HIDDEN_GRADE },
-            { title: "OFS · Officiers Supérieurs", matches: grade => /^(COL|LCL|CEN)\b/.test(grade) },
-            { title: "OFB · Officiers Subalternes", matches: grade => /^(CNE|LTN|SLT|ASP)\b/.test(grade) },
-            { title: "SOP · Sous-Officiers Supérieurs", matches: grade => /^(MAJ|ADC|ADJ)\b/.test(grade) },
-            { title: "SOB · Sous-Officiers Subalternes", matches: grade => /^(MDC|GDC|GDS|ELG)\b/.test(grade) },
-            { title: "GAV · Gendarmes Adjoints Volontaires", matches: grade => /^(MDL|BRC|BRI|GAV)\b/.test(grade) },
-            { title: "EGAV · Élèves Gendarmes Adjoints Volontaires", matches: grade => grade.startsWith("EGAV") },
+            { title: "SystÃ¨me", matches: grade => grade === HIDDEN_GRADE },
+            { title: "OFS Â· Officiers SupÃ©rieurs", matches: grade => /^(COL|LCL|CEN)\b/.test(grade) },
+            { title: "OFB Â· Officiers Subalternes", matches: grade => /^(CNE|LTN|SLT|ASP)\b/.test(grade) },
+            { title: "SOP Â· Sous-Officiers SupÃ©rieurs", matches: grade => /^(MAJ|ADC|ADJ)\b/.test(grade) },
+            { title: "SOB Â· Sous-Officiers Subalternes", matches: grade => /^(MDC|GDC|GDS|ELG)\b/.test(grade) },
+            { title: "GAV Â· Gendarmes Adjoints Volontaires", matches: grade => /^(MDL|BRC|BRI|GAV)\b/.test(grade) },
+            { title: "EGAV Â· Ã‰lÃ¨ves Gendarmes Adjoints Volontaires", matches: grade => grade.startsWith("EGAV") },
             { title: "Autres profils", matches: () => true }
         ];
 
@@ -1036,7 +1117,7 @@ async function loadEffectifs() {
                 
                 <div class="form-grid">
                     <div>
-                        <label>Nom / Prénom</label>
+                        <label>Nom / PrÃ©nom</label>
                         <input id="nom-${user.id}" type="text" value="${escapeHtml(user.nomPrenom)}">
                     </div>
                     <div>
@@ -1046,7 +1127,7 @@ async function loadEffectifs() {
                     <div>
                         <label>Grade</label>
                         <select id="grade-${user.id}" onchange="updateQJFromGrade('${user.id}')">
-                            <option value="">-- Sélectionner --</option>
+                            <option value="">-- SÃ©lectionner --</option>
                             ${grades.map(g => `<option value="${escapeHtml(g)}" ${user.grade === g ? 'selected' : ''}>${escapeHtml(g)}</option>`).join('')}
                         </select>
                     </div>
@@ -1060,7 +1141,7 @@ async function loadEffectifs() {
                         </select>
                     </div>
                     <div>
-                        <label>Spécialisation</label>
+                        <label>SpÃ©cialisation</label>
                         <input id="spe-${user.id}" type="text" value="${escapeHtml(user.specialisation)}">
                     </div>
                     <div>
@@ -1068,13 +1149,13 @@ async function loadEffectifs() {
                         <select id="statut-${user.id}">
                             <option ${user.statut === 'Actif' ? 'selected' : ''}>Actif</option>
                             <option ${user.statut === 'Suspendu' ? 'selected' : ''}>Suspendu</option>
-                            <option ${user.statut === 'Retraité' ? 'selected' : ''}>Retraité</option>
+                            <option ${user.statut === 'RetraitÃ©' ? 'selected' : ''}>RetraitÃ©</option>
                         </select>
                     </div>
                 </div>
                 
-                <button onclick="saveUser('${user.id}')">💾 Sauvegarder</button>
-                <button class="danger" onclick="deleteUser('${user.id}')">🗑️ Supprimer</button>
+                <button onclick="saveUser('${user.id}')">ðŸ’¾ Sauvegarder</button>
+                <button class="danger" onclick="deleteUser('${user.id}')">ðŸ—‘ï¸ Supprimer</button>
             </div>
         `;
 
@@ -1140,16 +1221,16 @@ async function acceptApp(id) {
             body: JSON.stringify({ message })
         }));
 
-        const lignes = ["✅ Candidature acceptée."];
+        const lignes = ["âœ… Candidature acceptÃ©e."];
         lignes.push(data.roleAdded
-            ? "✅ Rôle EGAV attribué sur Discord."
-            : `⚠️ Rôle EGAV NON attribué (${data.roleError || "erreur inconnue"}). Donne-le à la main.`);
+            ? "âœ… RÃ´le EGAV attribuÃ© sur Discord."
+            : `âš ï¸ RÃ´le EGAV NON attribuÃ© (${data.roleError || "erreur inconnue"}). Donne-le Ã  la main.`);
         lignes.push(data.nickSet
-            ? "✅ Pseudo serveur changé en « EGAV • Nom Prénom »."
-            : `⚠️ Pseudo NON modifié (${data.nickError || "erreur inconnue"}). Change-le à la main.`);
+            ? "âœ… Pseudo serveur changÃ© en Â« EGAV â€¢ Nom PrÃ©nom Â»."
+            : `âš ï¸ Pseudo NON modifiÃ© (${data.nickError || "erreur inconnue"}). Change-le Ã  la main.`);
         lignes.push(data.dmSent
-            ? "✅ MP envoyé au candidat."
-            : "⚠️ MP non envoyé (le candidat a fermé ses MP).");
+            ? "âœ… MP envoyÃ© au candidat."
+            : "âš ï¸ MP non envoyÃ© (le candidat a fermÃ© ses MP).");
         alert(lignes.join("\n"));
 
         loadApps();
@@ -1167,8 +1248,8 @@ async function rejectApp(id) {
         }));
 
         alert(data.dmSent
-            ? "❌ Candidature refusée. MP envoyé au candidat (aucun rôle donné)."
-            : "❌ Candidature refusée (aucun rôle donné). ⚠️ MP non envoyé : le candidat a fermé ses MP.");
+            ? "âŒ Candidature refusÃ©e. MP envoyÃ© au candidat (aucun rÃ´le donnÃ©)."
+            : "âŒ Candidature refusÃ©e (aucun rÃ´le donnÃ©). âš ï¸ MP non envoyÃ© : le candidat a fermÃ© ses MP.");
 
         loadApps();
     } catch (err) { alert(err.message || "Impossible de refuser cette candidature."); }
@@ -1188,17 +1269,17 @@ async function saveUser(id) {
                 statut: document.getElementById(`statut-${id}`).value
             })
         }));
-        alert("Profil sauvegardé.");
+        alert("Profil sauvegardÃ©.");
         loadEffectifs();
     } catch (err) { alert(err.message || "Impossible de sauvegarder ce profil."); }
 }
 
 async function deleteUser(id) {
-    if (!confirm("Supprimer définitivement ce profil ?")) return;
+    if (!confirm("Supprimer dÃ©finitivement ce profil ?")) return;
     
     try {
         await readResponse(await fetch(`${window.API_BASE || ""}/api/user/${id}`, { method: "DELETE" }));
-        alert("Profil supprimé.");
+        alert("Profil supprimÃ©.");
         loadEffectifs();
     } catch (err) { alert(err.message || "Impossible de supprimer ce profil."); }
 }
