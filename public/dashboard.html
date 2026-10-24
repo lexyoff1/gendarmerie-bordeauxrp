@@ -430,9 +430,19 @@ footer p {
     function cleanNomPrenom(nom) {
         if (!nom) return "";
 
-        return nom
+        return String(nom)
             .replace(/^(COL|LCL|CEN|CNE|LTN|SLT|ASP|MAJ|ADC|ADJ|MDC|GDC|GDS|ELG|MDL|BRC|BRI|GAV)\s*・\s*/i, "")
             .replace(/^(COL|LCL|CEN|CNE|LTN|SLT|ASP|MAJ|ADC|ADJ|MDC|GDC|GDS|ELG|MDL|BRC|BRI|GAV)\s*-\s*\d+\s*[•·]\s*/i, "");
+    }
+
+    function escapeHtml(value) {
+        return String(value ?? "").replace(/[&<>"']/g, character => ({
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#39;"
+        })[character]);
     }
 
     function loadProfile() {
@@ -450,7 +460,7 @@ footer p {
                 }
 
                 const avatar = user.avatar
-                    ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`
+                    ? `https://cdn.discordapp.com/avatars/${encodeURIComponent(user.id)}/${encodeURIComponent(user.avatar)}.png`
                     : "https://cdn.discordapp.com/embed/avatars/0.png";
 
                 const dateServeur = user.dateArriveeServeur
@@ -459,16 +469,16 @@ footer p {
 
                 box.innerHTML = `
                     <div class="id-card">
-                        <img src="${avatar}" class="avatar" alt="Avatar">
+                        <img src="${escapeHtml(avatar)}" class="avatar" alt="Avatar">
 
-                        <h2>${cleanNomPrenom(user.nomPrenom || user.username)}</h2>
+                        <h2>${escapeHtml(cleanNomPrenom(user.nomPrenom || user.username))}</h2>
 
-                        <p><b>NIGEND :</b> ${user.NIGEND || "Non attribué"}</p>
-                        <p><b>Grade :</b> ${user.grade || "Non attribué"}</p>
-                        <p><b>Qualification Judiciaire :</b> ${user.qualificationJudiciaire || "Non attribuée"}</p>
-                        <p><b>Statut :</b> ${user.statut || "Actif"}</p>
-                        <p><b>Date d'arrivée serveur :</b> ${dateServeur}</p>
-                        <p><b>Discord :</b> ${user.username}</p>
+                        <p><b>NIGEND :</b> ${escapeHtml(user.NIGEND || "Non attribué")}</p>
+                        <p><b>Grade :</b> ${escapeHtml(user.grade || "Non attribué")}</p>
+                        <p><b>Qualification Judiciaire :</b> ${escapeHtml(user.qualificationJudiciaire || "Non attribuée")}</p>
+                        <p><b>Statut :</b> ${escapeHtml(user.statut || "Actif")}</p>
+                        <p><b>Date d'arrivée serveur :</b> ${escapeHtml(dateServeur)}</p>
+                        <p><b>Discord :</b> ${escapeHtml(user.username)}</p>
                     </div>
                 `;
             })
