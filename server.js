@@ -457,11 +457,12 @@ if (process.env.NODE_ENV === "production" &&
     throw new Error("SESSION_SECRET doit contenir au moins 32 caractères en production.");
 }
 
-// Derrière un proxy (Render, Railway, Nginx, Cloudflare...) : nécessaire pour que
-// req.ip soit la vraie IP du visiteur et que la protection brute force fonctionne.
-// Mettre TRUST_PROXY=1 dans le .env si l'hébergeur utilise un reverse proxy.
-if (process.env.TRUST_PROXY) {
-    const value = process.env.TRUST_PROXY;
+// En production, le site est servi derrière le proxy HTTPS de l'hébergeur.
+// Express doit lui faire confiance pour reconnaître HTTPS et émettre le cookie
+// de session Secure, nécessaire pour retrouver l'état OAuth au retour de Discord.
+// TRUST_PROXY permet de remplacer cette valeur selon la topologie de l'hébergeur.
+if (process.env.TRUST_PROXY || process.env.NODE_ENV === "production") {
+    const value = process.env.TRUST_PROXY || "1";
     app.set("trust proxy", /^\d+$/.test(value) ? Number(value) : value === "true" ? 1 : value);
 }
 
@@ -623,6 +624,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/assets", express.static("public/assets"));
 // Avatars Discord synchronisés par Jore (voir avatar-sync.js)
 app.use("/avatars", express.static(process.env.AVATARS_DIR || path.join(__dirname, "public", "assets", "avatars")));
+app.use("/site-theme.css", express.static(path.join(__dirname, "public", "site-theme.css")));
 app.use("/style.css", express.static("public/style.css"));
 app.use("/script.js", express.static("public/script.js"));
 
@@ -1570,36 +1572,88 @@ app.post("/api/candidatures", candidatureLimiter, async (req, res) => {
         return res.status(401).json({ error: "Connexion Discord requise." });
     }
 
-    // On ignore ce qu'envoie le client : pseudo et ID viennent de la session (fiables)
-    req.body.email = req.session.user.username;
-    req.body.telephone = req.session.user.id;
+    const body = req.body && typeof req.body === "object" && !Array.isArray(req.body)
+        ? req.body
+        : {};
+    const readText = (field, maxLength, minLength = 1) => {
+        if (typeof body[field] !== "string") return null;
+        const value = body[field].trim();
+        return value.length >= minLength && value.length <= maxLength ? value : null;
+    };
 
-    const requiredFields = [
-        "nom", "prenom", "email", "telephone", "dateNaissance",
-        "diplome", "experience", "motivation"
-    ];
+    const nom = readText("nom", 50);
+    const prenom = readText("prenom", 50);
+    const experience = readText("experience", 1000, 10);
+    const motivation = readText("motivation", 2000, 10);
+    const roleplay = readText("roleplay", 600, 10);
+    const disponibilites = readText("disponibilites", 300);
+    const miseEnSituation = readText("miseEnSituation", 600, 10);
+    const dateNaissance = body.dateNaissance;
+    const dateValue = typeof dateNaissance === "string" && /^\d{4}-\d{2}-\d{2}$/.test(dateNaissance)
+        ? new Date(`${dateNaissance}T00:00:00.000Z`)
+        : null;
+    const today = new Date().toISOString().slice(0, 10);
 
-    if (requiredFields.some(field => !String(req.body[field] || "").trim())) {
-        return res.status(400).json({ error: "Merci de remplir tous les champs." });
+    if (
+        !nom || !prenom || !experience || !motivation || !roleplay ||
+        !disponibilites || !miseEnSituation ||
+        !dateValue || Number.isNaN(dateValue.getTime()) ||
+        dateValue.toISOString().slice(0, 10) !== dateNaissance ||
+        dateNaissance < "1900-01-01" || dateNaissance > today
+    ) {
+        return res.status(400).json({ error: "Vérifiez les champs obligatoires et leurs formats." });
+    }
+
+    const diplomaValue = body.diplome === undefined || body.diplome === null ? "" : body.diplome;
+    const diplome = typeof diplomaValue === "string" ? diplomaValue.trim() : null;
+    const allowedDiplomas = new Set(["", "aucun", "bac", "bac-pro-securite", "bac+2", "bac+3", "bac+5"]);
+    if (diplome === null || !allowedDiplomas.has(diplome)) {
+        return res.status(400).json({ error: "Le diplôme sélectionné est invalide." });
+    }
+
+    const trackedFields = new Set([
+        "nom", "prenom", "email", "telephone", "dateNaissance", "diplome",
+        "experience", "motivation", "roleplay", "disponibilites", "miseEnSituation"
+    ]);
+    const pastedFields = Array.isArray(body.pastedFields)
+        ? [...new Set(body.pastedFields.filter(field => typeof field === "string" && trackedFields.has(field)))]
+        : [];
+    const completionTimeSeconds = Number.isInteger(body.completionTimeSeconds) &&
+        body.completionTimeSeconds >= 0 && body.completionTimeSeconds <= 86400
+        ? body.completionTimeSeconds
+        : null;
+
+    // Le pseudo et l'identifiant proviennent de la session Discord, jamais du formulaire.
+    const discordId = String(req.session.user.id);
+    const discordUsername = typeof req.session.user.username === "string"
+        ? req.session.user.username.trim()
+        : "";
+    if (!/^\d{17,20}$/.test(discordId) || !discordUsername) {
+        return res.status(401).json({ error: "Session Discord invalide. Reconnectez-vous." });
     }
 
     const db = getData();
 
     // Une seule candidature en attente par personne
-    if (db.applications.some(a => a.discordId === req.session.user.id && a.status === "En attente")) {
+    if (db.applications.some(a => a.discordId === discordId && a.status === "En attente")) {
         return res.status(409).json({ error: "Vous avez déjà une candidature en attente." });
     }
 
     const application = {
         id: Date.now(),
-        nomPrenom: `${req.body.nom.trim()} ${req.body.prenom.trim()}`,
-        user: req.body.email.trim(),
-        username: req.body.email.trim(),
-        discordId: req.body.telephone.trim(),
-        dateNaissance: req.body.dateNaissance,
-        diplome: req.body.diplome.trim(),
-        experience: req.body.experience.trim(),
-        motivation: req.body.motivation.trim(),
+        nomPrenom: `${nom} ${prenom}`,
+        user: discordUsername,
+        username: discordUsername,
+        discordId,
+        dateNaissance,
+        diplome,
+        experience,
+        motivation,
+        roleplay,
+        disponibilites,
+        miseEnSituation,
+        pastedFields,
+        completionTimeSeconds,
         status: "En attente",
         createdAt: new Date().toISOString()
     };
