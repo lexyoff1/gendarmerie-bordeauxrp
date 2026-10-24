@@ -2586,14 +2586,12 @@ app.get("/api/applications", requireAdminAccess, async (req, res) => {
 // 1) statut "Acceptée"  2) création du profil EGAV  3) rôle EGAV donné sur Discord
 // 4) MP au candidat     5) MP de suivi à APPLICATION_DECISION_NOTIFY_ID
 app.post("/api/applications/:id/ai-detection", requireAdminAccess, async (req, res) => {
-    if (!(await isAdmin(req))) return res.status(403).json({ error: "Accès refusé" });
+    if (!(await isAdmin(req))) return res.status(403).json({ error: "Acc?s refus?" });
 
-    const email = process.env.ZEROGPT_EMAIL;
-    const password = process.env.ZEROGPT_PASSWORD;
-    const apiKey = process.env.ZEROGPT_API_KEY;
-    if (!email || !password || !apiKey) {
+    const apiKey = process.env.WRITTENCHECK_API_KEY;
+    if (!apiKey) {
         return res.status(503).json({
-            error: "ZeroGPT n'est pas configuré. Ajoutez ZEROGPT_EMAIL, ZEROGPT_PASSWORD et ZEROGPT_API_KEY aux variables d'environnement."
+            error: "WrittenCheck n'est pas configur?. Ajoutez WRITTENCHECK_API_KEY aux variables d'environnement."
         });
     }
 
@@ -2611,47 +2609,47 @@ app.post("/api/applications/:id/ai-detection", requireAdminAccess, async (req, r
         .map(value => value.trim())
         .join("\n\n");
 
-    if (!text) return res.status(400).json({ error: "Aucune réponse à analyser." });
+    const wordCount = text.trim() ? text.trim().split(/\s+/).length : 0;
+    if (wordCount < 40 || wordCount > 3000) {
+        return res.status(400).json({ error: "WrittenCheck accepte entre 40 et 3 000 mots par analyse." });
+    }
 
     try {
-        const login = await axios.post("https://api.zerogpt.com/api/auth/login", {
-            email,
-            password
-        }, { timeout: 15000 });
-        const token = login.data?.data?.token || login.data?.token || login.data?.data?.access_token;
-        if (typeof token !== "string" || !token) {
-            return res.status(502).json({ error: "ZeroGPT n'a pas fourni de jeton d'accès valide." });
-        }
-
-        const detection = await axios.post("https://api.zerogpt.com/api/detect/detectText", {
-            input_text: text
+        const detection = await axios.post("https://writtencheck.com/api/v1/detect", {
+            text,
+            language: "fr",
+            sentences: false
         }, {
             headers: {
-                Authorization: `Bearer ${token}`,
-                ApiKey: apiKey,
+                Authorization: "Bearer " + apiKey,
                 "Content-Type": "application/json"
             },
             timeout: 30000
         });
 
-        const result = detection.data?.data || detection.data;
-        const fakePercentage = Number(result?.fakePercentage);
-        if (!Number.isFinite(fakePercentage) || fakePercentage < 0 || fakePercentage > 100) {
-            return res.status(502).json({ error: "ZeroGPT n'a pas renvoyé de pourcentage exploitable." });
+        const result = detection.data;
+        const score = Number(result?.score);
+        if (result?.ok !== true || !Number.isFinite(score) || score < 0 || score > 100) {
+            return res.status(502).json({ error: "WrittenCheck n'a pas renvoy? de score exploitable." });
         }
 
         application.aiDetection = {
-            provider: "ZeroGPT",
-            fakePercentage,
-            aiWords: Number.isFinite(Number(result.aiWords)) ? Number(result.aiWords) : null,
-            textWords: Number.isFinite(Number(result.textWords)) ? Number(result.textWords) : null,
+            provider: "WrittenCheck",
+            score,
+            range: result.range && Number.isFinite(Number(result.range.low)) && Number.isFinite(Number(result.range.high))
+                ? { low: Number(result.range.low), high: Number(result.range.high) }
+                : null,
+            confidence: typeof result.confidence === "string" ? result.confidence : null,
+            verdict: typeof result.verdict === "string" ? result.verdict : null,
+            wordCount: Number.isFinite(Number(result.words)) ? Number(result.words) : wordCount,
             checkedAt: new Date().toISOString()
         };
         saveData(db);
         return res.json({ aiDetection: application.aiDetection });
     } catch (error) {
-        console.warn("Échec de l'analyse ZeroGPT.", { status: error.response?.status });
-        return res.status(502).json({ error: "ZeroGPT n'a pas pu analyser cette candidature. Vérifiez la configuration et le quota API." });
+        const status = error.response?.status === 429 ? 429 : 502;
+        console.warn("?chec de l'analyse WrittenCheck.", { status: error.response?.status });
+        return res.status(status).json({ error: "WrittenCheck n'a pas pu analyser cette candidature. V?rifiez la cl? API et les limites gratuites." });
     }
 });
 
