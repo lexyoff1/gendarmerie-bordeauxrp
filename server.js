@@ -50,6 +50,10 @@ function getClientIp(req) {
     return req.ip || req.socket?.remoteAddress || "unknown";
 }
 
+function siteRateLimitKey(ip) {
+    return `rate:site:${ip}`;
+}
+
 // ============================================================
 // BLOCAGES PERSISTANTS + CODES DE DÉBLOCAGE
 // - Un blocage (trop de requêtes OU trop d'échecs de connexion) est ENREGISTRÉ SUR DISQUE :
@@ -71,13 +75,32 @@ const blockCodeByKey = new Map();   // blockKey -> code
 const failedAttempts = new Map();   // clé -> { count, lockedUntil, lastFailAt }
 let lastBlockDmAt = 0;
 
+function writeJsonAtomically(filePath, value) {
+    const temporaryFile = `${filePath}.${process.pid}.${crypto.randomBytes(8).toString("hex")}.tmp`;
+    try {
+        fs.writeFileSync(temporaryFile, JSON.stringify(value, null, 2), {
+            encoding: "utf8",
+            flag: "wx",
+            mode: 0o600
+        });
+        fs.renameSync(temporaryFile, filePath);
+    } catch (error) {
+        try {
+            if (fs.existsSync(temporaryFile)) fs.unlinkSync(temporaryFile);
+        } catch (cleanupError) {
+            console.error("Erreur de nettoyage d'un fichier JSON temporaire :", cleanupError.message);
+        }
+        throw error;
+    }
+}
+
 function writeBlocksNow() {
     try {
         fs.mkdirSync(path.dirname(BLOCKS_FILE), { recursive: true });
-        fs.writeFileSync(BLOCKS_FILE, JSON.stringify({
+        writeJsonAtomically(BLOCKS_FILE, {
             failedAttempts: [...failedAttempts],
             activeBlocks: [...activeBlocks]
-        }));
+        });
     } catch (err) {
         console.log("Erreur sauvegarde des blocages :", err.message);
     }
@@ -309,11 +332,19 @@ function createRateLimiter({ name, windowMs, max, message, keyFn, permanent = BL
     }, Math.min(windowMs, 60 * 1000)).unref();
 
     const blockResponse = (req, res, banKey, remainingSeconds) => {
+        const ip = getClientIp(req);
+        const siteBanKey = siteRateLimitKey(ip);
+        const activeBan = failedAttempts.get(banKey);
+        if (activeBan && siteBanKey !== banKey) {
+            failedAttempts.set(siteBanKey, { ...activeBan });
+            saveBlocks();
+        }
+
         const code = issueUnlockCode({
-            blockKey: banKey,
-            keys: [banKey],
+            blockKey: `site:${ip}`,
+            keys: [...new Set([siteBanKey, banKey])],
             reason: `Trop de requêtes (${req.method} ${req.originalUrl.split("?")[0]}) - ${req.session?.user?.username || "non connecté"}`,
-            ip: getClientIp(req),
+            ip,
             ttlMs: remainingSeconds * 1000
         });
         const text = permanent
@@ -417,6 +448,14 @@ https://gendarmerie-bordeauxrp.com/tickets-commandement?id=${ticket.id}`
 }
 
 const app = express();
+const configuredSessionSecret = process.env.SESSION_SECRET;
+const SESSION_SECRET = configuredSessionSecret ||
+    (process.env.NODE_ENV === "production" ? "" : crypto.randomBytes(32).toString("hex"));
+
+if (process.env.NODE_ENV === "production" &&
+    (!configuredSessionSecret || configuredSessionSecret.length < 32)) {
+    throw new Error("SESSION_SECRET doit contenir au moins 32 caractères en production.");
+}
 
 // Derrière un proxy (Render, Railway, Nginx, Cloudflare...) : nécessaire pour que
 // req.ip soit la vraie IP du visiteur et que la protection brute force fonctionne.
@@ -425,6 +464,36 @@ if (process.env.TRUST_PROXY) {
     const value = process.env.TRUST_PROXY;
     app.set("trust proxy", /^\d+$/.test(value) ? Number(value) : value === "true" ? 1 : value);
 }
+
+app.use((req, res, next) => {
+    res.set("X-Content-Type-Options", "nosniff");
+    res.set("Referrer-Policy", "strict-origin-when-cross-origin");
+    res.set("X-Frame-Options", "SAMEORIGIN");
+    if (req.secure) res.set("Strict-Transport-Security", "max-age=31536000");
+    next();
+});
+
+app.use((req, res, next) => {
+    const ip = getClientIp(req);
+    const banKey = siteRateLimitKey(ip);
+    const remaining = getLockRemainingSeconds(banKey);
+    if (remaining <= 0) return next();
+
+    const code = issueUnlockCode({
+        blockKey: `site:${ip}`,
+        keys: [banKey],
+        reason: "Accès au site bloqué après un nombre excessif de requêtes",
+        ip,
+        ttlMs: remaining * 1000
+    });
+    return tooManyRequests(
+        req,
+        res,
+        "Accès au site bloqué après un nombre excessif de requêtes.",
+        remaining,
+        code
+    );
+});
 
 const discordBot = new Client({
     intents: [GatewayIntentBits.Guilds, GatewayIntentBits.DirectMessages, GatewayIntentBits.MessageContent],
@@ -534,21 +603,19 @@ if (process.env.DISCORD_BOT_TOKEN) {
     console.warn("DISCORD_BOT_TOKEN absent : les invitations par MP sont désactivées.");
 }
 
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, "public/assets/tenues/");
-    },
-    filename: (req, file, cb) => {
-        const cleanName = file.originalname
-            .toLowerCase()
-            .replace(/\s+/g, "-")
-            .replace(/[^a-z0-9.-]/g, "");
-
-        cb(null, Date.now() + "-" + cleanName);
-    }
+const upload = multer({
+    storage: multer.memoryStorage(),
+    limits: { fileSize: 5 * 1024 * 1024 }
 });
 
-const upload = multer({ storage });
+function getImageExtension(buffer) {
+    if (buffer.length >= 8 && buffer.subarray(0, 8).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]))) return "png";
+    if (buffer.length >= 3 && buffer[0] === 255 && buffer[1] === 216 && buffer[2] === 255) return "jpg";
+    if (buffer.length >= 6 && ["GIF87a", "GIF89a"].includes(buffer.subarray(0, 6).toString("ascii"))) return "gif";
+    if (buffer.length >= 12 && buffer.toString("ascii", 0, 4) === "RIFF" &&
+        buffer.toString("ascii", 8, 12) === "WEBP") return "webp";
+    return null;
+}
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -564,21 +631,41 @@ app.get("/favicon.ico", (req, res) => {
 });
 
 app.use(session({
-    secret: process.env.SESSION_SECRET || "secret123",
+    secret: SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
     cookie: {
         httpOnly: true,
         sameSite: "lax",
-        // Mettre COOKIE_SECURE=true dans le .env si le site est en HTTPS
-        secure: process.env.COOKIE_SECURE === "true",
+        secure: process.env.COOKIE_SECURE === "true" || process.env.NODE_ENV === "production",
         maxAge: 7 * 24 * 60 * 60 * 1000
     }
 }));
 
-if (!process.env.SESSION_SECRET) {
-    console.warn("⚠️ SESSION_SECRET absent : un secret par défaut peu sûr est utilisé. Définissez-en un long et aléatoire dans le .env.");
+function regenerateSession(req) {
+    return new Promise((resolve, reject) => {
+        req.session.regenerate(error => error ? reject(error) : resolve());
+    });
 }
+
+app.use((req, res, next) => {
+    if (["GET", "HEAD", "OPTIONS"].includes(req.method)) return next();
+
+    const origin = req.get("origin") || req.get("referer");
+    if (!origin) return next();
+
+    try {
+        const parsedOrigin = new URL(origin);
+        if (!["http:", "https:"].includes(parsedOrigin.protocol) ||
+            parsedOrigin.host.toLowerCase() !== String(req.get("host") || "").toLowerCase()) {
+            return res.status(403).json({ error: "Origine de la requête refusée." });
+        }
+    } catch {
+        return res.status(403).json({ error: "Origine de la requête invalide." });
+    }
+
+    next();
+});
 
 // Limite globale sur toutes les routes API (par IP)
 app.use("/api", apiLimiter);
@@ -849,7 +936,7 @@ function getData() {
 }
 
 function saveData(data) {
-    fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2));
+    writeJsonAtomically(DATA_FILE, data);
 }
 
 function gradeSortIndex(grade) {
@@ -1637,6 +1724,7 @@ app.post("/api/admin/login", adminLoginLimiter, async (req, res) => {
 
     clearFailedAttempts(ipKey, userKey);
 
+    await regenerateSession(req);
     req.session.systemAdmin = isSystemAdmin;
     req.session.adminAccessVerified = true;
     req.session.adminPanelAuthenticated = true;
@@ -1651,14 +1739,15 @@ app.post("/api/admin/login", adminLoginLimiter, async (req, res) => {
     res.json({ success: true, token: "session", userId: req.session.user.id });
 });
 
-app.get("/api/admin/data", requireAdmin, (req, res) => {
+app.get("/api/admin/data", requireAdminAccess, (req, res) => {
     const db = getData();
     const adminIds = (process.env.ADMIN_IDS || "").split(",").map(id => id.trim());
+    const admins = db.admins || (db.users || []).filter(user => adminIds.includes(user.id));
 
     res.json({
         ...db,
         users: sortUsersByGrade(db.users),
-        admins: db.admins || (db.users || []).filter(user => adminIds.includes(user.id)),
+        admins: admins.map(({ passwordHash, ...admin }) => admin),
         gnApplications: db.applications || [],
         roleCatalog: {
             specialites: SPECIALITES.map(({ id, nom, responsableRoleId, adjointRoleId }) => ({ id, nom, responsableRoleId, adjointRoleId })),
@@ -1667,7 +1756,7 @@ app.get("/api/admin/data", requireAdmin, (req, res) => {
     });
 });
 
-app.post("/api/admin/role-settings", requireAdmin, (req, res) => {
+app.post("/api/admin/role-settings", requireAdminAccess, (req, res) => {
     const settings = req.body || {};
     const isRoleId = value => value === "" || /^\d{17,20}$/.test(String(value));
     const specialites = settings.specialites || {};
@@ -1688,7 +1777,7 @@ app.post("/api/admin/role-settings", requireAdmin, (req, res) => {
     res.json({ success: true });
 });
 
-app.post("/api/admin/patrouilles", requireAdmin, (req, res) => {
+app.post("/api/admin/patrouilles", requireAdminAccess, (req, res) => {
     if (!req.body || typeof req.body !== "object" || Array.isArray(req.body)) {
         return res.status(400).json({ success: false, error: "Données des patrouilles invalides." });
     }
@@ -1698,7 +1787,7 @@ app.post("/api/admin/patrouilles", requireAdmin, (req, res) => {
     res.json({ success: true });
 });
 
-app.post("/api/admin/application/:type/:id/send-to-me", requireAdmin, async (req, res) => {
+app.post("/api/admin/application/:type/:id/send-to-me", requireAdminAccess, async (req, res) => {
     if (!req.session.user?.id || req.session.user.id.startsWith("systeme")) {
         return res.status(400).json({ success: false, error: "Connectez-vous avec un compte Discord administrateur pour recevoir ce MP." });
     }
@@ -1731,7 +1820,7 @@ app.post("/api/admin/application/:type/:id/send-to-me", requireAdmin, async (req
     res.json({ success: true });
 });
 
-app.post("/api/admin/add-user", requireAdmin, async (req, res) => {
+app.post("/api/admin/add-user", requireAdminAccess, async (req, res) => {
     const { discordId, username, grade = "" } = req.body || {};
     if (!String(discordId || "").trim() || !String(username || "").trim()) {
         return res.status(400).json({ success: false, error: "ID Discord et pseudo requis." });
@@ -1766,7 +1855,7 @@ app.post("/api/admin/add-user", requireAdmin, async (req, res) => {
     res.json({ success: true });
 });
 
-app.post("/api/admin/delete-user", requireAdmin, (req, res) => {
+app.post("/api/admin/delete-user", requireAdminAccess, (req, res) => {
     const userId = String(req.body?.userId || "");
     const db = getData();
     if (!Array.isArray(db.admins)) db.admins = [];
@@ -1783,22 +1872,86 @@ app.post("/api/admin/delete-user", requireAdmin, (req, res) => {
 
 // Seules ces pages peuvent être demandées comme retour après la connexion Discord
 const ALLOWED_RETURN_PATHS = new Set(["/gn-candidature"]);
+const OAUTH_STATE_TTL_MS = 10 * 60 * 1000;
+const MAX_PENDING_OAUTH_STATES = 5;
+
+function pendingOAuthStates(req) {
+    const now = Date.now();
+    return (Array.isArray(req.session.oauthStates) ? req.session.oauthStates : [])
+        .filter(entry => entry &&
+            typeof entry.state === "string" &&
+            /^[a-f0-9]{64}$/.test(entry.state) &&
+            Number.isSafeInteger(entry.createdAt) &&
+            entry.createdAt <= now &&
+            now - entry.createdAt <= OAUTH_STATE_TTL_MS);
+}
+
+function consumeOAuthState(req, state) {
+    const pending = pendingOAuthStates(req);
+    let matchingIndex = -1;
+
+    if (typeof state === "string" && /^[a-f0-9]{64}$/.test(state)) {
+        const supplied = Buffer.from(state);
+        matchingIndex = pending.findIndex(entry =>
+            crypto.timingSafeEqual(supplied, Buffer.from(entry.state))
+        );
+    }
+
+    const matched = matchingIndex < 0 ? null : pending.splice(matchingIndex, 1)[0];
+    req.session.oauthStates = pending;
+    return matched;
+}
 
 app.get("/auth/discord", oauthLimiter, (req, res) => {
+    if (!process.env.DISCORD_CLIENT_ID || !process.env.DISCORD_CLIENT_SECRET ||
+        !process.env.DISCORD_REDIRECT_URI) {
+        return res.status(503).send("La connexion Discord n'est pas configurée.");
+    }
+
+    let redirectUri;
+    try {
+        redirectUri = new URL(process.env.DISCORD_REDIRECT_URI);
+    } catch {
+        return res.status(503).send("La connexion Discord n'est pas configurée.");
+    }
+    if (!["http:", "https:"].includes(redirectUri.protocol) ||
+        (process.env.NODE_ENV === "production" && redirectUri.protocol !== "https:") ||
+        redirectUri.username || redirectUri.password || redirectUri.hash) {
+        return res.status(503).send("La connexion Discord n'est pas configurée.");
+    }
+
     const returnTo = String(req.query.returnTo || "");
-    req.session.returnTo = ALLOWED_RETURN_PATHS.has(returnTo) ? returnTo : null;
+    const state = crypto.randomBytes(32).toString("hex");
+    const pending = pendingOAuthStates(req);
+    pending.push({
+        state,
+        returnTo: ALLOWED_RETURN_PATHS.has(returnTo) ? returnTo : null,
+        createdAt: Date.now()
+    });
+    req.session.oauthStates = pending.slice(-MAX_PENDING_OAUTH_STATES);
 
-    const url =
-        `https://discord.com/oauth2/authorize?client_id=${process.env.DISCORD_CLIENT_ID}` +
-        `&redirect_uri=${encodeURIComponent(process.env.DISCORD_REDIRECT_URI)}` +
-        `&response_type=code&scope=identify`;
+    const url = new URL("https://discord.com/oauth2/authorize");
+    url.search = new URLSearchParams({
+        client_id: process.env.DISCORD_CLIENT_ID,
+        redirect_uri: redirectUri.toString(),
+        response_type: "code",
+        scope: "identify",
+        state
+    }).toString();
 
-    res.redirect(url);
+    res.redirect(url.toString());
 });
 
 app.get("/auth/discord/callback", oauthLimiter, async (req, res) => {
     try {
         const code = req.query.code;
+        const state = req.query.state;
+        const oauthState = consumeOAuthState(req, state);
+
+        if (req.query.error || typeof code !== "string" || !code || code.length > 2048 ||
+            !oauthState) {
+            return res.status(400).send("La connexion Discord a échoué. Recommencez la connexion.");
+        }
 
         const data = new URLSearchParams();
         data.append("client_id", process.env.DISCORD_CLIENT_ID);
@@ -1810,12 +1963,20 @@ app.get("/auth/discord/callback", oauthLimiter, async (req, res) => {
         const token = await axios.post("https://discord.com/api/oauth2/token", data, {
             headers: { "Content-Type": "application/x-www-form-urlencoded" }
         });
+        if (typeof token.data?.access_token !== "string" || token.data.token_type !== "Bearer") {
+            return res.status(502).send("La connexion Discord a échoué. Réessayez plus tard.");
+        }
 
         const userRes = await axios.get("https://discord.com/api/users/@me", {
             headers: {
                 Authorization: `Bearer ${token.data.access_token}`
             }
         });
+        if (!/^\d{17,20}$/.test(String(userRes.data?.id || "")) ||
+            typeof userRes.data.username !== "string" ||
+            (userRes.data.avatar != null && typeof userRes.data.avatar !== "string")) {
+            return res.status(502).send("La connexion Discord a échoué. Réessayez plus tard.");
+        }
 
         let member = null;
 
@@ -1826,6 +1987,8 @@ app.get("/auth/discord/callback", oauthLimiter, async (req, res) => {
         }
 
         const superUser = SUPER_ACCESS_IDS.has(userRes.data.id);
+        const returnTo = oauthState.returnTo;
+        await regenerateSession(req);
 
         const nomPrenom = member
             ? (member.nick || member.user.global_name || userRes.data.username)
@@ -1839,9 +2002,6 @@ app.get("/auth/discord/callback", oauthLimiter, async (req, res) => {
             estDansServeur: !!member || superUser,
             dateArriveeServeur: member ? member.joined_at : null
         };
-
-        const returnTo = req.session.returnTo;
-        delete req.session.returnTo;
 
         if (!member && !superUser) {
             // Un candidat pas encore dans le serveur peut revenir sur la page de candidature
@@ -1881,8 +2041,8 @@ app.get("/auth/discord/callback", oauthLimiter, async (req, res) => {
         return res.redirect(returnTo || "/dashboard");
 
     } catch (err) {
-        console.log(err.response?.data || err.message);
-        res.send("Erreur Discord OAuth : " + JSON.stringify(err.response?.data || err.message));
+        console.warn("Échec du callback OAuth Discord.", { status: err.response?.status });
+        res.status(502).send("La connexion Discord a échoué. Réessayez plus tard.");
     }
 });
 
@@ -1908,14 +2068,29 @@ app.post("/api/tenue/create", requireAdminAccess, (req, res) => {
     res.json({ success: true });
 });
 
-app.post("/api/tenue/upload", requireAdminAccess, upload.single("image"), (req, res) => {
-    if (!req.file) {
-        return res.status(400).json({ error: "Aucune image envoyée." });
-    }
+app.post("/api/tenue/upload", requireAdminAccess, (req, res, next) => {
+    upload.single("image")(req, res, error => {
+        if (error) {
+            const message = error instanceof multer.MulterError && error.code === "LIMIT_FILE_SIZE"
+                ? "L'image ne doit pas dépasser 5 Mo."
+                : "Le téléversement de l'image a échoué.";
+            return res.status(400).json({ error: message });
+        }
+        if (!req.file) return res.status(400).json({ error: "Aucune image envoyée." });
 
-    res.json({
-        success: true,
-        imagePath: "/assets/tenues/" + req.file.filename
+        const extension = getImageExtension(req.file.buffer);
+        if (!extension) return res.status(400).json({ error: "Le fichier doit être une image PNG, JPEG, GIF ou WebP valide." });
+
+        const filename = `${Date.now()}-${crypto.randomBytes(8).toString("hex")}.${extension}`;
+        const imageDirectory = path.join(__dirname, "public", "assets", "tenues");
+        try {
+            fs.mkdirSync(imageDirectory, { recursive: true });
+            fs.writeFileSync(path.join(imageDirectory, filename), req.file.buffer, { flag: "wx" });
+        } catch (writeError) {
+            return next(writeError);
+        }
+
+        res.json({ success: true, imagePath: "/assets/tenues/" + filename });
     });
 });
 
@@ -1953,12 +2128,8 @@ app.get("/api/me", (req, res) => {
     });
 });
 
-app.get("/api/debug-admin", async (req, res) => {
-    res.json({
-        connectedUser: req.session.user || null,
-        adminIds: (process.env.ADMIN_IDS || "").split(",").map(id => id.trim()).filter(Boolean),
-        isAdmin: await isAdmin(req)
-    });
+app.get("/api/debug-admin", requireAdminAccess, (req, res) => {
+    res.json({ isAdmin: true });
 });
 
 app.get("/api/effectifs", requireLogin, requireGNMember, async (req, res) => {
@@ -2020,13 +2191,24 @@ app.post("/api/renfort", requireLogin, requireGNMember, async (req, res) => {
 
     const { nombreMilitaires, unitePatrouille, raison, specialisations } = req.body;
 
-    if (!nombreMilitaires || !unitePatrouille || !raison || !specialisations || specialisations.length === 0) {
+    if (typeof nombreMilitaires !== "string" && typeof nombreMilitaires !== "number") {
+        return res.status(400).json({ error: "Nombre de militaires invalide." });
+    }
+    if (typeof unitePatrouille !== "string" || unitePatrouille.trim().length > 120 ||
+        typeof raison !== "string" || !raison.trim() || raison.length > 1000 ||
+        !Array.isArray(specialisations) || specialisations.length === 0 ||
+        specialisations.length > Object.keys(RENFORT_ROLES).length ||
+        specialisations.some(spe => typeof spe !== "string" || !Object.hasOwn(RENFORT_ROLES, spe))) {
         return res.status(400).json({ error: "Merci de remplir tous les champs." });
+    }
+    const nombre = Number(nombreMilitaires);
+    if (!Number.isInteger(nombre) || nombre < 1 || nombre > 100) {
+        return res.status(400).json({ error: "Nombre de militaires invalide." });
     }
 
     const configuredRenfortRoles = getConfiguredRenfortRoles(db);
     const rolesPing = specialisations
-        .map(spe => configuredRenfortRoles[spe] ? `<@&${configuredRenfortRoles[spe]}>` : spe)
+        .map(spe => `<@&${configuredRenfortRoles[spe] || RENFORT_ROLES[spe]}>`)
         .join(" ");
 
     const message = `<:Gendarmerie_Nationale:1170094137429733507> **Demande De Renfort** <:Gendarmerie_Nationale:1170094137429733507>
@@ -2041,7 +2223,7 @@ app.post("/api/renfort", requireLogin, requireGNMember, async (req, res) => {
 
 **Qualification Judiciaire :** ${user.qualificationJudiciaire || "Non attribuée"}
 
-**Nombre De Militaire En Service :** ${nombreMilitaires}
+**Nombre De Militaire En Service :** ${nombre}
 **Unité / Patrouille Présente En Ville :** ${unitePatrouille}
 
 **Raison :**
@@ -2053,7 +2235,11 @@ ${raison}
 
 Cordialement, <@${user.id}>`;
 
-    const sent = await sendDiscordChannelMessage(process.env.RENFORT_CHANNEL_ID, message);
+    const sent = await sendDiscordChannelMessage(process.env.RENFORT_CHANNEL_ID, message, {
+        parse: [],
+        roles: specialisations.map(spe => configuredRenfortRoles[spe] || RENFORT_ROLES[spe]),
+        users: [user.id]
+    });
 
     if (!sent) {
         return res.status(500).json({ error: "Impossible d'envoyer la demande." });
@@ -2264,11 +2450,11 @@ async function requireCommandement(req, res, next) {
     return res.status(403).json({ error: "Accès réservé au commandement." });
 }
 
-async function sendDiscordChannelMessage(channelId, message) {
+async function sendDiscordChannelMessage(channelId, message, allowedMentions = { parse: [] }) {
     try {
         await axios.post(
             `https://discord.com/api/v10/channels/${channelId}/messages`,
-            { content: message },
+            { content: message, allowed_mentions: allowedMentions },
             {
                 headers: {
                     Authorization: `Bot ${process.env.DISCORD_BOT_TOKEN}`,
@@ -2611,8 +2797,19 @@ app.delete("/api/user/:id", requireAdminAccess, async (req, res) => {
 });
 
 app.get("/logout", (req, res) => {
-    req.session.destroy();
-    res.redirect("/");
+    res.type("html").send(`<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Déconnexion</title></head><body><main><h1>Déconnexion</h1><p>Confirme ta déconnexion du site.</p><form method="post" action="/logout"><button type="submit">Se déconnecter</button></form><p><a href="/">Annuler</a></p></main></body></html>`);
+});
+
+app.post("/logout", (req, res, next) => {
+    req.session.destroy(error => {
+        if (error) return next(error);
+        res.clearCookie("connect.sid", {
+            httpOnly: true,
+            sameSite: "lax",
+            secure: process.env.COOKIE_SECURE === "true" || process.env.NODE_ENV === "production"
+        });
+        res.redirect("/");
+    });
 });
 
 app.post("/api/tickets-commandement/create", requireLogin, requireGNMember, async (req, res) => {
