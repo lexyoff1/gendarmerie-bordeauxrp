@@ -605,7 +605,7 @@ let pollTimer = null;
 
 function avatarUrl(id, avatar) {
     return avatar
-        ? `https://cdn.discordapp.com/avatars/${id}/${avatar}.png`
+        ? `https://cdn.discordapp.com/avatars/${encodeURIComponent(id)}/${encodeURIComponent(avatar)}.png`
         : "https://cdn.discordapp.com/embed/avatars/0.png";
 }
 
