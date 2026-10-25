@@ -545,11 +545,13 @@ body > header .login-btn:hover {
 </style>
 <link rel="stylesheet" href="/site-theme.css">
 <style data-page-styles>
-/* Tenues : fiches et visuels adapt?s ? leur taille r?elle. */
-.grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr)); gap:13px; align-items:stretch; }
-.grid-item, .tenue-admin { min-width:0; }
-.cours-image { display:block; max-width:100%; height:auto; max-height:62vh; margin-inline:auto; object-fit:contain; }
-@media(max-width:560px){ .grid { grid-template-columns:1fr; } .cours-image { max-height:none; } }
+/* Tenues : cartes et images de tenues clairement visibles. */
+#tenuesContainer { display:grid; gap:8px; }
+#tenuesContainer .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr)); gap:13px; align-items:stretch; margin-bottom:18px; }
+#tenuesContainer .grid-item { display:flex; flex-direction:column; min-width:0; min-height:360px; }
+#tenuesContainer .course-image { display:block; flex:none; width:100%; height:260px; min-height:200px; margin:12px 0; padding:6px; object-fit:contain; background:#dce2e9; border:1px solid rgba(255,255,255,.16); border-radius:7px; }
+#tenuesContainer .tenue-admin { min-width:0; margin-top:auto; }
+@media(max-width:560px){ #tenuesContainer .grid { grid-template-columns:1fr; } #tenuesContainer .course-image { height:240px; } }
 </style>
 
 <link rel="icon" type="image/png" href="/assets/logo-gendarmerie.png">
