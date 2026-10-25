@@ -361,20 +361,220 @@ footer p {
   footer { padding: 1.5rem; }
   .stat-box .stat-number { font-size: 1.5rem; }
 }
-    </style>
+    
+
+/* En-tete propre a cette page */
+body > header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 24px;
+  width: 100%;
+  min-height: 84px;
+  padding: 12px clamp(16px, 4vw, 52px);
+  color: #f4f6fb;
+  background: linear-gradient(110deg, rgba(5, 10, 24, 0.98), rgba(10, 19, 48, 0.96) 58%, rgba(8, 15, 35, 0.98));
+  border-bottom: 1px solid rgba(212, 175, 55, 0.32);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.28);
+  backdrop-filter: blur(10px);
+}
+
+body > header > .brand,
+body > header > .header-inner {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  justify-content: space-between;
+  gap: clamp(14px, 2.5vw, 32px);
+  min-width: 0;
+  width: 100%;
+  margin: 0;
+}
+
+body > header .brand-home {
+  display: flex;
+  flex: 0 1 auto;
+  flex-direction: row;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+  color: inherit;
+  text-decoration: none;
+  border-radius: 10px;
+}
+
+body > header .brand-home:hover {
+  color: inherit;
+  text-decoration: none;
+  filter: brightness(1.1);
+}
+
+body > header .brand-home:focus-visible {
+  outline: 2px solid #e6c866;
+  outline-offset: 5px;
+}
+
+body > header .logo {
+  width: 56px;
+  height: 56px;
+  flex: 0 0 auto;
+  padding: 4px;
+  object-fit: contain;
+  border: 1px solid rgba(230, 200, 102, 0.42);
+  border-radius: 15px;
+  background: rgba(212, 175, 55, 0.06);
+  filter: drop-shadow(0 4px 10px rgba(212, 175, 55, 0.18));
+}
+
+body > header h1,
+body > header .brand-text strong {
+  margin: 0;
+  color: #e6c866;
+  font-size: clamp(1.05rem, 1.8vw, 1.4rem);
+  line-height: 1.2;
+  letter-spacing: 0.01em;
+  text-shadow: 0 2px 12px rgba(212, 175, 55, 0.18);
+}
+
+body > header .brand p,
+body > header .brand-text > span {
+  margin: 4px 0 0;
+  color: #9aa6c4;
+  font-size: 0.84rem;
+  line-height: 1.35;
+}
+
+body > header nav {
+  display: flex;
+  flex: 0 1 auto;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  width: auto;
+  max-width: 100%;
+  margin: 0;
+}
+
+body > header nav a,
+body > header .back-btn,
+body > header .login-btn {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: 9px 13px;
+  color: #dce4f8;
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid rgba(212, 175, 55, 0.2);
+  border-radius: 10px;
+  font-size: 0.88rem;
+  font-weight: 650;
+  line-height: 1.2;
+  text-align: center;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color 160ms ease, background-color 160ms ease, border-color 160ms ease, transform 160ms ease;
+}
+
+body > header nav a:hover,
+body > header .back-btn:hover,
+body > header .login-btn:hover {
+  color: #e6c866;
+  background: rgba(212, 175, 55, 0.1);
+  border-color: rgba(230, 200, 102, 0.5);
+  transform: translateY(-1px);
+}
+
+body > header nav a:focus-visible,
+body > header .back-btn:focus-visible,
+body > header .login-btn:focus-visible {
+  outline: 2px solid #e6c866;
+  outline-offset: 3px;
+}
+
+body > header .login-btn {
+  color: #0a1330;
+  background: linear-gradient(135deg, #e6c866, #d4af37 58%, #b48f1f);
+  border-color: rgba(230, 200, 102, 0.7);
+}
+
+body > header .login-btn:hover {
+  color: #0a1330;
+  background: linear-gradient(135deg, #f0d77e, #d4af37);
+}
+
+@media (max-width: 700px) {
+  body > header {
+    gap: 10px 14px;
+    min-height: auto;
+    padding: 12px 16px;
+  }
+
+  body > header > .brand,
+  body > header > .header-inner {
+    flex-basis: 100%;
+    flex-wrap: wrap;
+    gap: 10px 12px;
+  }
+
+  body > header .brand-home {
+    gap: 11px;
+  }
+
+  body > header nav {
+    flex: 1 1 100%;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  body > header nav a,
+  body > header .back-btn,
+  body > header .login-btn {
+    min-height: 38px;
+    padding: 8px 11px;
+    font-size: 0.82rem;
+  }
+}
+
+@media (max-width: 420px) {
+  body > header .logo {
+    width: 48px;
+    height: 48px;
+    border-radius: 13px;
+  }
+
+  body > header h1,
+  body > header .brand-text strong {
+    font-size: 1rem;
+  }
+
+  body > header .brand p,
+  body > header .brand-text > span {
+    font-size: 0.78rem;
+  }
+}
+
+</style>
 <link rel="stylesheet" href="/site-theme.css">
+<link rel="icon" type="image/png" href="/assets/logo-gendarmerie.png">
 </head>
 <body>
 
 <header>
     <div class="brand">
-        <div class="brand-left">
+        <a class="brand-home brand-left" href="/dashboard" aria-label="Retour au tableau de bord">
             <img src="/assets/logo-gendarmerie.png" class="logo" alt="Logo Gendarmerie">
             <div>
                 <h1>Gendarmerie Nationale</h1>
                 <p>Avis de Recherche</p>
             </div>
-        </div>
+        </a>
         <nav>
             <a href="/dashboard">Dashboard</a>
             <a href="/rapports">Rapports</a>
