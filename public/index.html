@@ -2,7 +2,8 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Index Judiciaire</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gendarmerie Nationale</title>
     <style>
 * {
   margin: 0;
@@ -33,11 +34,17 @@ header {
 .brand {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 1.5rem;
-  margin-bottom: 1.5rem;
   max-width: 1200px;
-  margin-left: auto;
-  margin-right: auto;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.brand-left {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
 }
 
 .logo {
@@ -53,39 +60,24 @@ header {
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
 }
 
-.brand p {
-  font-size: 0.95rem;
-  color: #b0b0b0;
-}
-
-nav {
-  display: flex;
-  gap: 1rem;
-  justify-content: center;
-  flex-wrap: wrap;
-  max-width: 1200px;
-  margin: 0 auto;
-}
-
-nav a {
-  color: #d4af37;
-  text-decoration: none;
-  padding: 0.5rem 1rem;
-  border: 1px solid #d4af37;
-  border-radius: 4px;
-  transition: all 0.3s ease;
-  font-weight: 500;
-  font-size: 0.9rem;
-}
-
-nav a:hover {
-  background: #d4af37;
+.login-btn {
+  background: linear-gradient(135deg, #d4af37 0%, #c9a227 100%);
   color: #1a1a2e;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+  border: none;
+  padding: 0.7rem 1.5rem;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
 }
 
-section {
+.login-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(212, 175, 55, 0.4);
+}
+
+main {
   flex: 1;
   padding: 3rem 2rem;
   max-width: 1200px;
@@ -93,66 +85,108 @@ section {
   margin: 0 auto;
 }
 
+.hero {
+  text-align: center;
+  margin-bottom: 4rem;
+}
+
+.hero h1 {
+  font-size: 3rem;
+  color: #d4af37;
+  margin-bottom: 1rem;
+  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+.hero p {
+  font-size: 1.2rem;
+  color: #b0b0b0;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.sections {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  margin-top: 3rem;
+}
+
 .card {
-  background: rgba(30, 30, 50, 0.8);
-  border-left: 4px solid #d4af37;
+  background: rgba(212, 175, 55, 0.05);
+  border: 2px solid #d4af37;
   border-radius: 8px;
   padding: 2rem;
-  backdrop-filter: blur(10px);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-  margin-bottom: 2rem;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition: all 0.3s ease;
 }
 
 .card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 40px rgba(212, 175, 55, 0.2);
+  background: rgba(212, 175, 55, 0.15);
+  transform: translateY(-5px);
+  box-shadow: 0 12px 32px rgba(212, 175, 55, 0.2);
 }
 
 .card h2 {
-  font-size: 1.5rem;
   color: #d4af37;
-  margin-bottom: 1.5rem;
-  border-bottom: 2px solid #d4af37;
-  padding-bottom: 0.8rem;
-}
-
-.card h3 {
-  font-size: 1.1rem;
-  color: #e0d050;
-  margin-top: 1.5rem;
-  margin-bottom: 0.8rem;
-}
-
-.card h3:first-of-type {
-  margin-top: 0;
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
 }
 
 .card p {
-  color: #d0d0d0;
-  margin-bottom: 1rem;
-  line-height: 1.8;
+  color: #b0b0b0;
+  margin-bottom: 1.5rem;
 }
 
-.card ul {
+/* La carte Informations est retirée de l'accueil. */
+.sections .card:nth-child(2) {
+  display: none;
+}
+
+.contact-list {
   list-style: none;
-  margin-left: 0;
-}
-
-.card li {
-  background: rgba(212, 175, 55, 0.05);
-  border-left: 3px solid #d4af37;
-  padding: 0.8rem 1rem;
-  margin-bottom: 0.8rem;
-  border-radius: 4px;
-  transition: all 0.3s ease;
   color: #e0e0e0;
+  display: grid;
+  gap: 0.75rem;
 }
 
-.card li:hover {
-  background: rgba(212, 175, 55, 0.15);
-  transform: translateX(4px);
-  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.1);
+.contact-list strong {
+  color: #d4af37;
+}
+
+.card-btn {
+  display: inline-block;
+  background: linear-gradient(135deg, #d4af37 0%, #c9a227 100%);
+  color: #1a1a2e;
+  padding: 0.7rem 1.5rem;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.card-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(212, 175, 55, 0.4);
+}
+
+.info-section {
+  background: rgba(0, 0, 0, 0.3);
+  border-left: 4px solid #d4af37;
+  padding: 2rem;
+  border-radius: 6px;
+  margin-top: 3rem;
+}
+
+.info-section h2 {
+  color: #d4af37;
+  margin-bottom: 1rem;
+}
+
+.info-section p {
+  color: #b0b0b0;
+  margin-bottom: 0.5rem;
 }
 
 footer {
@@ -176,47 +210,37 @@ footer p {
 
   .brand {
     flex-direction: column;
+  }
+
+  .brand-left {
+    flex-direction: column;
     text-align: center;
-    margin-bottom: 1rem;
+    width: 100%;
   }
 
   .brand h1 {
     font-size: 1.8rem;
   }
 
-  nav {
-    gap: 0.6rem;
+  .logo {
+    width: 60px;
+    height: 60px;
   }
 
-  nav a {
-    font-size: 0.8rem;
-    padding: 0.4rem 0.6rem;
+  .login-btn {
+    width: 100%;
   }
 
-  section {
-    padding: 1.5rem 1rem;
+  main {
+    padding: 2rem 1.5rem;
   }
 
-  .card {
-    padding: 1.5rem;
-    margin-bottom: 1.5rem;
+  .hero h1 {
+    font-size: 2rem;
   }
 
-  .card h2 {
-    font-size: 1.3rem;
-  }
-
-  .card h3 {
-    font-size: 1rem;
-  }
-
-  .card p {
-    font-size: 0.95rem;
-  }
-
-  .card li {
-    padding: 0.7rem 0.8rem;
-    font-size: 0.9rem;
+  .sections {
+    grid-template-columns: 1fr;
   }
 }
 
@@ -229,33 +253,36 @@ footer p {
     font-size: 1.5rem;
   }
 
-  nav a {
-    font-size: 0.7rem;
-    padding: 0.3rem 0.5rem;
+  .logo {
+    width: 50px;
+    height: 50px;
   }
 
-  section {
-    padding: 1rem 0.75rem;
+  main {
+    padding: 1.5rem 1rem;
+  }
+
+  .hero h1 {
+    font-size: 1.5rem;
+  }
+
+  .hero p {
+    font-size: 1rem;
   }
 
   .card {
-    padding: 1rem;
+    padding: 1.5rem;
   }
 
   .card h2 {
-    font-size: 1.2rem;
+    font-size: 1.3rem;
   }
 
-  .card h3 {
-    font-size: 0.95rem;
+  footer {
+    padding: 1.5rem;
   }
 
-  .card p {
-    font-size: 0.9rem;
-  }
-
-  .card li {
-    padding: 0.6rem 0.8rem;
+  footer p {
     font-size: 0.85rem;
   }
 }
@@ -466,115 +493,65 @@ body > header .login-btn:hover {
 
 <header>
     <div class="brand">
-        <a class="brand-home" href="/dashboard" aria-label="Retour au tableau de bord"><img src="/assets/logo-gendarmerie.png" class="logo" alt="Logo Gendarmerie">
-        <div>
-            <h1>Index Judiciaire</h1>
-            <p>Gendarmerie Nationale</p>
-        </div></a>
+        <a class="brand-home brand-left" href="/" aria-label="Retour à l’accueil">
+            <img src="/assets/logo-gendarmerie.png" class="logo" alt="Logo Gendarmerie">
+            <h1>Gendarmerie Nationale</h1>
+        </a>
+        <a href="https://gendarmerie-bordeauxrp.com/auth/discord" class="login-btn">Connexion Discord</a>
     </div>
-
-    <nav>
-        <a href="/cours.html">Retour aux cours</a>
-        <a href="/dashboard.html">Dashboard</a>
-    </nav>
 </header>
 
-<section>
+<main>
+    <section class="hero">
+        <h1>Bienvenue</h1>
+        <p>Rejoignez la Gendarmerie Nationale et servez votre pays avec honneur et dévouement.</p>
+    </section>
 
-    <div class="card">
-        <h2>Présentation</h2>
+    <section class="sections">
+        <div class="card">
+            <h2>📋 Candidatures</h2>
+            <p>Postulez pour rejoindre nos rangs et participez à la sécurité publique.</p>
+            <a href="https://gendarmerie-bordeauxrp.com/gn-candidature" class="card-btn">Candidater</a>
+        </div>
 
-        <p>
-            L'index judiciaire réunit plusieurs articles essentiels à la fonction et à l'exécution du métier de Gendarme.
-        </p>
+        <div class="card">
+            <h2>ℹ️ Informations</h2>
+            <p>En savoir plus sur la Gendarmerie Nationale et nos missions.</p>
+            <button class="card-btn" onclick="alert('Section en cours de développement')">En savoir plus</button>
+        </div>
 
-        <p>
-            Ces articles doivent être connus et compris afin de garantir le bon fonctionnement de la Gendarmerie et d'éviter toute faute de procédure.
-        </p>
+        <div class="card">
+            <h2>📞 Contact</h2>
+            <p>Nous sommes là pour répondre à vos questions et préoccupations.</p>
+            <ul class="contact-list">
+                <li><strong>CNE :</strong> <span id="contact-capitaine">Chargement...</span></li>
+                <li><strong>LTN :</strong> <span id="contact-lieutenant">Chargement...</span></li>
+                <li><strong>Responsable CIR :</strong> KING lexi</li>
+            </ul>
+        </div>
+    </section>
 
-        <p>
-            Prenez le temps de lire et de comprendre chaque article, car ils seront utilisés régulièrement durant votre service.
-        </p>
+    <section class="info-section">
+        <h2>Notre Mission</h2>
+        <p>La Gendarmerie Nationale est au service de la population pour garantir la sécurité, l'ordre public et protéger les citoyens.</p>
+        <p>Nous recrutons des candidats motivés et engagés à servir leur communauté.</p>
+    </section>
+</main>
 
-    </div>
+<script>
+fetch("/api/contact")
+    .then(response => response.ok ? response.json() : Promise.reject())
+    .then(contacts => {
+        document.getElementById("contact-capitaine").textContent = contacts.capitaine || "Non renseigné";
+        document.getElementById("contact-lieutenant").textContent = contacts.lieutenant || "Non renseigné";
+    })
+    .catch(() => {
+        document.getElementById("contact-capitaine").textContent = "Non renseigné";
+        document.getElementById("contact-lieutenant").textContent = "Non renseigné";
+    });
+</script>
 
-    <div class="card">
-        <h2>Article 122-5 — Légitime Défense</h2>
-
-        <p>
-            L'article 122-5 définit la légitime défense.
-        </p>
-
-        <ul>
-            <li>L'agression doit être actuelle ou imminente.</li>
-            <li>L'agression doit être injustifiée.</li>
-            <li>Elle doit être dirigée contre soi-même ou autrui.</li>
-            <li>La réponse doit être simultanée.</li>
-            <li>La réponse doit être proportionnée.</li>
-            <li>La réponse doit être strictement nécessaire.</li>
-        </ul>
-
-    </div>
-
-    <div class="card">
-        <h2>Article 122-7 — État de Nécessité</h2>
-
-        <p>
-            N'est pas pénalement responsable la personne qui, face à un danger actuel ou imminent menaçant elle-même, autrui ou un bien, accomplit un acte nécessaire à la sauvegarde de la personne ou du bien.
-        </p>
-
-        <p>
-            Cette protection ne s'applique pas lorsqu'il existe une disproportion entre les moyens employés et la gravité de la menace.
-        </p>
-
-    </div>
-
-    <div class="card">
-        <h2>Article L435-1 — Usage des Armes</h2>
-
-        <p>
-            Les militaires de la Gendarmerie Nationale peuvent faire usage de leurs armes uniquement en cas d'absolue nécessité et de manière strictement proportionnée.
-        </p>
-
-        <h3>Cas autorisés :</h3>
-
-        <ul>
-            <li>Pour défendre leur vie ou celle d'autrui face à une menace armée.</li>
-            <li>Après deux sommations pour défendre un lieu ou des personnes confiées.</li>
-            <li>Pour empêcher la fuite d'un individu susceptible de porter atteinte à la vie ou à l'intégrité physique.</li>
-            <li>Pour immobiliser un véhicule dont les occupants représentent un danger grave.</li>
-            <li>Pour empêcher la répétition immédiate d'un ou plusieurs meurtres ou tentatives de meurtre.</li>
-        </ul>
-
-    </div>
-
-    <div class="card">
-        <h2>Article L4123-12 — Zone de Défense Sensible</h2>
-
-        <p>
-            Outre les cas de légitime défense, un militaire n'est pas pénalement responsable lorsqu'il déploie, après sommations, la force armée strictement nécessaire afin d'empêcher ou d'interrompre une intrusion dans une zone de défense hautement sensible.
-        </p>
-
-    </div>
-
-    <div class="card">
-        <h2>Article 803 — Menottage</h2>
-
-        <p>
-            Le port des menottes ne peut être utilisé que dans les situations suivantes :
-        </p>
-
-        <ul>
-            <li>La personne est considérée comme dangereuse pour elle-même.</li>
-            <li>La personne est considérée comme dangereuse pour autrui.</li>
-            <li>La personne est susceptible de prendre la fuite.</li>
-        </ul>
-
-    </div>
-
-</section>
-
-<footer class="footer">
+<footer>
     <p>© 2026 lexy_off1 — Tous droits réservés</p>
 </footer>
 
