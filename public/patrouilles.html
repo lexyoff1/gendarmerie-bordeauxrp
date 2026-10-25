@@ -2,148 +2,402 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#0a1330">
-    <title>Document des Patrouilles</title>
+    <title>Contrôle routier</title>
     <style>
-:root{color-scheme:dark;--night:#070d20;--navy:#0c1734;--panel:#101d3d;--line:rgba(177,194,230,.14);--gold:#d4af37;--gold-soft:#ecd27d;--ink:#f4f6fb;--muted:#9eacc9;--green:#39b879;--red:#dc5b68;--blue:#5682e8;--orange:#e69a4b}
-*{box-sizing:border-box}
-html{min-height:100%;background:var(--night)}
-body{min-width:320px;min-height:100vh;margin:0;display:flex;flex-direction:column;overflow-x:hidden;color:var(--ink);background:radial-gradient(900px 500px at 10% -12%,rgba(48,83,166,.22),transparent 65%),linear-gradient(180deg,#0a1330 0%,#050a18 100%);font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;line-height:1.5}
-body>header{position:sticky;top:0;z-index:100;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px 24px;width:100%;min-height:82px;padding:12px clamp(16px,4vw,52px);color:var(--ink);background:rgba(5,10,24,.93);border-bottom:1px solid rgba(212,175,55,.28);box-shadow:0 10px 30px rgba(0,0,0,.24);backdrop-filter:blur(12px)}
-body>header>.brand{display:flex;flex:1 1 auto;align-items:center;justify-content:space-between;gap:24px;min-width:0;margin:0}
-body>header .brand-home{display:flex;align-items:center;gap:14px;min-width:0;color:inherit;text-decoration:none;border-radius:10px;transition:filter .16s ease}
-body>header .brand-home:hover{color:inherit;text-decoration:none;filter:brightness(1.1)}
-body>header .brand-home:focus-visible{outline:2px solid var(--gold-soft);outline-offset:5px}
-body>header .logo{width:56px;height:56px;flex:0 0 auto;padding:4px;object-fit:contain;border:1px solid rgba(230,200,102,.4);border-radius:15px;background:rgba(212,175,55,.06);filter:drop-shadow(0 4px 10px rgba(212,175,55,.16))}
-body>header h1{margin:0;color:var(--gold-soft);font-size:clamp(1.05rem,1.8vw,1.4rem);line-height:1.2;letter-spacing:.01em}
-body>header .brand p{margin:4px 0 0;color:var(--muted);font-size:.84rem;line-height:1.35}
-body>header nav{display:flex;align-items:center;justify-content:flex-end;gap:6px;max-width:100%;margin:0}
-body>header nav a{display:inline-flex;align-items:center;justify-content:center;min-height:40px;padding:8px 13px;color:#dce4f8;background:rgba(255,255,255,.035);border:1px solid rgba(212,175,55,.2);border-radius:10px;font-size:.86rem;font-weight:650;text-decoration:none;white-space:nowrap;transition:all .16s ease}
-body>header nav a:hover{color:var(--gold-soft);background:rgba(212,175,55,.1);border-color:rgba(230,200,102,.5);transform:translateY(-1px)}
-body>header nav a:focus-visible{outline:2px solid var(--gold-soft);outline-offset:3px}
-.operations{width:min(1600px,100%);margin:0 auto;padding:clamp(20px,3vw,40px) clamp(14px,3vw,36px) 48px;flex:1}
-.page-heading{display:flex;align-items:flex-end;justify-content:space-between;gap:18px;margin:0 0 22px}
-.eyebrow{margin:0 0 7px;color:var(--gold-soft);font-size:.72rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase}
-.page-heading h2{margin:0;color:var(--ink);font-size:clamp(1.45rem,2.5vw,2rem);line-height:1.2;letter-spacing:-.025em}
-.page-heading .intro{margin:7px 0 0;color:var(--muted);font-size:.92rem}
-.save-status{display:flex;align-items:center;gap:9px;min-height:40px;padding:8px 12px;color:var(--muted);background:rgba(255,255,255,.035);border:1px solid var(--line);border-radius:999px;font-size:.82rem;white-space:nowrap}
-.status-dot{width:8px;height:8px;flex:0 0 auto;border-radius:50%;background:#8b98b2;box-shadow:0 0 0 3px rgba(139,152,178,.12)}
-.save-status.status-saving .status-dot{background:var(--gold);box-shadow:0 0 0 3px rgba(212,175,55,.14);animation:pulse 1.1s infinite}
-.save-status.status-saved .status-dot{background:var(--green);box-shadow:0 0 0 3px rgba(57,184,121,.14)}
-.save-status.status-error .status-dot{background:var(--red);box-shadow:0 0 0 3px rgba(220,91,104,.14)}
-@keyframes pulse{50%{opacity:.4}}
-#retry-save{padding:5px 9px;color:var(--gold-soft);background:rgba(212,175,55,.09);border:1px solid rgba(212,175,55,.25);border-radius:7px;font:inherit;font-weight:700;cursor:pointer}
-#retry-save[hidden]{display:none}
-.stats-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin:0 0 26px}
-.stat-card{position:relative;overflow:hidden;min-height:94px;padding:15px 17px;background:linear-gradient(145deg,rgba(16,29,61,.94),rgba(10,19,42,.94));border:1px solid var(--line);border-radius:14px;box-shadow:0 10px 26px rgba(0,0,0,.16)}
-.stat-card::after{position:absolute;top:0;right:0;width:54px;height:54px;background:radial-gradient(circle at top right,rgba(212,175,55,.13),transparent 72%);content:""}
-.stat-label{display:block;color:var(--muted);font-size:.76rem;font-weight:650;letter-spacing:.03em}
-.stat-value{display:block;margin-top:5px;color:var(--ink);font-size:1.55rem;font-weight:800;line-height:1.1;font-variant-numeric:tabular-nums}
-.stat-card.available .stat-value{color:#62d89b}.stat-card.intervention .stat-value{color:#84a5ff}.stat-card.unavailable .stat-value{color:#ff8d96}.stat-card.assigned .stat-value{color:var(--gold-soft)}
-.unit-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-items:start;gap:18px}
-.table-section{--unit-color:#71809d;min-width:0;overflow:visible;background:linear-gradient(150deg,rgba(16,29,61,.95),rgba(9,17,39,.97));border:1px solid var(--line);border-radius:15px;box-shadow:0 14px 34px rgba(0,0,0,.2)}
-.table-section.corg{--unit-color:#d8aa47}.table-section.pam{--unit-color:#5489bd}.table-section.psig{--unit-color:#4c9ab4}.table-section.edcf{--unit-color:#7188e3}.table-section.agign{--unit-color:#a77de0}.table-section.bdr{--unit-color:#4eb6aa}.table-section.pghm{--unit-color:#57a99b}
-.section-title{display:flex;align-items:center;gap:10px;min-height:54px;padding:13px 17px;color:var(--ink);background:linear-gradient(90deg,color-mix(in srgb,var(--unit-color) 14%,transparent),transparent 70%);border-bottom:1px solid var(--line);border-left:3px solid var(--unit-color);border-radius:14px 14px 0 0;font-size:.94rem;font-weight:750;line-height:1.35}
-.unit-count{margin-left:auto;min-width:27px;padding:3px 7px;color:var(--unit-color);background:color-mix(in srgb,var(--unit-color) 14%,transparent);border:1px solid color-mix(in srgb,var(--unit-color) 36%,transparent);border-radius:999px;font-size:.72rem;font-weight:800;text-align:center}
-.section-title::before{width:8px;height:8px;flex:0 0 auto;border-radius:50%;background:var(--unit-color);box-shadow:0 0 12px color-mix(in srgb,var(--unit-color) 60%,transparent);content:""}
-.table-scroll{width:100%;overflow-x:auto;overscroll-behavior-x:contain;border-radius:0 0 14px 14px;scrollbar-color:rgba(212,175,55,.35) rgba(255,255,255,.04);scrollbar-width:thin}
-.patrol-table{width:100%;min-width:1040px;border-collapse:separate;border-spacing:0;table-layout:fixed}
-.patrol-table th,.patrol-table td{padding:10px 9px;border-bottom:1px solid rgba(177,194,230,.1);border-right:1px solid rgba(177,194,230,.07);text-align:left;vertical-align:middle}
-.patrol-table th{position:sticky;top:0;color:#aab8d4;background:#0c1731;font-size:.67rem;font-weight:800;letter-spacing:.075em;line-height:1.25;text-transform:uppercase}
-.patrol-table th:first-child,.patrol-table td:first-child{width:190px;padding-left:14px}
-.patrol-table th:last-child,.patrol-table td:last-child{border-right:0}
-.patrol-table tbody tr{background:rgba(255,255,255,.012);transition:background-color .15s ease}
-.patrol-table tbody tr:nth-child(even){background:rgba(255,255,255,.028)}
-.patrol-table tbody tr:hover{background:rgba(212,175,55,.055)}
-.patrol-table tbody tr:last-child td{border-bottom:0}
-.patrol-name{color:#f4f6fb;font-size:.82rem;font-weight:750;line-height:1.3;overflow-wrap:anywhere}
-.badge-select{position:relative;width:100%;min-width:0}
-.badge-selected{display:flex;align-items:center;justify-content:space-between;gap:7px;width:100%;min-height:37px;padding:7px 9px;color:#e7ecf8;background:#111f40;border:1px solid rgba(177,194,230,.18);border-radius:9px;font-family:inherit;font-size:.76rem;font-weight:600;line-height:1.25;text-align:left;cursor:pointer;transition:border-color .15s ease,background-color .15s ease,box-shadow .15s ease}
-.badge-selected::after{width:7px;height:7px;flex:0 0 auto;border-right:1.5px solid currentColor;border-bottom:1.5px solid currentColor;opacity:.7;content:"";transform:rotate(45deg) translateY(-2px)}
-.badge-selected:hover{border-color:rgba(230,200,102,.5);filter:brightness(1.07)}
-.badge-selected:focus-visible{outline:2px solid var(--gold-soft);outline-offset:2px;border-color:var(--gold)}
-.badge-selected.badge-empty{color:#8592ad;background:rgba(255,255,255,.035)}
-.badge-options{position:fixed;z-index:2000;display:none;width:min(420px,calc(100vw - 24px));max-height:min(420px,55vh);overflow:auto;padding:7px;background:#0b1430;border:1px solid rgba(230,200,102,.48);border-radius:12px;box-shadow:0 20px 48px rgba(0,0,0,.5);overscroll-behavior:contain;scrollbar-color:rgba(212,175,55,.4) rgba(255,255,255,.04);scrollbar-width:thin}
-.badge-options.is-open{display:grid;gap:4px}
-.badge-option{display:block;width:100%;min-height:34px;padding:8px 10px;color:#e7ecf8;background:rgba(255,255,255,.045);border:1px solid transparent;border-radius:8px;font-family:inherit;font-size:.79rem;font-weight:600;line-height:1.25;text-align:left;white-space:normal;overflow-wrap:anywhere;cursor:pointer;transition:filter .14s ease,border-color .14s ease,background-color .14s ease}
-.badge-option:hover,.badge-option:focus-visible{filter:brightness(1.12);border-color:rgba(230,200,102,.35);outline:none}
-.badge-empty{background:#24314f;color:#c1cbe0}.badge-ofs{background:#2f80c0;color:#fff}.badge-ofb{background:#b84d48;color:#fff}.badge-sop{background:#a8642e;color:#fff}.badge-sob{background:#c3a832;color:#101626}.badge-gav{background:#7377bd;color:#fff}
-.badge-green{background:#24734e;color:#effff6}.badge-red{background:#913945;color:#fff}.badge-blue{background:#354f9b;color:#fff}.badge-orange{background:#a65d25;color:#fff}.badge-yellow{background:#ad8e20;color:#111827}.badge-purple{background:#644594;color:#fff}.badge-cyan{background:#287d8b;color:#fff}.badge-pink{background:#973f84;color:#fff}.badge-lightgreen{background:#4d8d61;color:#fff}.badge-salmon{background:#a35750;color:#fff}.badge-lavender{background:#7661a4;color:#fff}.badge-brown{background:#765034;color:#fff}.badge-darkgreen{background:#176453;color:#fff}.badge-agign{background:#43495a;color:#fff}.badge-bdr{background:#267c79;color:#fff}.badge-pghm{background:#286d68;color:#fff}.badge-edcf{background:#4e62a4;color:#fff}.badge-psig{background:#a99542;color:#101626}
-.load-error{grid-column:1/-1;padding:22px;color:#ffdce0;background:rgba(145,57,69,.12);border:1px solid rgba(220,91,104,.28);border-radius:12px}.load-error button{margin:12px 0 0;padding:8px 12px;color:#0a1330;background:var(--gold-soft);border:0;border-radius:8px;font-weight:700;cursor:pointer}
-footer{margin-top:auto;padding:18px 16px;color:#7e8ba7;border-top:1px solid rgba(177,194,230,.1);text-align:center;font-size:.78rem}
-@media(max-width:1100px){.unit-grid{grid-template-columns:1fr}.stats-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
-@media(max-width:700px){body>header{position:relative;gap:10px;padding:12px 16px}body>header>.brand{flex-basis:100%;flex-wrap:wrap;gap:10px 12px}body>header nav{flex:1 1 100%;justify-content:flex-start;flex-wrap:wrap}.page-heading{align-items:flex-start;flex-direction:column}.stats-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.stat-card{min-height:82px;padding:12px}.stat-value{font-size:1.35rem}.operations{padding:22px 14px 36px}.table-section{border-radius:12px}.section-title{border-radius:11px 11px 0 0}}
-@media(max-width:420px){body>header .logo{width:48px;height:48px}.stats-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.stat-label{font-size:.69rem}.save-status{white-space:normal}.patrol-table{min-width:980px}}
-@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}}
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
-/* Layout inspir&eacute; du poste de commandement */
-body{display:block;min-height:100vh;background:#061022}
-body>header.command-header{position:relative;top:auto;display:grid;grid-template-columns:minmax(280px,360px) minmax(250px,1fr) auto;align-items:center;gap:24px;min-height:64px;padding:8px 24px;color:var(--ink);background:linear-gradient(90deg,rgba(3,12,28,.99) 0%,rgba(4,17,38,.97) 38%,rgba(4,17,38,.75) 68%,rgba(3,12,28,.95) 100%),url("/assets/patrol-car-banner.svg") center 54%/cover no-repeat;border-bottom:1px solid rgba(212,175,55,.38);box-shadow:0 8px 24px rgba(0,0,0,.28)}
-.command-brand{display:flex;align-items:center;gap:13px;min-width:0;color:inherit;text-decoration:none}
-.command-brand:hover{color:inherit;filter:brightness(1.1)}
-.command-brand:focus-visible{outline:2px solid var(--gold-soft);outline-offset:4px;border-radius:6px}
-.command-logo{width:42px;height:48px;flex:0 0 auto;object-fit:contain;filter:drop-shadow(0 2px 8px rgba(212,175,55,.35))}
-.command-brand-copy{display:grid;gap:1px;min-width:0;text-transform:uppercase}
-.command-brand-copy strong{overflow:hidden;color:#f1f4fb;font-size:.91rem;font-weight:800;letter-spacing:.11em;text-overflow:ellipsis;white-space:nowrap}
-.command-brand-copy small{color:#d5ad4c;font-size:.59rem;font-weight:750;letter-spacing:.13em;white-space:nowrap}
-.command-title{position:relative;margin:0;padding:4px 0;color:#f1f4fb;font-size:1.08rem;font-weight:700;line-height:1.2;white-space:nowrap}
-body>header.command-header h1.command-title{color:#f1f4fb;font-size:1.08rem;font-weight:700}
-.command-title::after{position:absolute;bottom:-9px;left:0;width:48px;height:3px;border-radius:3px;background:linear-gradient(90deg,#f1cc67,#d29f31);content:""}
-.command-tools{display:flex;align-items:center;gap:20px;color:#e1e8f5}
-.command-meta{display:flex;align-items:center;gap:8px;font-size:.73rem;font-weight:650;white-space:nowrap}
-.command-meta svg{width:17px;height:17px;fill:none;stroke:#dce5f5;stroke-linecap:round;stroke-linejoin:round;stroke-width:1.7}
-.app-shell{display:grid;grid-template-columns:154px minmax(0,1fr);min-height:calc(100vh - 64px)}
-.sidebar{position:sticky;top:0;display:flex;height:calc(100vh - 64px);min-height:560px;flex-direction:column;padding:15px 10px 12px;background:linear-gradient(180deg,#07142b,#061022 72%,#08152b);border-right:1px solid rgba(89,132,187,.18)}
-.side-nav{display:grid;gap:5px}
-.side-link{display:flex;align-items:center;gap:10px;min-height:38px;padding:8px 10px;color:#b8c6dc;background:transparent;border:1px solid transparent;border-radius:8px;font-size:.76rem;font-weight:600;text-decoration:none;transition:background .16s,border-color .16s,color .16s}
-.side-link:hover{color:#fff;background:rgba(255,255,255,.055);border-color:rgba(150,180,220,.12)}
-.side-link.active{color:#fff;background:linear-gradient(110deg,rgba(212,175,55,.2),rgba(212,175,55,.07));border-color:rgba(212,175,55,.35);box-shadow:inset 0 0 18px rgba(212,175,55,.05)}
-.side-icon{display:grid;width:18px;height:18px;flex:0 0 auto;place-items:center}
-.side-icon svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round;stroke-width:1.7}
-.side-link.active .side-icon{color:var(--gold-soft)}
-.sidebar-footer{display:grid;justify-items:center;gap:8px;margin-top:auto;padding:18px 5px 8px;color:#8492aa;text-align:center;font-size:.62rem;line-height:1.5}
-.sidebar-footer img{width:62px;height:62px;object-fit:contain;opacity:.24;filter:grayscale(1)}
-.tricolour{display:flex;width:38px;height:7px;overflow:hidden;border-radius:2px}
-.tricolour i{flex:1}.tricolour i:nth-child(1){background:#234e9b}.tricolour i:nth-child(2){background:#f2f4f8}.tricolour i:nth-child(3){background:#d74a54}
-.sidebar-footer>a{margin-top:7px;padding:6px 10px;color:#9dabc1;text-decoration:none;border:1px solid rgba(177,194,230,.13);border-radius:7px}
-.sidebar-footer>a:hover{color:#fff;border-color:rgba(212,175,55,.4)}
-.operations{width:100%;max-width:none;min-width:0;margin:0;padding:20px clamp(14px,1.45vw,24px) 32px;flex:1}
-.page-heading{align-items:center;margin-bottom:16px}
-.page-heading h2{font-size:1.1rem;color:#c9d6eb;letter-spacing:0}
-.page-heading .eyebrow{font-size:.62rem;letter-spacing:.14em}
-.page-heading .intro{font-size:.77rem;margin-top:3px}
-.save-status{min-height:44px;padding:8px 13px;background:rgba(5,18,38,.86);border-color:rgba(95,143,192,.25);border-radius:10px;font-size:.72rem}
-.save-status.status-saved{color:#74d9a6}.save-status.status-error{color:#ff9da6}
-.stats-grid{grid-template-columns:repeat(5,minmax(125px,1fr));gap:10px;margin-bottom:18px}
-.stat-card{display:flex;min-height:72px;align-items:center;gap:12px;padding:10px 13px;background:linear-gradient(135deg,rgba(9,29,57,.96),rgba(9,23,46,.96));border-color:rgba(89,132,187,.3);border-radius:11px;box-shadow:0 8px 22px rgba(0,0,0,.16)}
-.stat-card::before{display:grid;width:36px;height:36px;flex:0 0 auto;place-items:center;color:#fff;background:rgba(82,132,193,.32);border:1px solid rgba(123,169,220,.25);border-radius:50%;font-size:1rem;font-weight:900;content:"\2022"}
-.stat-card.available::before{content:"\2713";background:rgba(37,157,108,.4);border-color:rgba(62,203,147,.35)}
-.stat-card.intervention::before{content:"\25CE";background:rgba(26,113,183,.48);border-color:rgba(38,157,237,.4)}
-.stat-card.unavailable::before{content:"\00D7";background:rgba(176,55,65,.4);border-color:rgba(227,83,92,.4)}
-.stat-card.assigned::before{content:"\25CF";background:rgba(111,74,164,.45);border-color:rgba(160,111,218,.4)}
-.stat-label{font-size:.67rem;line-height:1.3}.stat-value{margin-top:3px;font-size:1.16rem}
-.unit-grid{grid-template-columns:minmax(0,1fr);gap:10px}
-.table-section{border-color:color-mix(in srgb,var(--unit-color) 58%,rgba(177,194,230,.12));border-radius:10px;box-shadow:0 8px 20px rgba(0,0,0,.16)}
-.section-title{min-height:31px;padding:6px 12px;background:linear-gradient(90deg,color-mix(in srgb,var(--unit-color) 24%,rgba(5,15,32,.8)),rgba(5,15,32,.78));border-left-width:3px;border-radius:9px 9px 0 0;font-size:.73rem}
-.section-title::before{width:7px;height:7px}
-.unit-count{min-width:24px;padding:2px 7px;font-size:.65rem}
-.table-scroll{border-radius:0 0 9px 9px}
-.patrol-table{min-width:1080px;table-layout:fixed}
-.patrol-table th,.patrol-table td{padding:5px 7px;border-bottom-color:rgba(90,133,181,.16);border-right-color:rgba(90,133,181,.1)}
-.patrol-table th{color:#9ab4d6;background:rgba(5,18,38,.97);font-size:.57rem;letter-spacing:.045em}
-.patrol-table th:first-child,.patrol-table td:first-child{width:185px;padding-left:12px}
-.patrol-table tbody tr:nth-child(even){background:rgba(28,66,106,.12)}
-.patrol-table tbody tr:hover{background:rgba(29,99,156,.16)}
-.patrol-name{color:#d7e8ff;font-size:.7rem}
-.badge-selected{min-height:27px;padding:4px 7px;color:#dce8f8;background:#092143;border-color:rgba(100,151,203,.27);border-radius:8px;font-size:.65rem}
-.badge-selected.badge-empty{color:#8294ad;background:rgba(9,23,44,.86)}
-.badge-selected::after{width:6px;height:6px}
-.badge-option{min-height:30px;font-size:.73rem}
-footer{padding:12px;color:#657590;border-top-color:rgba(89,132,187,.16);font-size:.68rem}
-@media(max-width:1150px){body>header.command-header{grid-template-columns:minmax(220px,300px) minmax(200px,1fr) auto;gap:14px;padding-inline:16px}.command-tools{gap:12px}.sidebar{width:70px;padding-inline:8px}.app-shell{grid-template-columns:70px minmax(0,1fr)}.side-link{justify-content:center;padding:9px 5px}.side-link>span:last-child{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap}.sidebar-footer>span,.sidebar-footer>a{display:none}.sidebar-footer img{width:42px;height:42px}.stats-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
-@media(max-width:760px){body>header.command-header{grid-template-columns:1fr auto;gap:9px 16px;min-height:60px}.command-title{grid-column:1/-1;grid-row:2;padding:0 0 5px;font-size:.98rem}body>header.command-header h1.command-title{font-size:.98rem}.command-title::after{bottom:-2px}.command-tools{grid-column:2;grid-row:1}.app-shell{display:block;min-height:0}.sidebar{position:sticky;top:0;z-index:90;width:100%;height:auto;min-height:0;padding:7px 10px;background:rgba(5,15,32,.97);border-right:0;border-bottom:1px solid rgba(89,132,187,.18);backdrop-filter:blur(12px)}.side-nav{display:flex;gap:5px;overflow-x:auto;scrollbar-width:none}.side-nav::-webkit-scrollbar{display:none}.side-link{justify-content:flex-start;flex:0 0 auto;min-height:34px;padding:6px 10px;font-size:.69rem}.side-link>span:last-child{position:static;width:auto;height:auto;overflow:visible;clip:auto;white-space:nowrap}.sidebar-footer{display:none}.operations{padding:16px 12px 28px}.stats-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.stat-card{min-height:65px;padding:8px 10px}.stat-card::before{width:30px;height:30px;font-size:.85rem}.stat-label{font-size:.61rem}.stat-value{font-size:1rem}.page-heading{gap:10px}}
-@media(max-width:480px){body>header.command-header{grid-template-columns:minmax(0,1fr) auto;padding:8px 12px}.command-logo{width:35px;height:40px}.command-brand{gap:8px}.command-brand-copy strong{max-width:185px;font-size:.72rem;letter-spacing:.07em}.command-brand-copy small{font-size:.49rem;letter-spacing:.07em}.command-tools{gap:8px}.command-meta{gap:4px;font-size:.62rem}.command-meta svg{width:14px;height:14px}.command-title{font-size:.89rem}.side-link{padding-inline:8px}.side-icon,.side-icon svg{width:15px;height:15px}.stats-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.stat-card{gap:8px}.stat-card::before{width:27px;height:27px}.stat-label{font-size:.57rem}.save-status{width:100%;justify-content:flex-start}.page-heading{align-items:flex-start}.operations{padding-inline:9px}}
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  color: #e0e0e0;
+  line-height: 1.6;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+header {
+  background: rgba(0, 0, 0, 0.5);
+  border-bottom: 3px solid #d4af37;
+  padding: 2rem;
+  backdrop-filter: blur(10px);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.logo {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 8px rgba(212, 175, 55, 0.5));
+}
+
+.brand h1 {
+  font-size: 2.5rem;
+  color: #d4af37;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+}
+
+.brand p {
+  font-size: 0.95rem;
+  color: #b0b0b0;
+}
+
+nav {
+  display: flex;
+  gap: 1.5rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+nav a {
+  color: #d4af37;
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  border: 1px solid #d4af37;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+nav a:hover {
+  background: #d4af37;
+  color: #1a1a2e;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+}
+
+section {
+  flex: 1;
+  padding: 3rem 2rem;
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.card {
+  background: rgba(30, 30, 50, 0.8);
+  border-left: 4px solid #d4af37;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+  transform: translateX(5px);
+  box-shadow: 0 12px 40px rgba(212, 175, 55, 0.2);
+}
+
+.card h2 {
+  font-size: 1.8rem;
+  color: #d4af37;
+  margin-bottom: 1rem;
+}
+
+.card h3 {
+  font-size: 1.3rem;
+  color: #d4af37;
+  margin-bottom: 1rem;
+}
+
+.card p {
+  color: #d0d0d0;
+  line-height: 1.8;
+  margin-bottom: 1rem;
+}
+
+.card ul {
+  list-style: none;
+  padding-left: 0;
+  margin-bottom: 1rem;
+}
+
+.card li {
+  padding: 0.6rem 0;
+  padding-left: 1.5rem;
+  position: relative;
+  color: #d0d0d0;
+}
+
+.card li:before {
+  content: "▸";
+  position: absolute;
+  left: 0;
+  color: #d4af37;
+  font-weight: bold;
+}
+
+.card .quote {
+  font-style: italic;
+  border-left: 3px solid #d4af37;
+  padding-left: 1rem;
+  color: #c0c0c0;
+  margin: 0.8rem 0;
+}
+
+.card .cours-image {
+  max-width: 100%;
+  height: auto;
+  border-radius: 4px;
+  margin-top: 1rem;
+  display: block;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+footer {
+  background: rgba(0, 0, 0, 0.7);
+  border-top: 2px solid #d4af37;
+  padding: 2rem;
+  text-align: center;
+  color: #b0b0b0;
+  font-size: 0.9rem;
+}
+
+footer p {
+  margin: 0.5rem 0;
+}
+
+@media (max-width: 768px) {
+  .brand {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .brand h1 {
+    font-size: 1.8rem;
+  }
+
+  nav {
+    gap: 0.8rem;
+  }
+
+  nav a {
+    font-size: 0.9rem;
+    padding: 0.4rem 0.8rem;
+  }
+
+  section {
+    padding: 1.5rem 1rem;
+  }
+
+  .card {
+    padding: 1rem;
+  }
+}
+    
+
+/* En-tete propre a cette page */
+body > header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 24px;
+  width: 100%;
+  min-height: 84px;
+  padding: 12px clamp(16px, 4vw, 52px);
+  color: #f4f6fb;
+  background: linear-gradient(110deg, rgba(5, 10, 24, 0.98), rgba(10, 19, 48, 0.96) 58%, rgba(8, 15, 35, 0.98));
+  border-bottom: 1px solid rgba(212, 175, 55, 0.32);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.28);
+  backdrop-filter: blur(10px);
+}
+
+body > header > .brand,
+body > header > .header-inner {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  justify-content: space-between;
+  gap: clamp(14px, 2.5vw, 32px);
+  min-width: 0;
+  width: 100%;
+  margin: 0;
+}
+
+body > header .brand-home {
+  display: flex;
+  flex: 0 1 auto;
+  flex-direction: row;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+  color: inherit;
+  text-decoration: none;
+  border-radius: 10px;
+}
+
+body > header .brand-home:hover {
+  color: inherit;
+  text-decoration: none;
+  filter: brightness(1.1);
+}
+
+body > header .brand-home:focus-visible {
+  outline: 2px solid #e6c866;
+  outline-offset: 5px;
+}
+
+body > header .logo {
+  width: 56px;
+  height: 56px;
+  flex: 0 0 auto;
+  padding: 4px;
+  object-fit: contain;
+  border: 1px solid rgba(230, 200, 102, 0.42);
+  border-radius: 15px;
+  background: rgba(212, 175, 55, 0.06);
+  filter: drop-shadow(0 4px 10px rgba(212, 175, 55, 0.18));
+}
+
+body > header h1,
+body > header .brand-text strong {
+  margin: 0;
+  color: #e6c866;
+  font-size: clamp(1.05rem, 1.8vw, 1.4rem);
+  line-height: 1.2;
+  letter-spacing: 0.01em;
+  text-shadow: 0 2px 12px rgba(212, 175, 55, 0.18);
+}
+
+body > header .brand p,
+body > header .brand-text > span {
+  margin: 4px 0 0;
+  color: #9aa6c4;
+  font-size: 0.84rem;
+  line-height: 1.35;
+}
+
+body > header nav {
+  display: flex;
+  flex: 0 1 auto;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  width: auto;
+  max-width: 100%;
+  margin: 0;
+}
+
+body > header nav a,
+body > header .back-btn,
+body > header .login-btn {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: 9px 13px;
+  color: #dce4f8;
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid rgba(212, 175, 55, 0.2);
+  border-radius: 10px;
+  font-size: 0.88rem;
+  font-weight: 650;
+  line-height: 1.2;
+  text-align: center;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color 160ms ease, background-color 160ms ease, border-color 160ms ease, transform 160ms ease;
+}
+
+body > header nav a:hover,
+body > header .back-btn:hover,
+body > header .login-btn:hover {
+  color: #e6c866;
+  background: rgba(212, 175, 55, 0.1);
+  border-color: rgba(230, 200, 102, 0.5);
+  transform: translateY(-1px);
+}
+
+body > header nav a:focus-visible,
+body > header .back-btn:focus-visible,
+body > header .login-btn:focus-visible {
+  outline: 2px solid #e6c866;
+  outline-offset: 3px;
+}
+
+body > header .login-btn {
+  color: #0a1330;
+  background: linear-gradient(135deg, #e6c866, #d4af37 58%, #b48f1f);
+  border-color: rgba(230, 200, 102, 0.7);
+}
+
+body > header .login-btn:hover {
+  color: #0a1330;
+  background: linear-gradient(135deg, #f0d77e, #d4af37);
+}
+
+@media (max-width: 700px) {
+  body > header {
+    gap: 10px 14px;
+    min-height: auto;
+    padding: 12px 16px;
+  }
+
+  body > header > .brand,
+  body > header > .header-inner {
+    flex-basis: 100%;
+    flex-wrap: wrap;
+    gap: 10px 12px;
+  }
+
+  body > header .brand-home {
+    gap: 11px;
+  }
+
+  body > header nav {
+    flex: 1 1 100%;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  body > header nav a,
+  body > header .back-btn,
+  body > header .login-btn {
+    min-height: 38px;
+    padding: 8px 11px;
+    font-size: 0.82rem;
+  }
+}
+
+@media (max-width: 420px) {
+  body > header .logo {
+    width: 48px;
+    height: 48px;
+    border-radius: 13px;
+  }
+
+  body > header h1,
+  body > header .brand-text strong {
+    font-size: 1rem;
+  }
+
+  body > header .brand p,
+  body > header .brand-text > span {
+    font-size: 0.78rem;
+  }
+}
 
 </style>
 <link rel="stylesheet" href="/site-theme.css">
@@ -151,550 +405,74 @@ footer{padding:12px;color:#657590;border-top-color:rgba(89,132,187,.16);font-siz
 </head>
 <body>
 
-<header class="command-header">
-    <a class="command-brand" href="/dashboard" aria-label="Retour au dashboard">
-        <img src="/assets/logo-gendarmerie.png" class="command-logo" alt="">
-        <span class="command-brand-copy"><strong>Gendarmerie Nationale</strong><small>Notre engagement, votre s&eacute;curit&eacute;</small></span>
-    </a>
-    <h1 class="command-title">Document des Patrouilles</h1>
-    <div class="command-tools" aria-label="Informations de session">
-        <span class="command-meta"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/></svg><time id="header-date">&mdash;</time></span>
-        <span class="command-meta"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><time id="header-time">&mdash;</time></span>
+<header>
+    <div class="brand">
+        <a class="brand-home" href="/dashboard" aria-label="Retour au tableau de bord"><img src="/assets/logo-gendarmerie.png" class="logo" alt="Logo Gendarmerie">
+        <div>
+            <h1>Contrôle routier</h1>
+        </div></a>
     </div>
+
+    <nav>
+        <a href="/cours.html">Retour aux cours</a>
+        <a href="/dashboard.html">Dashboard</a>
+    </nav>
 </header>
 
-<div class="app-shell">
-    <aside class="sidebar">
-        <nav class="side-nav" aria-label="Navigation principale">
-            <a class="side-link active" href="#patrols" aria-current="page"><span class="side-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 4.5 6v5.2c0 4.7 3.2 8 7.5 9.8 4.3-1.8 7.5-5.1 7.5-9.8V6L12 3Z"/><path d="m9 12 2 2 4-4"/></svg></span><span>Patrouilles</span></a>
-            <a class="side-link" href="/dashboard"><span class="side-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 11 9-8 9 8v9a1 1 0 0 1-1 1h-5v-7h-6v7H4a1 1 0 0 1-1-1v-9Z"/></svg></span><span>Dashboard</span></a>
-            <a class="side-link" href="/effectifs"><span class="side-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3 20v-2a6 6 0 0 1 12 0v2M16 5.5a3 3 0 0 1 0 5.8M18 14a4 4 0 0 1 3 4v2"/></svg></span><span>Effectifs</span></a>
-            <a class="side-link" href="/admin"><span class="side-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 16 6.5 9h11l1.5 7M4 16h16v4H4zM7 9l2-4h6l2 4M7.5 13h.01M16.5 13h.01"/><circle cx="7" cy="19" r="1"/><circle cx="17" cy="19" r="1"/></svg></span><span>V&eacute;hicules</span></a>
-            <a class="side-link" href="/admin"><span class="side-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-1.8 1.8-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5v.2h-2.6v-.2a1.7 1.7 0 0 0-1-1.5 1.7 1.7 0 0 0-1.9.3l-.1.1-1.8-1.8.1-.1A1.7 1.7 0 0 0 8 15a1.7 1.7 0 0 0-1.5-1H6.3v-2.6h.2A1.7 1.7 0 0 0 8 10a1.7 1.7 0 0 0-.3-1.9l-.1-.1 1.8-1.8.1.1a1.7 1.7 0 0 0 1.9.3 1.7 1.7 0 0 0 1-1.5v-.2H15v.2a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1 1.8 1.8-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.5 1h.2v2.6h-.2a1.7 1.7 0 0 0-1.5 1Z"/></svg></span><span>Param&egrave;tres</span></a>
-        </nav>
-        <div class="sidebar-footer">
-            <img src="/assets/logo-gendarmerie.png" alt="">
-            <span>Gendarmerie Nationale<br>R&eacute;publique Fran&ccedil;aise</span>
-            <span class="tricolour" aria-label="Drapeau fran&ccedil;ais"><i></i><i></i><i></i></span>
-            <a href="/logout">D&eacute;connexion</a>
-        </div>
-    </aside>
-    <main class="operations">
-
-
-    <div class="page-heading">
-        <div>
-            <p class="eyebrow">Centre opérationnel · Gendarmerie Nationale</p>
-            <h2>Situation op&eacute;rationnelle</h2>
-            <p class="intro">Suivi des équipages, véhicules et états opérationnels.</p>
-        </div>
-        <div id="save-status" class="save-status status-loading" role="status" aria-live="polite">
-            <span class="status-dot" aria-hidden="true"></span>
-            <span id="save-label">Chargement des données…</span>
-            <button id="retry-save" type="button" hidden>Réessayer</button>
-        </div>
+<section>
+    <div class="card">
+        <h2>Contrôle de véhicule</h2>
+        <p>Procédure complète pour effectuer un contrôle en sécurité.</p>
     </div>
-    <div class="stats-grid" id="patrol-stats" aria-label="Synthèse opérationnelle">
-        <article class="stat-card"><span class="stat-label">Patrouilles configurées</span><strong class="stat-value" id="stat-total">&mdash;</strong></article>
-        <article class="stat-card available"><span class="stat-label">Disponibles</span><strong class="stat-value" id="stat-available">&mdash;</strong></article>
-        <article class="stat-card intervention"><span class="stat-label">En intervention</span><strong class="stat-value" id="stat-intervention">&mdash;</strong></article>
-        <article class="stat-card unavailable"><span class="stat-label">Indisponibles</span><strong class="stat-value" id="stat-unavailable">&mdash;</strong></article>
-        <article class="stat-card assigned"><span class="stat-label">Avec personnel affecté</span><strong class="stat-value" id="stat-assigned">&mdash;</strong></article>
+
+    <div class="card">
+        <h3>Étape 1</h3>
+        <p>Activer les avertisseurs lumineux et sonores pour signaler le contrôle.</p>
     </div>
-    <div id="patrols" class="unit-grid" aria-live="polite"><div class="load-error">Chargement des unités…</div></div>
-</main>
-</div>
+
+    <div class="card">
+        <h3>Étape 2</h3>
+        <p>Récolter les informations importantes :</p>
+        <ul>
+            <li>Plaque d'immatriculation</li>
+            <li>Couleur</li>
+            <li>Modèle du véhicule</li>
+            <li>Nombre d'individus visibles</li>
+        </ul>
+    </div>
+
+    <div class="card">
+        <h3>Placement des effectifs</h3>
+        <img src="/assets/controle-placement.png" class="cours-image" alt="Placement des effectifs">
+    </div>
+
+    <div class="card">
+        <h3>Début du contrôle</h3>
+        <p class="quote">
+            Monsieur / Madame bonjour, coupez le contact du véhicule et mettez la clé sur le tableau de bord.
+        </p>
+        <p class="quote">
+            Présentez-moi vos papiers : permis, carte grise et pièce d'identité.
+        </p>
+    </div>
+
+    <div class="card">
+        <h3>Motif du contrôle</h3>
+        <p>
+            Demander si l'individu connaît le motif du contrôle. Sinon, expliquer clairement les faits reprochés.
+        </p>
+    </div>
+
+    <div class="card">
+        <h3>Fin du contrôle</h3>
+        <p>Remettre le véhicule en circulation en sécurité.</p>
+    </div>
+
+</section>
 
 <footer class="footer">
     <p>© 2026 lexy_off1 — Tous droits réservés</p>
 </footer>
-
-<script>
-let effectifs = [];
-let saved = {};
-
-const STATUTS = [
-    "(1) • DISPONIBLE",
-    "(2) • INDISPONIBLE",
-    "(3) • INTERVENTION",
-    "(4) • OPÉRATION",
-    "(5) • CONTRÔLE PARTIEL",
-    "(6) • CONTRÔLE TOTAL",
-    "(7) • TRANSFÈRE PÉNITENTIAIRE",
-    "(8) • ENQUÊTE PJGN",
-    "(9) • CONTRÔLE RADAR (ERI)",
-    "(10) • ESCORTE GN/SP/SM/BC",
-    "(11) • BARRAGE ROUTIER",
-    "(12) • AUDITION PJGN/OPJ",
-    "(13) • DÉPÔT DE PLAINTE",
-    "(14) • ENTRAÎNEMENT",
-    "(15) • FORMATION",
-    "(16) • COMMANDEMENT",
-    "(17) • CONVOI SPÉCIAL",
-    "(18) • HOSPITALISATION",
-    "(19) • CORG TEMPORAIRE",
-    "(20) • PATROUILLE PÉDESTRE",
-    "(21) • REFUS D'OBTEMPÉRER EN COURS",
-    "(22) • CAFÉ"
-];
-
-let VEHICULES = {
-    PAM: [
-        "2020 Bullhorn Prancer Widebody",
-        "2022 Avantismo Q8",
-        "2024 Falcon eStallion",
-        "2020 BKM Munich",
-        "2019 Chevlon Platoon PPV",
-        "2021 Falcon Rampage PPV",
-        "2018 Bullhorn Pueblo Pursuit",
-        "2021 Chevlon Camion PPV",
-        "2024 Falcon Interceptor Utility",
-        "2011 Bullhorn Prancer Pursuit",
-        "2019 Falcon Interceptor Utility",
-        "1981 Chevlon Inferno",
-        "2013 Falcon Interceptor Utility",
-        "2020 Stuttgart Runner",
-        "2015 Bullhorn Prancer Pursuit",
-        "2018 Chevlon Camion PPV",
-        "2017 Falcon Interceptor Sedan",
-        "1988 Bulleron Foreman",
-        "2002 Falcon Traveller",
-        "2008 Chevlon Camion PPV",
-        "2009 Chevlon Captain PPV",
-        "2000 Chevlon Camion PPV",
-        "2009 Bullhorn BH15 SSV",
-        "2006 Chevlon Commuter Van",
-        "2003 Falcon Prime Eques Interceptor",
-        "Chaise de Bureau",
-        "Véhicule spécialité"
-    ],
-    PSIG: [
-        "2020 BKM Munich - PSIG BANA",
-        "2019 Chevlon Platoon PPV - PSIG BANA",
-        "2018 Bullhorn Pueblo - PSIG BANA",
-        "2020 Bullhorn Prancer Pursuit Widebody - PSIG BANA",
-        "2024 Falcon eStallion - PSIG BANA",
-        "2020 Stuttgart Runner - PSIG BANA",
-        "2021 Falcon Rampage PPV",
-        "2022 Avantismo Q8",
-        "2024 Falcon Interceptor Utility"
-    ],
-    EDCF: [
-        "2014 Chevlon Corbeta TZ",
-        "2020 Bullhorn Prancer Pursuit Widebody",
-        "2011 Chevlon Amigo",
-        "2022 Bullhorn Determinator SFP Fury",
-        "2022 Averon Q8",
-        "2024 Falcon eStallion",
-        "2015 Stallion 350 Bana",
-        "2006 Chevlon Commuter Van"
-    ],
-    AGIGN: [
-        "2020 Falcon Traveller SSV",
-        "2019 Chevlon Platoon PPV",
-        "2018 Bullhorn Pueblo Pursuit",
-        "2008 Chevlon Camion PPV",
-        "2021 Chevlon Camion PPV",
-        "2020 Bullhorn Prancer Pursuit Widebody",
-        "2020 BKM Munich",
-        "2022 Averon Q8",
-        "2011 SWAT TRUCK",
-        "2005 Mobile Command"
-    ],
-    BDR: [
-        "2003 Falcon Prime Eques",
-        "2006 Chevlon Commuter Van",
-        "2009 Chevlon Captain",
-        "2011 Bullhorn Prancer Pursuit",
-        "2015 Bullhorn Prancer Pursuit",
-        "2018 Bullhorn Pueblo Pursuit",
-        "2019 Falcon Interceptor Utility",
-        "2019 Falcon Interceptor Sedan",
-        "2020 Stuttgart Runner",
-        "2021 Chevlon Camion PPV",
-        "2024 eStallion"
-    ],
-    PGHM: [
-        "Averon Q8",
-        "Falcon Advance 350",
-        "2021 Chevlon Camion PPV",
-        "2021 Falcon Rampage PPV",
-        "2018 Chevlon Camion PPV",
-        "2019 Chevlon Platoon PPV",
-        "2006 Chevlon Commuter Van",
-        "2020 Stuttgart Runner",
-        "2009 Bullhorn BH15 SSV",
-        "Canyon Descender",
-        "4-Wheeler"
-    ]
-};
-
-const SECTIONS = [
-    {
-        title: "CORG ・ Centre d'opérations et de renseignement de la gendarmerie",
-        className: "corg",
-        vehicules: "PAM",
-        columns: ["CONDUCTEUR CORG", "OPÉRATEUR CORG", "ÉQUIPIER 1", "ÉQUIPIER 2"],
-        rows: ["CORG 69"]
-    },
-    {
-        title: "PAM ・ Sécurité Publique",
-        className: "pam",
-        vehicules: "PAM",
-        columns: ["CONDUCTEUR", "CHEF DE BORD", "ÉQUIPIER 1", "ÉQUIPIER 2"],
-        rows: ["PAM 01 Mérignac", "PAM 02 Mérignac", "PAM 03 Mérignac", "PAM 04 Mérignac", "PAM 05 Mérignac"]
-    },
-    {
-        title: "PSIG ・ Peloton de Surveillance Et d'Intervention De La Gendarmerie",
-        className: "psig",
-        vehicules: "PSIG",
-        columns: ["CONDUCTEUR PSIG", "CHEF DE BORD PSIG", "ÉQUIPIER 1 PSIG", "ÉQUIPIER 2 PSIG"],
-        rows: ["PSIG 130 ALPHA Mérignac", "PSIG 131 BRAVO Mérignac", "PSIG SABRE Mérignac"]
-    },
-    {
-        title: "EDCF ・ Escadron Départemental de Contrôle des Flux",
-        className: "edcf",
-        vehicules: "EDCF",
-        columns: ["PILOTE ERI", "CO-PILOTE ERI", "CONDUCTEUR TPI", "CHEF DE BORD TPI"],
-        rows: ["EDCF ALPHA Mérignac", "EDCF BRAVO Mérignac"]
-    },
-    {
-        title: "AGIGN ・ Groupe d'Intervention De La Gendarmerie",
-        className: "agign",
-        vehicules: "AGIGN",
-        columns: ["CONDUCTEUR AGIGN", "CHEF DE SERVICE", "OPÉRATEUR AGIGN 1", "OPÉRATEUR AGIGN 2"],
-        rows: ["AGIGN 250 ALPHA", "AGIGN 251 BRAVO", "AGIGN 350 COMMANDEMENT"]
-    },
-    {
-        title: "BDR ・ Brigade de Recherches",
-        className: "bdr",
-        vehicules: "BDR",
-        columns: ["CONDUCTEUR BDR", "CHEF DE BORD BDR", "ÉQUIPIER 1", "ÉQUIPIER 2"],
-        rows: ["BDR ALPHA", "BDR BRAVO"]
-    },
-    {
-        title: "PGHM ・ Peloton de Gendarmerie De Haute Montagne",
-        className: "pghm",
-        vehicules: "PGHM",
-        columns: ["CONDUCTEUR PGHM", "CHEF DE BORD PGHM", "ÉQUIPIER 1 PGHM", "ÉQUIPIER 2 PGHM"],
-        rows: ["PGHM 300 ALPHA", "PGHM BRAVO 330"]
-    }
-];
-
-function getGradeClass(grade = "") {
-    grade = String(grade || "").toUpperCase();
-    if (grade.startsWith("COL") || grade.startsWith("LCL") || grade.startsWith("CEN")) return "badge-ofs";
-    if (grade.startsWith("CNE") || grade.startsWith("LTN") || grade.startsWith("SLT") || grade.startsWith("ASP")) return "badge-ofb";
-    if (grade.startsWith("MAJ") || grade.startsWith("ADC") || grade.startsWith("ADJ")) return "badge-sop";
-    if (grade.startsWith("MDC") || grade.startsWith("GDC") || grade.startsWith("GDS") || grade.startsWith("ELG")) return "badge-sob";
-    return "badge-gav";
-}
-
-function getVehicleClass(vehicle = "") {
-    if (vehicle.includes("PSIG BANA")) return "badge-psig";
-    if (vehicle.includes("Sérigraphies")) return "badge-ofs";
-    if (vehicle.includes("ERI") || vehicle.includes("EDCF") || vehicle.includes("Corbeta") || vehicle.includes("Determinator")) return "badge-edcf";
-    if (vehicle.includes("GIGN") || vehicle.includes("SWAT") || vehicle.includes("Mobile Command")) return "badge-agign";
-    if (vehicle.includes("BDR") || vehicle.includes("Bana") || vehicle.includes("RESPONSABLE")) return "badge-bdr";
-    if (vehicle.includes("PGHM") || vehicle.includes("R-PGHM") || vehicle.includes("Canyon") || vehicle.includes("4-Wheeler")) return "badge-pghm";
-    if (vehicle.includes("2020 Bullhorn Prancer Widebody")) return "badge-ofs";
-    if (vehicle.includes("2022 Avantismo Q8") || vehicle.includes("2024 Falcon eStallion") || vehicle.includes("2020 BKM Munich")) return "badge-ofb";
-    if (vehicle.includes("2019 Chevlon Platoon PPV") || vehicle.includes("2021 Falcon Rampage PPV") || vehicle.includes("2018 Bullhorn Pueblo Pursuit") || vehicle.includes("2021 Chevlon Camion PPV") || vehicle.includes("2024 Falcon Interceptor Utility")) return "badge-sop";
-    if (vehicle.includes("2011 Bullhorn Prancer Pursuit") || vehicle.includes("2019 Falcon Interceptor Utility") || vehicle.includes("1981 Chevlon Inferno") || vehicle.includes("2013 Falcon Interceptor Utility") || vehicle.includes("2020 Stuttgart Runner") || vehicle.includes("2015 Bullhorn Prancer Pursuit")) return "badge-sob";
-    if (vehicle.includes("2018 Chevlon Camion PPV") || vehicle.includes("2017 Falcon Interceptor Sedan") || vehicle.includes("1988 Bulleron Foreman") || vehicle.includes("2002 Falcon Traveller") || vehicle.includes("2008 Chevlon Camion PPV") || vehicle.includes("2009 Chevlon Captain PPV") || vehicle.includes("2000 Chevlon Camion PPV") || vehicle.includes("2009 Bullhorn BH15 SSV") || vehicle.includes("2006 Chevlon Commuter Van") || vehicle.includes("2003 Falcon Prime Eques Interceptor")) return "badge-gav";
-    return "badge-empty";
-}
-
-function getVehicleDetails(name) {
-    for (const list of Object.values(VEHICULES)) {
-        const found = list.find(vehicle =>
-            (typeof vehicle === "string" ? vehicle : vehicle.name) === name
-        );
-        if (found) {
-            return typeof found === "string"
-                ? { name: found, color: "" }
-                : { name: found.name, color: found.color || "" };
-        }
-    }
-    return { name, color: "" };
-}
-
-function getContrastColor(hex) {
-    if (!/^#[0-9a-f]{6}$/i.test(hex || "")) return "white";
-    const value = hex.slice(1);
-    const luminance = (parseInt(value.slice(0, 2), 16) * 0.299) +
-        (parseInt(value.slice(2, 4), 16) * 0.587) +
-        (parseInt(value.slice(4, 6), 16) * 0.114);
-    return luminance > 160 ? "black" : "white";
-}
-
-
-
-function formatUser(user = {}) {
-    const gradeValue = String(user.grade || "").trim();
-    const grade = gradeValue.match(/^(COL|LCL|CEN|CNE|LTN|SLT|ASP|MAJ|ADC|ADJ|MDC|GDC|GDS|ELG|MDL|BRC|BRI|GAV)\b/i)?.[0]?.toUpperCase() || "--";
-    const nigend = user.NIGEND == null ? "--" : String(user.NIGEND).slice(0, 2);
-    const rawName = String(user.nomPrenom || user.username || "Inconnu");
-    const nom = rawName.replace(/^(COL|LCL|CEN|CNE|LTN|SLT|ASP|MAJ|ADC|ADJ|MDC|GDC|GDS|ELG|MDL|BRC|BRI|GAV)\s*[|\u2022\u2014-]\s*/i, "");
-    return `${grade} - ${nigend} • ${nom}`;
-}
-
-function escapeHtml(value) {
-    return String(value ?? "").replace(/[&<>"']/g, character => ({
-        "&": "&amp;",
-        "<": "&lt;",
-        ">": "&gt;",
-        '"': "&quot;",
-        "'": "&#39;"
-    })[character]);
-}
-
-function isRecord(value) {
-    return value !== null && typeof value === "object" && !Array.isArray(value);
-}
-
-function makeBadgeSelect(id, items, getClassFn, ariaLabel) {
-    const safeId = escapeHtml(id);
-    const choices = [{ value: "", label: "\u2014", raw: "", color: "" }, ...items];
-    return `<div class="badge-select" id="wrap-${safeId}">
-        <button class="badge-selected badge-empty" id="${safeId}" type="button" data-value="" data-badge-toggle="${safeId}" aria-label="${escapeHtml(ariaLabel)}" aria-haspopup="listbox" aria-expanded="false" aria-controls="options-${safeId}"><span class="badge-value">\u2014</span></button>
-        <div class="badge-options" id="options-${safeId}" role="listbox" aria-label="${escapeHtml(ariaLabel)}">
-        ${choices.map(item => {
-            const label = String(item.label ?? ""), value = String(item.value ?? ""), cls = getClassFn(item.raw || label);
-            const color = /^#[0-9a-f]{6}$/i.test(item.color || "") ? item.color : "";
-            const style = color ? ` style="background:${escapeHtml(color)};color:${getContrastColor(color)}"` : "";
-            return `<button type="button" class="badge-option ${escapeHtml(cls)}" role="option" aria-selected="false" data-badge-option data-badge-id="${safeId}" data-badge-value="${escapeHtml(value)}" data-badge-label="${escapeHtml(label)}" data-badge-class="${escapeHtml(cls)}" data-badge-color="${escapeHtml(color)}"${style}>${escapeHtml(label)}</button>`;
-        }).join("")}</div></div>`;
-}
-
-function makeSelect(id, type, section = null, ariaLabel = "Sélection") {
-    if (type === "user") return makeBadgeSelect(id, effectifs.map(user => ({ value: String(user.id), label: formatUser(user), raw: user.grade || "" })), getGradeClass, ariaLabel);
-    if (type === "vehicle") {
-        const list = Array.isArray(VEHICULES[section.vehicules]) ? VEHICULES[section.vehicules] : [];
-        const items = list.map(vehicle => ({
-            value: typeof vehicle === "string" ? vehicle : String(vehicle?.name || ""),
-            label: typeof vehicle === "string" ? vehicle : String(vehicle?.name || ""),
-            raw: typeof vehicle === "string" ? vehicle : String(vehicle?.name || ""),
-            color: typeof vehicle === "string" ? "" : vehicle?.color || ""
-        })).filter(item => item.value);
-        return makeBadgeSelect(id, items, getVehicleClass, ariaLabel);
-    }
-    if (type === "statut") return makeBadgeSelect(id, STATUTS.map(status => ({ value: status, label: status, raw: status })), getStatutClass, ariaLabel);
-    return "";
-}
-
-function getStatutClass(value = "") {
-    const number = String(value).match(/^\((\d+)\)/)?.[1];
-    const classes = {1:"badge-green",2:"badge-red",3:"badge-blue",4:"badge-orange",5:"badge-yellow",6:"badge-purple",7:"badge-cyan",8:"badge-pink",9:"badge-lightgreen",10:"badge-salmon",11:"badge-yellow",12:"badge-pink",13:"badge-lavender",14:"badge-gav",15:"badge-green",16:"badge-red",17:"badge-darkgreen",18:"badge-orange",19:"badge-yellow",20:"badge-green",21:"badge-red",22:"badge-brown"};
-    return classes[number] || "badge-empty";
-}
-
-function getBadgeButton(id) { return document.getElementById(id); }
-function getBadgeMenu(id) { return document.getElementById(`options-${id}`); }
-
-function closeBadgeMenus(exceptId = "") {
-    document.querySelectorAll(".badge-select.open").forEach(wrapper => {
-        const button = wrapper.querySelector("[data-badge-toggle]");
-        if (button?.dataset.badgeToggle === exceptId) return;
-        wrapper.classList.remove("open");
-        if (button) button.setAttribute("aria-expanded", "false");
-        getBadgeMenu(button?.dataset.badgeToggle)?.classList.remove("is-open");
-    });
-}
-
-function positionBadgeMenu(wrapper) {
-    const button = wrapper.querySelector("[data-badge-toggle]"), menu = button && getBadgeMenu(button.dataset.badgeToggle);
-    if (!button || !menu || !wrapper.classList.contains("open")) return;
-    const rect = button.getBoundingClientRect();
-    const width = Math.max(1, Math.min(420, Math.max(260, rect.width), window.innerWidth - 24));
-    menu.style.width = `${width}px`;
-    menu.style.maxHeight = `${Math.min(420, window.innerHeight * .55)}px`;
-    const height = menu.getBoundingClientRect().height;
-    const above = rect.bottom + height + 8 > window.innerHeight - 8 && rect.top > height + 16;
-    menu.style.top = `${Math.max(8, above ? rect.top - height - 5 : Math.min(window.innerHeight - height - 8, rect.bottom + 5))}px`;
-    menu.style.left = `${Math.max(12, Math.min(rect.left, window.innerWidth - width - 12))}px`;
-}
-
-function toggleBadge(id) {
-    const button = getBadgeButton(id), wrapper = document.getElementById(`wrap-${id}`), menu = getBadgeMenu(id);
-    if (!button || !wrapper || !menu) return;
-    const open = !wrapper.classList.contains("open");
-    closeBadgeMenus();
-    if (!open) return;
-    wrapper.classList.add("open"); menu.classList.add("is-open"); button.setAttribute("aria-expanded", "true");
-    positionBadgeMenu(wrapper);
-}
-
-function chooseBadge(id, value, label, cls, color = "") {
-    const button = getBadgeButton(id), wrapper = document.getElementById(`wrap-${id}`), menu = getBadgeMenu(id);
-    if (!button || !wrapper || !menu) return;
-    button.dataset.value = value;
-    button.querySelector(".badge-value").textContent = label || "\u2014";
-    button.className = `badge-selected ${cls || "badge-empty"}`;
-    button.style.backgroundColor = color || "";
-    button.style.color = color ? getContrastColor(color) : "";
-    button.setAttribute("aria-expanded", "false");
-    wrapper.classList.remove("open"); menu.classList.remove("is-open");
-    menu.querySelectorAll("[data-badge-option]").forEach(option => option.setAttribute("aria-selected", option.dataset.badgeValue === value ? "true" : "false"));
-    updateStatistics(); savePatrouilles();
-}
-
-function applySaved() {
-    document.querySelectorAll("[data-badge-toggle]").forEach(button => {
-        const id = button.dataset.badgeToggle, raw = Object.prototype.hasOwnProperty.call(saved, id) ? saved[id] : "";
-        const value = raw == null ? "" : String(raw);
-        let label = "\u2014", cls = "badge-empty", color = "";
-        if (value) {
-            const user = effectifs.find(item => String(item.id) === value);
-            if (user) { label = formatUser(user); cls = getGradeClass(user.grade || ""); }
-            else if (STATUTS.includes(value)) { label = value; cls = getStatutClass(value); }
-            else { label = value; color = getVehicleDetails(value).color; cls = getVehicleClass(value); }
-        }
-        button.dataset.value = value; button.querySelector(".badge-value").textContent = label;
-        button.className = `badge-selected ${cls}`; button.style.backgroundColor = color || "";
-        button.style.color = color ? getContrastColor(color) : "";
-        getBadgeMenu(id)?.querySelectorAll("[data-badge-option]").forEach(option => option.setAttribute("aria-selected", option.dataset.badgeValue === value ? "true" : "false"));
-    });
-    updateStatistics();
-}
-
-function render() {
-    const box = document.getElementById("patrols");
-    box.innerHTML = SECTIONS.map(section => {
-        const headingId = `unit-${section.className}-title`;
-        const rows = section.rows.map((row, rowIndex) => {
-            const staff = section.columns.map((column, columnIndex) => {
-                const id = `${section.className}_${rowIndex}_${columnIndex}`;
-                return `<td>${makeSelect(id, "user", section, `${column} — ${row}`)}</td>`;
-            }).join("");
-            return `<tr><th scope="row" class="patrol-name">${escapeHtml(row)}</th>${staff}<td>${makeSelect(`${section.className}_${rowIndex}_vehicule`, "vehicle", section, `Véhicule — ${row}`)}</td><td>${makeSelect(`${section.className}_${rowIndex}_statut`, "statut", section, `Statut ? ${row}`)}</td></tr>`;
-        }).join("");
-        return `<section class="table-section ${escapeHtml(section.className)}" aria-labelledby="${headingId}">
-            <h3 class="section-title" id="${headingId}">${escapeHtml(section.title)}<span class="unit-count">${section.rows.length}</span></h3>
-            <div class="table-scroll" tabindex="0" aria-label="Tableau de ${escapeHtml(section.title)} ; défilement horizontal possible">
-                <table class="patrol-table"><thead><tr><th scope="col">Patrouille</th>${section.columns.map(col => `<th scope="col">${escapeHtml(col)}</th>`).join("")}<th scope="col">Véhicule</th><th scope="col">Statut</th></tr></thead><tbody>${rows}</tbody></table>
-            </div></section>`;
-    }).join("");
-    box.querySelectorAll(".badge-options").forEach(menu => document.body.appendChild(menu));
-    applySaved();
-}
-
-function updateStatistics() {
-    const rows = SECTIONS.flatMap(section => section.rows.map((_, rowIndex) => ({ section, rowIndex })));
-    let available=0, intervention=0, unavailable=0, assigned=0;
-    rows.forEach(({section,rowIndex}) => {
-        const base=section.className, status=getBadgeButton(`${base}_${rowIndex}_statut`)?.dataset.value || "";
-        if (status.startsWith("(1)")) available++;
-        if (status.startsWith("(3)")) intervention++;
-        if (status.startsWith("(2)")) unavailable++;
-        if (section.columns.some((_,index) => Boolean(getBadgeButton(`${base}_${rowIndex}_${index}`)?.dataset.value))) assigned++;
-    });
-    document.getElementById("stat-total").textContent=String(rows.length);
-    document.getElementById("stat-available").textContent=String(available);
-    document.getElementById("stat-intervention").textContent=String(intervention);
-    document.getElementById("stat-unavailable").textContent=String(unavailable);
-    document.getElementById("stat-assigned").textContent=String(assigned);
-}
-
-function setSaveStatus(state,message,retry=false) {
-    document.getElementById("save-status").className=`save-status status-${state}`;
-    document.getElementById("save-label").textContent=message;
-    document.getElementById("retry-save").hidden=!retry;
-}
-
-function collectPatrouilleState() {
-    const data={...saved};
-    document.querySelectorAll("[data-badge-toggle]").forEach(button => { data[button.dataset.badgeToggle]=button.dataset.value || ""; });
-    return data;
-}
-
-let saveTimer=null, saveRunning=false, pendingSave=null;
-function savePatrouilles() {
-    clearTimeout(saveTimer); setSaveStatus("pending","Modifications en attente");
-    saveTimer=setTimeout(() => { pendingSave=collectPatrouilleState(); flushPatrouilleSaves(); },350);
-}
-
-async function flushPatrouilleSaves() {
-    if(saveRunning)return; saveRunning=true;
-    try {
-        while(pendingSave) {
-            const snapshot=pendingSave; pendingSave=null; setSaveStatus("saving","Enregistrement en cours…");
-            const response=await fetch((window.API_BASE || "")+"/api/patrouilles",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(snapshot)});
-            const result=await response.json().catch(()=>({}));
-            if(!response.ok || result.success!==true) throw new Error(result.error || `Échec de l'enregistrement (HTTP ${response.status}).`);
-            saved={...saved,...snapshot};
-            if(!pendingSave) setSaveStatus("saved",`Enregistré à ${new Date().toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit"})}`);
-        }
-    } catch(error) {
-        pendingSave=null; console.error("Erreur lors de la sauvegarde des patrouilles:",error);
-        setSaveStatus("error",error.message || "Enregistrement impossible. Vos choix restent affichés.",true);
-    } finally { saveRunning=false; if(pendingSave) flushPatrouilleSaves(); }
-}
-
-async function init() {
-    const box=document.getElementById("patrols"); box.innerHTML='<div class="load-error">Chargement des unités…</div>';
-    setSaveStatus("loading","Chargement des données…");
-    try {
-        const usersRes=await fetch((window.API_BASE || "")+"/api/effectifs");
-        if(!usersRes.ok) throw new Error(`Effectifs indisponibles (HTTP ${usersRes.status}).`);
-        const usersData=await usersRes.json();
-        if(!Array.isArray(usersData)) throw new Error("Le format des effectifs re?u n'est pas valide.");
-        effectifs=usersData.filter(user=>isRecord(user)&&user.id!=null);
-        const vehiclesRes=await fetch((window.API_BASE || "")+"/api/vehicules/list");
-        if(!vehiclesRes.ok) throw new Error(`Véhicules indisponibles (HTTP ${vehiclesRes.status}).`);
-        const vehiclesData=await vehiclesRes.json();
-        if(!isRecord(vehiclesData)) throw new Error("Le format des véhicules reçu n'est pas valide.");
-        VEHICULES={...VEHICULES,...Object.fromEntries(Object.entries(vehiclesData).filter(([,list])=>Array.isArray(list)))};
-        const patrolRes=await fetch((window.API_BASE || "")+"/api/patrouilles");
-        if(!patrolRes.ok) throw new Error(`Patrouilles indisponibles (HTTP ${patrolRes.status}).`);
-        const patrolData=await patrolRes.json();
-        if(!isRecord(patrolData)) throw new Error("Le format des patrouilles reçu n'est pas valide.");
-        saved=patrolData; render(); setSaveStatus("ready","Données opérationnelles chargées");
-    } catch(error) {
-        console.error("Erreur lors du chargement des patrouilles:",error);
-        box.innerHTML=`<div class="load-error" role="alert">${escapeHtml(error.message || "Impossible de charger les données opérationnelles.")}<br><button type="button" data-retry-load>Réessayer le chargement</button></div>`;
-        setSaveStatus("error","Chargement impossible");
-    }
-}
-
-document.addEventListener("click",event=>{
-    const target=event.target instanceof Element?event.target:null; if(!target)return;
-    const toggle=target.closest("[data-badge-toggle]");
-    if(toggle){toggleBadge(toggle.dataset.badgeToggle);return;}
-    const option=target.closest("[data-badge-option]");
-    if(option){chooseBadge(option.dataset.badgeId,option.dataset.badgeValue,option.dataset.badgeLabel,option.dataset.badgeClass,option.dataset.badgeColor);return;}
-    if(target.closest("[data-retry-load]")){init();return;}
-    if(!target.closest(".badge-select,.badge-options"))closeBadgeMenus();
-});
-
-document.addEventListener("keydown",event=>{
-    const toggle=event.target.closest?.("[data-badge-toggle]");
-    if(toggle && ["Enter"," ","ArrowDown"].includes(event.key)){
-        event.preventDefault(); const id=toggle.dataset.badgeToggle,open=document.getElementById(`wrap-${id}`)?.classList.contains("open");
-        toggleBadge(id); if(!open)getBadgeMenu(id)?.querySelector("[data-badge-option]")?.focus(); return;
-    }
-    const option=event.target.closest?.("[data-badge-option]"); if(!option)return;
-    const menu=option.closest(".badge-options");
-    if(event.key==="ArrowDown"||event.key==="ArrowUp"){
-        event.preventDefault();const options=[...menu.querySelectorAll("[data-badge-option]")],i=options.indexOf(option);
-        options[(i+(event.key==="ArrowDown"?1:options.length-1))%options.length]?.focus();
-    }else if(event.key==="Escape"){
-        event.preventDefault();const button=getBadgeButton(option.dataset.badgeId);closeBadgeMenus();button?.focus();
-    }
-});
-document.addEventListener("scroll",()=>document.querySelectorAll(".badge-select.open").forEach(positionBadgeMenu),true);
-window.addEventListener("resize",()=>document.querySelectorAll(".badge-select.open").forEach(positionBadgeMenu));
-document.getElementById("retry-save").addEventListener("click",()=>{pendingSave=collectPatrouilleState();flushPatrouilleSaves();});
-function updateHeaderClock() {
-    const now = new Date();
-    document.getElementById("header-date").textContent = new Intl.DateTimeFormat("fr-FR", { day: "numeric", month: "short", year: "numeric" }).format(now);
-    document.getElementById("header-time").textContent = new Intl.DateTimeFormat("fr-FR", { hour: "2-digit", minute: "2-digit" }).format(now);
-}
-updateHeaderClock();
-setInterval(updateHeaderClock, 60000);
-
-init();
-</script>
 
 </body>
 </html>
