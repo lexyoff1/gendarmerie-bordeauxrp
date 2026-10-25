@@ -626,7 +626,7 @@ function getImageExtension(buffer) {
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use("/assets", express.static("public/assets"));
+app.use("/assets", express.static(path.join(__dirname, "public", "assets")));
 // Avatars Discord synchronisés par Jore (voir avatar-sync.js)
 app.use("/avatars", express.static(process.env.AVATARS_DIR || path.join(__dirname, "public", "assets", "avatars")));
 app.use("/site-theme.css", express.static(path.join(__dirname, "public", "site-theme.css")));
@@ -905,6 +905,7 @@ const SPECIALITES = [
 ];
 
 const DATA_FILE = process.env.DATA_FILE_PATH || path.join(__dirname, "data.json");
+const DEFAULT_TENUES = require("./tenues-defaults.json");
 
 function getData() {
     if (!fs.existsSync(DATA_FILE)) {
@@ -922,6 +923,10 @@ function getData() {
     if (!Array.isArray(db.applications)) db.applications = [];
     if (!Array.isArray(db.specialiteApplications)) db.specialiteApplications = [];
     if (!Array.isArray(db.tenues)) db.tenues = [];
+    if (db.tenuesDefaultsVersion !== 1) {
+        seedDefaultTenues(db);
+        db.tenuesDefaultsVersion = 1;
+    }
     if (!Array.isArray(db.ticketsCommandement)) db.ticketsCommandement = [];
     if (!Array.isArray(db.saisies)) db.saisies = [];
     if (!Array.isArray(db.avis)) db.avis = [];
@@ -941,6 +946,36 @@ function getData() {
 
     saveData(db);
     return db;
+}
+
+function seedDefaultTenues(db) {
+    const usedIds = new Set(db.tenues.map(tenue => String(tenue.id)));
+    let nextId = db.tenues.reduce((maximum, tenue) => {
+        const id = Number(tenue.id);
+        return Number.isSafeInteger(id) ? Math.max(maximum, id) : maximum;
+    }, 0) + 1;
+
+    for (const defaultTenue of DEFAULT_TENUES) {
+        const alreadyPresent = db.tenues.some(tenue =>
+            String(tenue._defaultTenueId) === String(defaultTenue.id) ||
+            (String(tenue.id) === String(defaultTenue.id) &&
+                tenue.nom === defaultTenue.nom &&
+                tenue.categorie === defaultTenue.categorie &&
+                tenue.image === defaultTenue.image &&
+                tenue.description === defaultTenue.description)
+        );
+        if (alreadyPresent) continue;
+
+        const tenue = { ...defaultTenue };
+        if (usedIds.has(String(tenue.id))) {
+            while (usedIds.has(String(nextId))) nextId++;
+            tenue._defaultTenueId = tenue.id;
+            tenue.id = nextId++;
+        }
+
+        usedIds.add(String(tenue.id));
+        db.tenues.push(tenue);
+    }
 }
 
 function saveData(data) {
