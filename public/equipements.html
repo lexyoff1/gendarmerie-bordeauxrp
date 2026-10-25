@@ -2,10 +2,13 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Effectifs GN</title>
+    <title>Équipements</title>
     <style>
-* { margin: 0; padding: 0; box-sizing: border-box; }
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -44,8 +47,16 @@ header {
   filter: drop-shadow(0 0 8px rgba(212, 175, 55, 0.5));
 }
 
-.brand h1 { font-size: 2.5rem; color: #d4af37; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7); }
-.brand p { font-size: 0.95rem; color: #b0b0b0; }
+.brand h1 {
+  font-size: 2.5rem;
+  color: #d4af37;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+}
+
+.brand p {
+  font-size: 0.95rem;
+  color: #b0b0b0;
+}
 
 nav {
   display: flex;
@@ -82,14 +93,6 @@ section {
   margin: 0 auto;
 }
 
-section h2 {
-  font-size: 2rem;
-  color: #d4af37;
-  margin-bottom: 2rem;
-  border-bottom: 2px solid #d4af37;
-  padding-bottom: 0.8rem;
-}
-
 .card {
   background: rgba(30, 30, 50, 0.8);
   border-left: 4px solid #d4af37;
@@ -98,53 +101,43 @@ section h2 {
   backdrop-filter: blur(10px);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
   margin-bottom: 2rem;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.card h2 { font-size: 1.5rem; color: #d4af37; margin-bottom: 1.5rem; border: none; padding: 0; }
-.card h3 { font-size: 1.1rem; color: #e0d050; margin: 1.5rem 0 1rem 0; padding-top: 1rem; }
-.card hr { border: none; border-top: 1px solid rgba(212, 175, 55, 0.2); margin: 0; }
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(212, 175, 55, 0.2);
+}
 
-.effectif-user {
-  display: flex;
-  align-items: center;
+.card h2 {
+  font-size: 1.5rem;
+  color: #d4af37;
+  margin-bottom: 1.5rem;
+  border-bottom: 2px solid #d4af37;
+  padding-bottom: 0.8rem;
+}
+
+.card ul {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 1rem;
-  padding: 1rem 0;
-  border-bottom: 1px solid rgba(212, 175, 55, 0.1);
-  transition: background 0.3s ease;
 }
 
-.effectif-user:hover {
+.card li {
   background: rgba(212, 175, 55, 0.05);
-  padding-left: 0.5rem;
+  border-left: 3px solid #d4af37;
+  padding: 0.8rem 1rem;
   border-radius: 4px;
+  transition: all 0.3s ease;
+  color: #e0e0e0;
 }
 
-.effectif-avatar {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  border: 2px solid #d4af37;
-  object-fit: cover;
-  flex-shrink: 0;
+.card li:hover {
+  background: rgba(212, 175, 55, 0.15);
+  transform: translateX(4px);
+  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.1);
 }
-
-.effectif-info { display: flex; flex-direction: column; gap: 0.4rem; }
-.effectif-info span { color: #e0e0e0; font-weight: 500; font-size: 0.95rem; }
-
-.commandement-badge {
-  display: inline-block;
-  background: linear-gradient(135deg, #d4af37 0%, #c9a227 100%);
-  color: #1a1a2e;
-  padding: 0.2rem 0.6rem;
-  border-radius: 3px;
-  font-size: 0.75rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  width: fit-content;
-}
-
-.muted { color: #808080; font-style: italic; padding: 1rem 0; }
 
 footer {
   background: rgba(0, 0, 0, 0.7);
@@ -156,30 +149,88 @@ footer {
   margin-top: auto;
 }
 
-footer p { margin: 0.5rem 0; }
+footer p {
+  margin: 0.5rem 0;
+}
 
 @media (max-width: 768px) {
-  header { padding: 1.5rem; }
-  .brand { flex-direction: column; text-align: center; margin-bottom: 1rem; }
-  .brand h1 { font-size: 1.8rem; }
-  nav { gap: 0.6rem; }
-  nav a { font-size: 0.8rem; padding: 0.4rem 0.6rem; }
-  section { padding: 1.5rem 1rem; }
-  section h2 { font-size: 1.5rem; }
-  .card { padding: 1.5rem; }
-  .card h2 { font-size: 1.3rem; }
-  .card h3 { font-size: 1rem; }
-  .effectif-user { padding: 0.8rem 0; }
-  .effectif-avatar { width: 40px; height: 40px; }
-  .effectif-info span { font-size: 0.9rem; }
+  header {
+    padding: 1.5rem;
+  }
+
+  .brand {
+    flex-direction: column;
+    text-align: center;
+    margin-bottom: 1rem;
+  }
+
+  .brand h1 {
+    font-size: 1.8rem;
+  }
+
+  nav {
+    gap: 0.6rem;
+  }
+
+  nav a {
+    font-size: 0.8rem;
+    padding: 0.4rem 0.6rem;
+  }
+
+  section {
+    padding: 1.5rem 1rem;
+  }
+
+  .card {
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .card h2 {
+    font-size: 1.3rem;
+  }
+
+  .card ul {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 0.8rem;
+  }
+
+  .card li {
+    padding: 0.7rem 0.8rem;
+    font-size: 0.9rem;
+  }
 }
 
 @media (max-width: 480px) {
-  header { padding: 1rem; }
-  .brand h1 { font-size: 1.5rem; }
-  nav a { font-size: 0.7rem; padding: 0.3rem 0.5rem; }
-  .card { padding: 1rem; }
-  .effectif-info span { font-size: 0.85rem; }
+  header {
+    padding: 1rem;
+  }
+
+  .brand h1 {
+    font-size: 1.5rem;
+  }
+
+  nav a {
+    font-size: 0.7rem;
+    padding: 0.3rem 0.5rem;
+  }
+
+  .card {
+    padding: 1rem;
+  }
+
+  .card h2 {
+    font-size: 1.2rem;
+  }
+
+  .card ul {
+    grid-template-columns: 1fr;
+  }
+
+  .card li {
+    padding: 0.6rem 0.8rem;
+    font-size: 0.85rem;
+  }
 }
     
 
@@ -382,6 +433,14 @@ body > header .login-btn:hover {
 
 </style>
 <link rel="stylesheet" href="/site-theme.css">
+<style data-page-styles>
+/* ?quipements : fiches de consultation du mat?riel. */
+.card { border-top:2px solid #527eaf; }
+.card h2, .card h3 { margin-bottom:10px; }
+.card p, .card li { line-height:1.68; }
+.card ul, .card ol { padding-inline-start:1.4rem; }
+</style>
+
 <link rel="icon" type="image/png" href="/assets/logo-gendarmerie.png">
 </head>
 <body>
@@ -390,136 +449,61 @@ body > header .login-btn:hover {
     <div class="brand">
         <a class="brand-home" href="/dashboard" aria-label="Retour au tableau de bord"><img src="/assets/logo-gendarmerie.png" class="logo" alt="Logo Gendarmerie">
         <div>
-            <h1>Effectifs de la Gendarmerie</h1>
+            <h1>Équipements</h1>
             <p>Gendarmerie Nationale</p>
         </div></a>
     </div>
-
     <nav>
+        <a href="/cours.html">Retour aux cours</a>
         <a href="/dashboard.html">Dashboard</a>
-        <a href="/cours.html">Cours</a>
-        <a href="/logout">Déconnexion</a>
     </nav>
 </header>
 
 <section>
-    <h2>Annuaire des effectifs</h2>
-    <div id="effectifs">Chargement...</div>
+    <div class="card">
+        <h2>Équipement obligatoire</h2>
+        <ul>
+            <li>Radio</li>
+            <li>Gilet pare-balles</li>
+            <li>Arme de service</li>
+            <li>Menottes</li>
+            <li>Lampe torche</li>
+            <li>Taser</li>
+            <li>Trousse de secours</li>
+        </ul>
+    </div>
+
+    <div class="card">
+        <h2>Équipement véhicule</h2>
+        <ul>
+            <li>Balises</li>
+            <li>Cônes</li>
+            <li>Extincteur</li>
+            <li>Herse</li>
+            <li>Matériel de premiers secours</li>
+        </ul>
+    </div>
+
+    <div class="card">
+        <h2>PSIG</h2>
+        <ul>
+            <li>Casque balistique</li>
+            <li>M4A1</li>
+            <li>Bouclier balistique</li>
+            <li>Gilet lourd</li>
+        </ul>
+    </div>
+
+    <div class="card">
+        <h2>GIGN</h2>
+        <ul>
+            <li>Type 89</li>
+            <li>G36C</li>
+            <li>Orsis T-5000</li>
+            <li>Spas-12</li>
+        </ul>
+    </div>
 </section>
-
-<script>
-const categories = [
-    {
-        nom: "OFS ・ Officiers Supérieurs",
-        grades: ["COL ・ Colonel", "LCL ・ Lieutenant-Colonel", "CEN ・ Chef d'Escadron"]
-    },
-    {
-        nom: "OFB ・ Officiers Subalternes",
-        grades: ["CNE ・ Capitaine", "LTN ・ Lieutenant", "SLT ・ Sous-Lieutenant", "ASP ・ Aspirant"]
-    },
-    {
-        nom: "SOP ・ Sous-Officiers Supérieurs",
-        grades: ["MAJ ・ Major", "ADC ・ Adjudant-Chef", "ADJ ・ Adjudant"]
-    },
-    {
-        nom: "SOB ・ Sous-Officiers Subalternes",
-        grades: [
-            "MDC ・ Maréchal des Logis-Chef",
-            "GDC ・ Gendarme de Carrière",
-            "GDS ・ Gendarme Sous Contrat",
-            "ELG ・ Élève Gendarme"
-        ]
-    },
-    {
-        nom: "GAV ・ Gendarmes Adjoints Volontaires",
-        grades: [
-            "MDL ・ Maréchal des Logis",
-            "BRC ・ Brigadier-Chef",
-            "BRI ・ Brigadier",
-            "GAV ・ Gendarme Adjoint Volontaire"
-        ]
-    }
-];
-
-const POLL_INTERVAL_MS = 10000;
-const DEFAULT_AVATAR = "https://cdn.discordapp.com/embed/avatars/0.png";
-
-function escapeHtml(value) {
-    return String(value ?? "")
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#39;");
-}
-
-function cleanNomPrenom(nom) {
-    if (!nom) return "";
-    return nom
-        .replace(/^(COL|LCL|CEN|CNE|LTN|SLT|ASP|MAJ|ADC|ADJ|MDC|GDC|GDS|ELG|MDL|BRC|BRI|GAV)\s*・\s*/i, "")
-        .replace(/^(COL|LCL|CEN|CNE|LTN|SLT|ASP|MAJ|ADC|ADJ|MDC|GDC|GDS|ELG|MDL|BRC|BRI|GAV)\s*-\s*\d+\s*[•·]\s*/i, "");
-}
-
-// 1) avatar stocké localement par Jore, 2) CDN Discord, 3) avatar par défaut
-function getAvatarUrl(m) {
-    if (m.avatarFile) return `/avatars/${encodeURIComponent(m.avatarFile)}`;
-    if (m.avatar && m.id) return `https://cdn.discordapp.com/avatars/${encodeURIComponent(m.id)}/${encodeURIComponent(m.avatar)}.png`;
-    return DEFAULT_AVATAR;
-}
-
-async function loadEffectifs() {
-    try {
-        const res = await fetch((window.API_BASE || "") + "/api/effectifs");
-        if (!res.ok) throw new Error("Chargement impossible (" + res.status + ")");
-        const users = await res.json();
-
-        const box = document.getElementById("effectifs");
-        let output = "";
-
-        categories.forEach(cat => {
-            let html = `<div class="card"><h2>${escapeHtml(cat.nom)}</h2>`;
-
-            cat.grades.forEach((grade, idx) => {
-                const membres = users.filter(u => u.grade === grade);
-
-                if (idx > 0) html += `<hr>`;
-                html += `<h3>${escapeHtml(grade)}</h3>`;
-
-                if (membres.length === 0) {
-                    html += `<p class="muted">Aucun gendarme n'est à ce grade actuellement.</p>`;
-                } else {
-                    membres.forEach(m => {
-                        const commandement = m.commandement
-                            ? `<small class="commandement-badge">${escapeHtml(m.commandement)}</small>`
-                            : "";
-
-                        html += `
-                            <div class="effectif-user">
-                                <img src="${escapeHtml(getAvatarUrl(m))}" class="effectif-avatar" alt="Avatar"
-                                     onerror="this.onerror=null; this.src='${DEFAULT_AVATAR}'">
-                                <div class="effectif-info">
-                                    <span>${escapeHtml(cleanNomPrenom(m.nomPrenom || m.username))}</span>
-                                    ${commandement}
-                                </div>
-                            </div>`;
-                    });
-                }
-            });
-
-            html += `</div>`;
-            output += html;
-        });
-
-        box.innerHTML = output;
-    } catch (err) {
-        document.getElementById("effectifs").innerHTML =
-            `<div class="card"><p class="muted">Erreur : ${escapeHtml(err.message)}</p></div>`;
-    }
-}
-
-loadEffectifs();
-setInterval(loadEffectifs, POLL_INTERVAL_MS);
-</script>
 
 <footer class="footer">
     <p>© 2026 lexy_off1 — Tous droits réservés</p>
