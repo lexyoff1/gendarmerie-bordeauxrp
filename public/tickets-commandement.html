@@ -728,6 +728,16 @@ body > header .login-btn:hover {
 
 </style>
 <link rel="stylesheet" href="/site-theme.css">
+<style data-page-styles>
+/* Tickets : liste et d?tail restent lisibles sur les petits ?crans. */
+.ticket-layout { display:grid; grid-template-columns:minmax(220px,.8fr) minmax(0,1.7fr); gap:14px; align-items:start; }
+.ticket-sidebar, .ticket-panel { min-width:0; }
+.ticket-item { overflow-wrap:anywhere; }
+.ticket-message, .ticket-detail { overflow-wrap:anywhere; }
+.ticket-avatar { flex:none; }
+@media(max-width:760px){ .ticket-layout { grid-template-columns:1fr; } }
+</style>
+
 <link rel="icon" type="image/png" href="/assets/logo-gendarmerie.png">
 </head>
 <body>
