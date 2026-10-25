@@ -2971,11 +2971,7 @@ app.delete("/api/user/:id", requireAdminAccess, async (req, res) => {
     res.json({ success: true });
 });
 
-app.get("/logout", (req, res) => {
-    res.type("html").send(`<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Déconnexion</title></head><body><main><h1>Déconnexion</h1><p>Confirme ta déconnexion du site.</p><form method="post" action="/logout"><button type="submit">Se déconnecter</button></form><p><a href="/">Annuler</a></p></main></body></html>`);
-});
-
-app.post("/logout", (req, res, next) => {
+function destroySessionAndRedirect(req, res, next) {
     req.session.destroy(error => {
         if (error) return next(error);
         res.clearCookie("connect.sid", {
@@ -2983,9 +2979,12 @@ app.post("/logout", (req, res, next) => {
             sameSite: "lax",
             secure: process.env.COOKIE_SECURE === "true" || process.env.NODE_ENV === "production"
         });
-        res.redirect("/");
+        res.redirect("/index.html");
     });
-});
+}
+
+app.get("/logout", destroySessionAndRedirect);
+app.post("/logout", destroySessionAndRedirect);
 
 app.post("/api/tickets-commandement/create", requireLogin, requireGNMember, async (req, res) => {
     const db = getData();
