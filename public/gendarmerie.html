@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Formation sur le terrain</title>
+    <title>Équipements</title>
     <style>
 * {
   margin: 0;
@@ -117,22 +117,17 @@ section {
   padding-bottom: 0.8rem;
 }
 
-.card p {
-  color: #d0d0d0;
-  margin-bottom: 1rem;
-  line-height: 1.8;
-}
-
 .card ul {
   list-style: none;
-  margin-left: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
 }
 
 .card li {
   background: rgba(212, 175, 55, 0.05);
   border-left: 3px solid #d4af37;
   padding: 0.8rem 1rem;
-  margin-bottom: 0.8rem;
   border-radius: 4px;
   transition: all 0.3s ease;
   color: #e0e0e0;
@@ -142,10 +137,6 @@ section {
   background: rgba(212, 175, 55, 0.15);
   transform: translateX(4px);
   box-shadow: 0 4px 12px rgba(212, 175, 55, 0.1);
-}
-
-.card strong {
-  color: #d4af37;
 }
 
 footer {
@@ -199,8 +190,9 @@ footer p {
     font-size: 1.3rem;
   }
 
-  .card p {
-    font-size: 0.95rem;
+  .card ul {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 0.8rem;
   }
 
   .card li {
@@ -223,10 +215,6 @@ footer p {
     padding: 0.3rem 0.5rem;
   }
 
-  section {
-    padding: 1rem 0.75rem;
-  }
-
   .card {
     padding: 1rem;
   }
@@ -235,8 +223,8 @@ footer p {
     font-size: 1.2rem;
   }
 
-  .card p {
-    font-size: 0.9rem;
+  .card ul {
+    grid-template-columns: 1fr;
   }
 
   .card li {
@@ -453,11 +441,10 @@ body > header .login-btn:hover {
     <div class="brand">
         <a class="brand-home" href="/dashboard" aria-label="Retour au tableau de bord"><img src="/assets/logo-gendarmerie.png" class="logo" alt="Logo Gendarmerie">
         <div>
-            <h1>Formation sur le terrain</h1>
+            <h1>Équipements</h1>
             <p>Gendarmerie Nationale</p>
         </div></a>
     </div>
-
     <nav>
         <a href="/cours.html">Retour aux cours</a>
         <a href="/dashboard.html">Dashboard</a>
@@ -465,86 +452,49 @@ body > header .login-btn:hover {
 </header>
 
 <section>
-
     <div class="card">
-        <h2>Présentation</h2>
-
-        <p>
-            La formation sur le terrain sert à deux choses essentielles pour continuer sa carrière en tant que gendarme.
-        </p>
-
-        <p>
-            Elle se divise en deux étapes qui se font tout au long de la période de formation sur le terrain en tant que GAV.
-        </p>
-    </div>
-
-    <div class="card">
-        <h2>1 — L'apprentissage sur le terrain</h2>
-
-        <p>
-            L'apprentissage sur le terrain permet au GAV de s'adapter à la Gendarmerie, de poser ses questions aux sous-officiers et d'observer les interventions effectuées durant le service.
-        </p>
-
-        <p>
-            Cette étape permet de mieux comprendre le métier de gendarme dans la réalité du terrain et non uniquement en formation théorique.
-        </p>
-
-        <p>
-            Les cours appris pendant la formation donnent déjà une base solide sur le rôle à adopter pendant une intervention, mais l'expérience terrain permet de mieux appliquer ces connaissances.
-        </p>
-    </div>
-
-    <div class="card">
-        <h2>2 — L'apprentissage par les cours</h2>
-
-        <p>
-            Grâce au site de la Gendarmerie, les cours sont répartis en deux catégories :
-        </p>
-
+        <h2>Équipement obligatoire</h2>
         <ul>
-            <li>Cours principaux ;</li>
-            <li>Cours secondaires.</li>
-        </ul>
-
-        <p>
-            Pendant votre période de formation sur le terrain, vous avez l'obligation d'apprendre les cours principaux, car ils regroupent les connaissances essentielles au service.
-        </p>
-
-        <p>
-            Ces cours concernent notamment la hiérarchie, les procédures d'arrestation, les règles de sécurité, les contrôles, les refus d'obtempérer et les bases judiciaires.
-        </p>
-    </div>
-
-    <div class="card">
-        <h2>Choses principales à apprendre</h2>
-
-        <ul>
-            <li><strong>Hiérarchie :</strong> à connaître intégralement pour le respect, la distinction des grades et l'organisation interne.</li>
-            <li><strong>Armement :</strong> connaître les règles d'usage et les armements autorisés.</li>
-            <li><strong>Règles de sécurité :</strong> bien retenir les notions importantes comme l'ISTC, l'usage des armes et les consignes de sécurité.</li>
-            <li><strong>Équipements :</strong> savoir ce que vous devez avoir sur vous selon votre unité et votre mission.</li>
-            <li><strong>Contrôle :</strong> retenir les étapes dans l'ordre et savoir expliquer rapidement chaque étape.</li>
-            <li><strong>Refus d'obtempérer :</strong> connaître les étapes, les transmissions et les règles d'intervention.</li>
-            <li><strong>Procédure :</strong> connaître les bases de l'interpellation, de la fouille, de la garde à vue et du transport.</li>
-            <li><strong>Index judiciaire :</strong> connaître les articles essentiels ou être capable d'en faire un résumé correct.</li>
-            <li><strong>Architecture de l'intervention :</strong> connaître son rôle dans une intervention et savoir évaluer le niveau de menace.</li>
-            <li><strong>La Gendarmerie, ses devoirs et ses obligations :</strong> connaître les principes généraux, même sous forme résumée.</li>
-            <li><strong>Commandement de la Gendarmerie :</strong> connaître au minimum le Commandant de Brigade actuellement en fonction.</li>
+            <li>Radio</li>
+            <li>Gilet pare-balles</li>
+            <li>Arme de service</li>
+            <li>Menottes</li>
+            <li>Lampe torche</li>
+            <li>Taser</li>
+            <li>Trousse de secours</li>
         </ul>
     </div>
 
     <div class="card">
-        <h2>Objectif de la formation terrain</h2>
-
-        <p>
-            L'objectif est de permettre au GAV de gagner en autonomie, de comprendre les attentes de la hiérarchie et d'appliquer correctement les procédures en service.
-        </p>
-
-        <p>
-            Un militaire en formation doit rester attentif, poser des questions lorsque nécessaire et faire preuve de sérieux durant toute sa période d'apprentissage.
-        </p>
+        <h2>Équipement véhicule</h2>
+        <ul>
+            <li>Balises</li>
+            <li>Cônes</li>
+            <li>Extincteur</li>
+            <li>Herse</li>
+            <li>Matériel de premiers secours</li>
+        </ul>
     </div>
 
+    <div class="card">
+        <h2>PSIG</h2>
+        <ul>
+            <li>Casque balistique</li>
+            <li>M4A1</li>
+            <li>Bouclier balistique</li>
+            <li>Gilet lourd</li>
+        </ul>
+    </div>
+
+    <div class="card">
+        <h2>GIGN</h2>
+        <ul>
+            <li>Type 89</li>
+            <li>G36C</li>
+            <li>Orsis T-5000</li>
+            <li>Spas-12</li>
+        </ul>
+    </div>
 </section>
 
 <footer class="footer">
