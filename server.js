@@ -1687,7 +1687,27 @@ app.get("/test123", (req, res) => {
 });
 
 function adminAuthPage({ title, heading, description, form, script }) {
-    return `<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#0a1330"><title>${title}</title><link rel="stylesheet" href="/site-theme.css"><link rel="stylesheet" href="/admin-auth.css"></head>
+    return `<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#0a1330"><title>${title}</title><link rel="stylesheet" href="/site-theme.css"><style>
+body.auth-page{display:grid;min-height:100vh;place-items:center;padding:24px;background:radial-gradient(600px 420px at 50% 42%,rgba(40,80,190,.2),transparent 72%),radial-gradient(500px 360px at 50% 100%,rgba(212,175,55,.08),transparent 70%),linear-gradient(180deg,#0a1330 0%,#050a18 100%);color:#f4f6fb;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+body.auth-page .auth-card{position:relative;overflow:hidden;width:min(500px,100%);padding:clamp(28px,6vw,42px);color:#f4f6fb;background:linear-gradient(145deg,rgba(17,32,70,.97),rgba(8,16,39,.97));border:1px solid rgba(212,175,55,.38);border-radius:20px;box-shadow:0 28px 80px rgba(0,0,0,.48),0 0 48px rgba(40,80,190,.12),inset 0 1px 0 rgba(255,255,255,.06)}
+body.auth-page .auth-card::before{position:absolute;top:0;right:12%;left:12%;height:3px;background:linear-gradient(90deg,transparent,#e6c866,#d4af37,transparent);content:""}
+body.auth-page .auth-brand{display:flex;align-items:center;gap:18px;margin-bottom:30px;color:inherit;text-decoration:none;cursor:pointer;transition:filter 160ms ease}
+body.auth-page .auth-brand:hover{filter:brightness(1.12)}
+body.auth-page .auth-brand:focus-visible{outline:2px solid #e6c866;outline-offset:6px;border-radius:8px}
+body.auth-page .auth-brand img{display:block;width:72px;height:72px;padding:5px;object-fit:contain;flex:0 0 72px;border:1px solid rgba(230,200,102,.42);border-radius:50%;background:rgba(212,175,55,.06);filter:drop-shadow(0 0 12px rgba(212,175,55,.2))}
+body.auth-page .auth-brand h1{margin:0;color:#e6c866;font-size:1.35rem;line-height:1.3}
+body.auth-page .auth-brand p{margin:6px 0 0;color:#9aa6c4;font-size:.95rem;letter-spacing:.02em}
+body.auth-page .auth-card h2{margin:0 0 10px;color:#e6c866;font-size:1.6rem;line-height:1.25}
+body.auth-page .auth-description{margin:0 0 24px;color:#9aa6c4;line-height:1.6}
+body.auth-page .auth-card form{display:grid;gap:12px;margin:0}
+body.auth-page .auth-card input{display:block;width:100%;min-height:50px;padding:14px 16px;color:#f4f6fb;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.16);border-radius:10px;font:inherit}
+body.auth-page .auth-card input:focus-visible{outline:2px solid #e6c866;outline-offset:2px;border-color:#d4af37}
+body.auth-page .auth-card button{width:100%;min-height:48px;margin:6px 0 0;padding:12px 16px;color:#0a1330;background:linear-gradient(135deg,#e6c866,#d4af37 58%,#b48f1f);border:1px solid rgba(230,200,102,.7);border-radius:9px;font:inherit;font-size:1rem;font-weight:700;cursor:pointer}
+body.auth-page .auth-card button:hover{filter:brightness(1.08)}
+body.auth-page .auth-error{min-height:1.4em;margin:14px 0 0;color:#ff9b9b}
+body.auth-page .auth-error:not(:empty){padding:10px 12px;border:1px solid rgba(255,155,155,.3);border-radius:9px;background:rgba(145,35,50,.12)}
+@media(max-width:480px){body.auth-page{padding:16px}body.auth-page .auth-card{padding:28px 22px;border-radius:16px}body.auth-page .auth-brand{gap:14px;margin-bottom:26px}body.auth-page .auth-brand img{width:60px;height:60px;flex-basis:60px}body.auth-page .auth-brand h1{font-size:1.2rem}body.auth-page .auth-card h2{font-size:1.4rem}}
+</style></head>
 <body class="auth-page"><main class="auth-card">
 <a class="auth-brand" href="/dashboard" aria-label="Retour au dashboard"><img src="/assets/logo-gendarmerie.png" alt="Logo de la Gendarmerie"><div><h1>Gendarmerie Nationale</h1><p>Administration s&eacute;curis&eacute;e</p></div></a>
 <h2>${heading}</h2><p class="auth-description">${description}</p>${form}<p id="error" class="auth-error" role="alert"></p></main><script>${script}</script></body></html>`;
