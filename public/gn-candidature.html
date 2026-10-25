@@ -402,6 +402,17 @@ body > header .login-btn:hover {
 
 </style>
 <link rel="stylesheet" href="/site-theme.css">
+<style data-page-styles>
+/* Candidature : formulaire confortable et adaptable. */
+.header-inner { width:min(100%,1440px); margin-inline:auto; }
+.panel { padding:clamp(16px,3vw,28px); }
+.form-row { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; }
+.form-group { min-width:0; }
+.control, .area, .select { width:100%; }
+.field-foot { display:flex; justify-content:space-between; gap:8px; flex-wrap:wrap; }
+@media(max-width:640px){ .form-row { grid-template-columns:1fr; } .header-inner { gap:10px; } }
+</style>
+
 <link rel="icon" type="image/png" href="/assets/logo-gendarmerie.png">
 </head>
 <body>
