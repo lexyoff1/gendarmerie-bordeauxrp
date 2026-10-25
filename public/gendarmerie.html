@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Équipements</title>
+    <title>La Gendarmerie</title>
     <style>
 * {
   margin: 0;
@@ -117,17 +117,33 @@ section {
   padding-bottom: 0.8rem;
 }
 
+.card h3 {
+  font-size: 1.1rem;
+  color: #e0d050;
+  margin-top: 1.5rem;
+  margin-bottom: 0.8rem;
+}
+
+.card h3:first-of-type {
+  margin-top: 0;
+}
+
+.card p {
+  color: #d0d0d0;
+  margin-bottom: 1rem;
+  line-height: 1.8;
+}
+
 .card ul {
   list-style: none;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 1rem;
+  margin-left: 0;
 }
 
 .card li {
   background: rgba(212, 175, 55, 0.05);
   border-left: 3px solid #d4af37;
   padding: 0.8rem 1rem;
+  margin-bottom: 0.8rem;
   border-radius: 4px;
   transition: all 0.3s ease;
   color: #e0e0e0;
@@ -190,9 +206,12 @@ footer p {
     font-size: 1.3rem;
   }
 
-  .card ul {
-    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-    gap: 0.8rem;
+  .card h3 {
+    font-size: 1rem;
+  }
+
+  .card p {
+    font-size: 0.95rem;
   }
 
   .card li {
@@ -215,6 +234,10 @@ footer p {
     padding: 0.3rem 0.5rem;
   }
 
+  section {
+    padding: 1rem 0.75rem;
+  }
+
   .card {
     padding: 1rem;
   }
@@ -223,8 +246,12 @@ footer p {
     font-size: 1.2rem;
   }
 
-  .card ul {
-    grid-template-columns: 1fr;
+  .card h3 {
+    font-size: 0.95rem;
+  }
+
+  .card p {
+    font-size: 0.9rem;
   }
 
   .card li {
@@ -441,10 +468,11 @@ body > header .login-btn:hover {
     <div class="brand">
         <a class="brand-home" href="/dashboard" aria-label="Retour au tableau de bord"><img src="/assets/logo-gendarmerie.png" class="logo" alt="Logo Gendarmerie">
         <div>
-            <h1>Équipements</h1>
+            <h1>La Gendarmerie</h1>
             <p>Gendarmerie Nationale</p>
         </div></a>
     </div>
+
     <nav>
         <a href="/cours.html">Retour aux cours</a>
         <a href="/dashboard.html">Dashboard</a>
@@ -452,49 +480,96 @@ body > header .login-btn:hover {
 </header>
 
 <section>
+
     <div class="card">
-        <h2>Équipement obligatoire</h2>
-        <ul>
-            <li>Radio</li>
-            <li>Gilet pare-balles</li>
-            <li>Arme de service</li>
-            <li>Menottes</li>
-            <li>Lampe torche</li>
-            <li>Taser</li>
-            <li>Trousse de secours</li>
-        </ul>
+        <h2>La Gendarmerie, ses devoirs et ses obligations</h2>
+
+        <p>
+            La Gendarmerie Nationale est soumise à de nombreux devoirs et obligations définis par la Charte du Gendarme, le Code de déontologie de la Police Nationale et de la Gendarmerie Nationale ainsi que par les différents règlements en vigueur.
+        </p>
+
+        <p>
+            Chaque militaire doit respecter ces principes afin de garantir le professionnalisme, l'exemplarité et la confiance de la population envers les forces de l'ordre.
+        </p>
+
     </div>
 
     <div class="card">
-        <h2>Équipement véhicule</h2>
-        <ul>
-            <li>Balises</li>
-            <li>Cônes</li>
-            <li>Extincteur</li>
-            <li>Herse</li>
-            <li>Matériel de premiers secours</li>
-        </ul>
+        <h2>Les devoirs du Gendarme</h2>
+
+        <h3>Secret professionnel</h3>
+
+        <p>
+            Le gendarme est tenu au secret professionnel. Il lui est interdit de divulguer à des personnes extérieures à l'institution les informations obtenues dans le cadre de ses fonctions.
+        </p>
+
+        <h3>Probité</h3>
+
+        <p>
+            Le gendarme ne doit tirer aucun avantage personnel de sa fonction ou de son uniforme. Il lui est interdit d'exercer une quelconque pression sur une personne en raison de son statut ou de son grade.
+        </p>
+
     </div>
 
     <div class="card">
-        <h2>PSIG</h2>
-        <ul>
-            <li>Casque balistique</li>
-            <li>M4A1</li>
-            <li>Bouclier balistique</li>
-            <li>Gilet lourd</li>
-        </ul>
+        <h2>Les obligations du Gendarme</h2>
+
+        <h3>Respect de la hiérarchie</h3>
+
+        <p>
+            Le respect de la hiérarchie constitue une règle fondamentale de la Gendarmerie Nationale.
+        </p>
+
+        <p>
+            Les grades doivent être respectés en toutes circonstances. Les salutations réglementaires doivent être effectuées lorsqu'un Brigadier ou un gradé supérieur est présent dans une brigade, lors d'une annonce de patrouille ou d'une réunion de service.
+        </p>
+
+        <p>
+            Toutefois, il est recommandé d'éviter les formalités de respect durant une intervention ou une situation d'urgence, sauf nécessité particulière.
+        </p>
+
+        <p>
+            Le militaire doit obéir aux ordres de ses supérieurs hiérarchiques, sauf lorsque ceux-ci sont manifestement illégaux, injustifiés ou susceptibles de porter atteinte à la vie d'autrui.
+        </p>
+
     </div>
 
     <div class="card">
-        <h2>GIGN</h2>
-        <ul>
-            <li>Type 89</li>
-            <li>G36C</li>
-            <li>Orsis T-5000</li>
-            <li>Spas-12</li>
-        </ul>
+        <h2>Les Patrouilles</h2>
+
+        <p>
+            Les patrouilles individuelles sont interdites, sauf autorisation particulière ou dans certaines spécialités spécifiques.
+        </p>
+
+        <p>
+            Une patrouille doit normalement être composée d'au moins un Sous-Officier afin de garantir le bon déroulement des interventions et des procédures.
+        </p>
+
+        <p>
+            Lorsque aucun Sous-Officier n'est disponible, une patrouille composée de deux militaires peut être autorisée exceptionnellement.
+        </p>
+
+        <p>
+            Dans ce cas, les militaires titulaires uniquement de la qualification APJA ne sont pas autorisés à procéder à des arrestations ou à certaines procédures judiciaires nécessitant une qualification supérieure.
+        </p>
+
     </div>
+
+    <div class="card">
+        <h2>Valeurs du Gendarme</h2>
+
+        <ul>
+            <li>Respect de la loi ;</li>
+            <li>Respect de la population ;</li>
+            <li>Neutralité ;</li>
+            <li>Discipline ;</li>
+            <li>Professionnalisme ;</li>
+            <li>Esprit d'équipe ;</li>
+            <li>Sens du service public.</li>
+        </ul>
+
+    </div>
+
 </section>
 
 <footer class="footer">
