@@ -2335,10 +2335,11 @@ app.post("/api/intervention-plans", requireLogin, requireGNMember, (req, res) =>
     res.status(201).json(plan);
 });
 
-app.get("/api/intervention-plans/:id", requireLogin, requireGNMember, (req, res) => {
+app.get("/api/intervention-plans/:id", requireLogin, requireGNMember, async (req, res) => {
     const plan = getData().interventionPlans.find(item => item.id === req.params.id);
     if (!plan) return res.status(404).json({ error: "Plan introuvable." });
-    res.json(plan);
+    const admin = await isPlanAdministrator(req);
+    res.json({ ...plan, canEdit: admin || canManagePlan(req, plan), canDelete: admin || plan.authorId === req.session.user.id, canShare: admin || plan.authorId === req.session.user.id });
 });
 
 app.patch("/api/intervention-plans/:id", requireLogin, requireGNMember, async (req, res) => {
