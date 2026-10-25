@@ -759,6 +759,17 @@ body > header .login-btn:hover {
 
 </style>
 <link rel="stylesheet" href="/site-theme.css">
+<style data-page-styles>
+/* Administration : commandes et formulaires regroup?s par module. */
+body { --page-accent: #d4af37; }
+.tabs, .cat-tabs { display:flex; flex-wrap:wrap; gap:8px; margin-block:12px; }
+.tab-btn, .cat-btn { min-height:36px; padding:7px 12px; border-radius:6px; }
+.tab-content { min-width:0; }
+.form-grid, .effectifs-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr)); gap:12px; }
+.effectif-admin-card, .vehicle-row, .ai-detection-box { border:1px solid var(--panel-line); border-radius:8px; }
+@media(max-width:640px){ .section-title { font-size:1rem; } }
+</style>
+
 </head>
 <body>
 
