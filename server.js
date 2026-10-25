@@ -276,7 +276,7 @@ function formatLockDuration(seconds) {
 
 function blockedPageHtml(message, code) {
     const codeBlock = code
-        ? "<p>Communiquez ce code &agrave; un responsable pour demander le d&eacute;blocage :</p><div class=\"code\">" + code + "</div>"
+        ? "<p>Envoyez un MP &agrave; lexy_off1 avec ce code pour demander le d&eacute;blocage :</p><div class=\"code\">" + code + "</div>"
         : "";
     return [
         "<!doctype html><html lang=\"fr\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><meta name=\"theme-color\" content=\"#0a1330\"><title>Acc&egrave;s bloqu&eacute; - Gendarmerie Nationale</title>",
