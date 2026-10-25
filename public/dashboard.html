@@ -597,6 +597,12 @@ body > header .login-btn:hover {
         </div>
 
         <div class="card">
+            <h3>🗺️ Plans d’intervention</h3>
+            <p>Préparer et partager des plans cartographiques avec annotations et export PNG.</p>
+            <a href="/plans-intervention"><button>Ouvrir</button></a>
+        </div>
+
+        <div class="card">
             <h3>🚔 Spécialités</h3>
             <p>Consulter les spécialités disponibles et déposer une candidature.</p>
             <a href="/specialites.html"><button>Ouvrir</button></a>
@@ -692,7 +698,7 @@ body > header .login-btn:hover {
                     : "https://cdn.discordapp.com/embed/avatars/0.png";
 
                 const dateServeur = user.dateArriveeServeur
-                    ? new Date(user.dateArriveeServeur).toLocaleDateString("fr-FR")
+                    ? new Date(user.dateArriveeServeur).toLocaleDateString("fr-FR", { timeZone: "Europe/Paris" })
                     : "Inconnue";
 
                 box.innerHTML = `
