@@ -755,6 +755,16 @@ body > header .login-btn:hover {
 
 </style>
 <link rel="stylesheet" href="/site-theme.css">
+<style data-page-styles>
+/* Rapports : saisie et relecture du compte rendu. */
+.form-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr)); gap:12px; }
+.rapport-content { min-width:0; }
+.patrol-view-block, .precisions-card, .derouler-box { border:1px solid var(--panel-line); border-radius:8px; }
+.item-top { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px; }
+.effectifs-list-view { display:grid; gap:8px; }
+@media(max-width:620px){ .form-grid { grid-template-columns:1fr; } }
+</style>
+
 <link rel="icon" type="image/png" href="/assets/logo-gendarmerie.png">
 </head>
 <body>
