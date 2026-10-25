@@ -551,6 +551,7 @@ body > header .login-btn:hover {
 #tenuesContainer .grid-item { display:flex; flex-direction:column; min-width:0; min-height:360px; }
 #tenuesContainer .course-image { display:block; flex:none; width:100%; height:260px; min-height:200px; margin:12px 0; padding:6px; object-fit:contain; background:#dce2e9; border:1px solid rgba(255,255,255,.16); border-radius:7px; }
 #tenuesContainer .tenue-admin { min-width:0; margin-top:auto; }
+#tenuesContainer .load-error { color:#b42318; font-weight:600; }
 @media(max-width:560px){ #tenuesContainer .grid { grid-template-columns:1fr; } #tenuesContainer .course-image { height:240px; } }
 </style>
 
@@ -609,7 +610,7 @@ body > header .login-btn:hover {
         <button onclick="addTenue()">Ajouter</button>
     </div>
 
-    <div id="tenuesContainer">Chargement...</div>
+    <div id="tenuesContainer" aria-live="polite" aria-busy="true">Chargement des tenues...</div>
 
 </section>
 
@@ -666,15 +667,43 @@ async function checkAdmin() {
 }
 
 async function loadTenues() {
+    const container = document.getElementById("tenuesContainer");
     try {
         const res = await fetch((window.API_BASE || "") + "/api/tenues");
-        if (!res.ok) throw new Error("Erreur");
-        
-        tenues = await res.json();
+        if (!res.ok) {
+            if (res.status === 401 || res.status === 403) {
+                throw new Error("Accès refusé. Reconnectez-vous et vérifiez que votre compte a accès à la Gendarmerie.");
+            }
+            throw new Error(`Le serveur n'a pas pu charger les tenues (HTTP ${res.status}).`);
+        }
+
+        const contentType = (res.headers.get("content-type") || "").toLowerCase();
+        if (res.redirected || contentType.includes("text/html")) {
+            throw new Error("La session a expiré ou l'accès a été redirigé. Reconnectez-vous puis rechargez la page.");
+        }
+        if (!contentType.includes("application/json")) {
+            throw new Error("Le serveur n'a pas renvoyé les tenues au format JSON.");
+        }
+
+        const data = await res.json();
+        if (!Array.isArray(data)) throw new Error("La réponse du serveur est invalide.");
+
+        tenues = data;
+        if (tenues.length === 0) {
+            container.innerHTML = '<p class="muted">Aucune tenue n\'est enregistrée pour le moment.</p>';
+            return;
+        }
         renderTenues();
     } catch (error) {
         console.error("Erreur loadTenues:", error);
-        document.getElementById("tenuesContainer").innerHTML = "<p>Erreur de chargement.</p>";
+        container.replaceChildren();
+        const message = document.createElement("p");
+        message.className = "load-error";
+        message.setAttribute("role", "alert");
+        message.textContent = error.message || "Impossible de charger les tenues. Réessayez dans quelques instants.";
+        container.append(message);
+    } finally {
+        container.setAttribute("aria-busy", "false");
     }
 }
 
