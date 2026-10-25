@@ -542,6 +542,16 @@ body > header .login-btn:hover {
 
 </style>
 <link rel="stylesheet" href="/site-theme.css">
+<style data-page-styles>
+/* Dashboard : identit? et informations du compte. */
+.grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr)); gap:14px; align-items:stretch; }
+.grid > .card { height:100%; }
+.id-card { align-items:flex-start; gap:12px; }
+.id-card h2 { font-size:clamp(1.3rem,2.5vw,1.8rem); }
+.avatar { flex:none; }
+@media(max-width:560px){ .grid { grid-template-columns:1fr; } }
+</style>
+
 <link rel="icon" type="image/png" href="/assets/logo-gendarmerie.png">
 </head>
 <body>
