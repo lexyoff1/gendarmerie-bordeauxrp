@@ -29,46 +29,6 @@ body {
   background-attachment: fixed;
 }
 
-header,
-.header,
-.navbar {
-  color: var(--white);
-  background: rgba(5, 10, 24, 0.82);
-  border-bottom: 1px solid var(--panel-line);
-  backdrop-filter: blur(10px);
-}
-
-header h1,
-.header h1,
-.navbar h1,
-.brand h1 {
-  color: var(--gold-soft);
-  text-shadow: 0 2px 12px rgba(212, 175, 55, 0.18);
-}
-
-.brand-home {
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
-  min-width: 0;
-  color: inherit;
-  text-decoration: none;
-  cursor: pointer;
-  border-radius: 10px;
-  transition: filter 160ms ease, opacity 160ms ease;
-}
-
-.brand-home:hover {
-  color: inherit;
-  text-decoration: none;
-  filter: brightness(1.12);
-}
-
-.brand-home:focus-visible {
-  outline: 2px solid var(--gold-soft);
-  outline-offset: 6px;
-}
-
 h1,
 h2,
 h3,
@@ -227,10 +187,224 @@ hr {
   outline-offset: 3px;
 }
 
-@media (max-width: 700px) {
-  header,
-  .header,
-  .navbar {
-    background: rgba(5, 10, 24, 0.94);
+/* Shared MDT surface: compact, operational and consistent with Patrouilles. */
+:root {
+  --bg-0: #071126;
+  --bg-1: #0b1732;
+  --panel: rgba(12, 25, 53, 0.96);
+  --panel-line: rgba(129, 151, 189, 0.24);
+  --field: #101d39;
+  --field-line: rgba(155, 175, 211, 0.28);
+}
+
+body {
+  line-height: 1.55;
+  background:
+    radial-gradient(900px 500px at 15% -10%, rgba(31, 64, 133, 0.2), transparent 60%),
+    linear-gradient(180deg, var(--bg-1) 0%, var(--bg-0) 100%);
+}
+
+body > header:not(.command-header) {
+  position: relative;
+  z-index: 20;
+  padding: 12px clamp(16px, 4vw, 56px);
+  background: rgba(5, 12, 27, 0.96);
+  border-bottom: 1px solid rgba(212, 175, 55, 0.38);
+  box-shadow: 0 5px 18px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(10px);
+}
+
+body > header:not(.command-header) .brand {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  width: min(100%, 1440px);
+  margin: 0 auto 10px;
+}
+
+body > header:not(.command-header) .brand-home {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  color: inherit;
+  text-decoration: none;
+  border-radius: 8px;
+}
+
+body > header:not(.command-header) .logo {
+  width: 54px;
+  height: 54px;
+  filter: drop-shadow(0 3px 8px rgba(212, 175, 55, 0.18));
+}
+
+body > header:not(.command-header) .brand h1 {
+  margin: 0;
+  color: #f0cf65;
+  font-size: clamp(1.12rem, 2.2vw, 1.55rem);
+  line-height: 1.2;
+  letter-spacing: 0.01em;
+  text-shadow: none;
+}
+
+body > header:not(.command-header) .brand p {
+  margin: 3px 0 0;
+  color: #aebbd2;
+  font-size: 0.84rem;
+}
+
+body > header:not(.command-header) > nav {
+  display: flex;
+  justify-content: flex-start;
+  gap: 7px;
+  width: min(100%, 1440px);
+  margin: 0 auto;
+}
+
+body > header:not(.command-header) > nav a {
+  min-height: 36px;
+  padding: 7px 11px;
+  color: #cbd5e7;
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(155, 175, 211, 0.15);
+  border-radius: 7px;
+  font-size: 0.82rem;
+  transition: background-color 140ms ease, border-color 140ms ease, color 140ms ease;
+}
+
+body > header:not(.command-header) > nav a:hover,
+body > header:not(.command-header) > nav a:focus-visible {
+  color: #f0cf65;
+  background: rgba(212, 175, 55, 0.09);
+  border-color: rgba(212, 175, 55, 0.45);
+  transform: none;
+  box-shadow: none;
+}
+
+body > header:not(.command-header) + main,
+body > header:not(.command-header) ~ main {
+  width: min(100% - 40px, 1440px);
+  margin-inline: auto;
+}
+
+h1, h2, h3, h4 {
+  text-shadow: none;
+  line-height: 1.25;
+}
+
+body > header:not(.command-header) ~ main h1 {
+  font-size: clamp(1.45rem, 3vw, 2rem);
+}
+
+.card,
+.panel,
+.notice,
+.id-card,
+.modal-content,
+.login-card {
+  background: rgba(12, 25, 53, 0.94);
+  border-color: rgba(129, 151, 189, 0.24);
+  border-radius: 10px;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.19);
+  backdrop-filter: none;
+}
+
+.card:hover,
+.id-card:hover {
+  background: rgba(15, 30, 62, 0.98);
+  border-color: rgba(212, 175, 55, 0.38);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.24);
+  transform: none;
+}
+
+button,
+.button,
+.card-btn,
+.login-btn {
+  min-height: 36px;
+  border-radius: 7px;
+  box-shadow: none;
+}
+
+button:hover,
+.button:hover,
+.card-btn:hover,
+.login-btn:hover {
+  box-shadow: 0 3px 10px rgba(212, 175, 55, 0.16);
+}
+
+input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type="button"]),
+textarea,
+select {
+  min-height: 36px;
+  border-radius: 7px;
+}
+
+table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+th {
+  font-weight: 700;
+  text-align: left;
+}
+
+td,
+th {
+  padding: 9px 11px;
+}
+
+@media (max-width: 760px) {
+  body > header:not(.command-header) {
+    padding: 10px 14px;
+  }
+
+  body > header:not(.command-header) .brand {
+    gap: 10px;
+    margin-bottom: 9px;
+  }
+
+  body > header:not(.command-header) .logo {
+    width: 44px;
+    height: 44px;
+  }
+
+  body > header:not(.command-header) > nav {
+    justify-content: flex-start;
+    overflow-x: auto;
+    padding-bottom: 2px;
+    scrollbar-width: thin;
+  }
+
+  body > header:not(.command-header) > nav a {
+    flex: 0 0 auto;
+  }
+
+  body > header:not(.command-header) + main,
+  body > header:not(.command-header) ~ main {
+    width: min(100% - 24px, 1440px);
+  }
+
+  table {
+    font-size: 0.88rem;
+  }
+
+  td,
+  th {
+    padding: 7px 8px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }
