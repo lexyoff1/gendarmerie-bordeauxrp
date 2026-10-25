@@ -562,6 +562,16 @@ body > header .login-btn:hover {
 
 </style>
 <link rel="stylesheet" href="/site-theme.css">
+<style data-page-styles>
+/* Avis de recherche : filtres, indicateurs et dossiers. */
+.stats-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(145px,1fr)); gap:10px; }
+.stat-box, .stat-total { border-radius:8px; }
+.form-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr)); gap:12px; }
+.item-top { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:8px; }
+.danger-badge { white-space:nowrap; }
+@media(max-width:600px){ .stats-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+</style>
+
 <link rel="icon" type="image/png" href="/assets/logo-gendarmerie.png">
 </head>
 <body>
