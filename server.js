@@ -480,6 +480,8 @@ app.use((req, res, next) => {
 });
 
 app.use((req, res, next) => {
+    if (req.path.startsWith("/assets/")) return next();
+
     const ip = getClientIp(req);
     const banKey = siteRateLimitKey(ip);
     const remaining = getLockRemainingSeconds(banKey);
