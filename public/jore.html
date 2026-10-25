@@ -237,6 +237,15 @@ body > header .login-btn:hover {
 
 </style>
 <link rel="stylesheet" href="/site-theme.css">
+<style data-page-styles>
+/* Jore : mise en page de consultation des messages. */
+.jore-content { min-width:0; }
+.grid { gap:12px; }
+.em { max-width:min(100%,620px); overflow-wrap:anywhere; }
+.em .im { max-width:100%; height:auto; object-fit:contain; }
+@media(max-width:640px){ .grid { grid-template-columns:1fr; } }
+</style>
+
 <link rel="icon" type="image/png" href="/assets/logo-gendarmerie.png">
 </head>
 <body>
@@ -417,12 +426,3 @@ $('loadMsg').onclick=async()=>{
 };
 
 // Modèles
-const TK='jore_tpl';
-const tpls=()=>{try{return JSON.parse(localStorage.getItem(TK))||{}}catch{return{}}};
-function renderTpls(){$('tpls').innerHTML=Object.keys(tpls()).map(n=>`<div style="margin-top:.4rem"><b>${esc(n)}</b><button class="ghost" style="margin:0 0 0 .5rem" data-tl="${esc(n)}">Charger</button><button class="red" style="margin:0 0 0 .3rem" data-td="${esc(n)}">✕</button></div>`).join('')}
-$('tplSave').onclick=()=>{const n=$('tplName').value.trim();if(!n)return;const t=tpls();t[n]=payload();localStorage.setItem(TK,JSON.stringify(t));renderTpls()};
-
-renderTpls();renderBtns();syncForm();
-</script>
-</body>
-</html>
