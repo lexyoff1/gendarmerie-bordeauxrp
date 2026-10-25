@@ -497,6 +497,14 @@ body > header .login-btn:hover {
 
 </style>
 <link rel="stylesheet" href="/site-theme.css">
+<style data-page-styles>
+/* Centre de formation : catalogue de modules. */
+.grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr)); gap:14px; align-items:stretch; }
+.grid > .card { height:100%; border-top:2px solid #527eaf; }
+.card h2, .card h3 { margin-bottom:10px; }
+@media(max-width:560px){ .grid { grid-template-columns:1fr; } }
+</style>
+
 <link rel="icon" type="image/png" href="/assets/logo-gendarmerie.png">
 </head>
 <body>
