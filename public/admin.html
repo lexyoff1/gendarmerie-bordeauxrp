@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panel Admin - Gendarmerie Nationale</title>
+    <link rel="icon" type="image/png" href="/assets/logo-gendarmerie.png">
     <style>
 * {
   margin: 0;
@@ -46,6 +47,15 @@ header {
   display: flex;
   align-items: center;
   gap: 1.5rem;
+}
+
+.brand-home {
+  color: inherit;
+  text-decoration: none;
+}
+
+.brand-home:hover {
+  color: inherit;
 }
 
 .logo {
@@ -556,13 +566,13 @@ footer p {
 
 <header>
     <div class="brand">
-        <div class="brand-left">
+        <a class="brand-left brand-home" href="/dashboard" aria-label="Retour au tableau de bord">
             <img src="/assets/logo-gendarmerie.png" class="logo" alt="Logo Gendarmerie">
             <div>
                 <h1>Gendarmerie Nationale</h1>
                 <p>Panel Administrateur</p>
             </div>
-        </div>
+        </a>
         <nav>
             <a href="/">Accueil</a>
             <a href="/dashboard.html">Dashboard</a>
