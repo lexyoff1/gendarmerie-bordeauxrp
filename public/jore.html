@@ -7,7 +7,8 @@
 <title>Jore</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:-apple-system,"Segoe UI",Roboto,sans-serif;background:linear-gradient(135deg,#1a1a2e,#16213e);color:#e0e0e0;min-height:100vh;padding:1rem}
+body{font-family:-apple-system,"Segoe UI",Roboto,sans-serif;background:linear-gradient(135deg,#1a1a2e,#16213e);color:#e0e0e0;min-height:100vh;padding:0}
+.jore-content{padding:1rem}
 h1{color:#d4af37;margin-bottom:1rem}h3{color:#d4af37;margin:1rem 0 .5rem}
 .grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:1rem}
 @media(max-width:900px){.grid{grid-template-columns:1fr}}
@@ -34,10 +35,224 @@ button.red{background:#b91c1c;color:#fff}button.ghost{background:rgba(212,175,55
 .em .ft{display:flex;gap:.4rem;align-items:center;font-size:.75rem;color:#b5bac1;margin-top:.5rem}.em .ft img{width:18px;height:18px;border-radius:50%}
 .fld{display:grid;grid-template-columns:1fr 1fr auto auto;gap:.4rem;margin-top:.4rem;align-items:center}
 #status{margin-top:.6rem;min-height:1.3em}.ok{color:#86efac}.ko{color:#ff9b9b}
+
+
+/* En-tete propre a cette page */
+body > header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 24px;
+  width: 100%;
+  min-height: 84px;
+  padding: 12px clamp(16px, 4vw, 52px);
+  color: #f4f6fb;
+  background: linear-gradient(110deg, rgba(5, 10, 24, 0.98), rgba(10, 19, 48, 0.96) 58%, rgba(8, 15, 35, 0.98));
+  border-bottom: 1px solid rgba(212, 175, 55, 0.32);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.28);
+  backdrop-filter: blur(10px);
+}
+
+body > header > .brand,
+body > header > .header-inner {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  justify-content: space-between;
+  gap: clamp(14px, 2.5vw, 32px);
+  min-width: 0;
+  width: 100%;
+  margin: 0;
+}
+
+body > header .brand-home {
+  display: flex;
+  flex: 0 1 auto;
+  flex-direction: row;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+  color: inherit;
+  text-decoration: none;
+  border-radius: 10px;
+}
+
+body > header .brand-home:hover {
+  color: inherit;
+  text-decoration: none;
+  filter: brightness(1.1);
+}
+
+body > header .brand-home:focus-visible {
+  outline: 2px solid #e6c866;
+  outline-offset: 5px;
+}
+
+body > header .logo {
+  width: 56px;
+  height: 56px;
+  flex: 0 0 auto;
+  padding: 4px;
+  object-fit: contain;
+  border: 1px solid rgba(230, 200, 102, 0.42);
+  border-radius: 15px;
+  background: rgba(212, 175, 55, 0.06);
+  filter: drop-shadow(0 4px 10px rgba(212, 175, 55, 0.18));
+}
+
+body > header h1,
+body > header .brand-text strong {
+  margin: 0;
+  color: #e6c866;
+  font-size: clamp(1.05rem, 1.8vw, 1.4rem);
+  line-height: 1.2;
+  letter-spacing: 0.01em;
+  text-shadow: 0 2px 12px rgba(212, 175, 55, 0.18);
+}
+
+body > header .brand p,
+body > header .brand-text > span {
+  margin: 4px 0 0;
+  color: #9aa6c4;
+  font-size: 0.84rem;
+  line-height: 1.35;
+}
+
+body > header nav {
+  display: flex;
+  flex: 0 1 auto;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  width: auto;
+  max-width: 100%;
+  margin: 0;
+}
+
+body > header nav a,
+body > header .back-btn,
+body > header .login-btn {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: 9px 13px;
+  color: #dce4f8;
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid rgba(212, 175, 55, 0.2);
+  border-radius: 10px;
+  font-size: 0.88rem;
+  font-weight: 650;
+  line-height: 1.2;
+  text-align: center;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color 160ms ease, background-color 160ms ease, border-color 160ms ease, transform 160ms ease;
+}
+
+body > header nav a:hover,
+body > header .back-btn:hover,
+body > header .login-btn:hover {
+  color: #e6c866;
+  background: rgba(212, 175, 55, 0.1);
+  border-color: rgba(230, 200, 102, 0.5);
+  transform: translateY(-1px);
+}
+
+body > header nav a:focus-visible,
+body > header .back-btn:focus-visible,
+body > header .login-btn:focus-visible {
+  outline: 2px solid #e6c866;
+  outline-offset: 3px;
+}
+
+body > header .login-btn {
+  color: #0a1330;
+  background: linear-gradient(135deg, #e6c866, #d4af37 58%, #b48f1f);
+  border-color: rgba(230, 200, 102, 0.7);
+}
+
+body > header .login-btn:hover {
+  color: #0a1330;
+  background: linear-gradient(135deg, #f0d77e, #d4af37);
+}
+
+@media (max-width: 700px) {
+  body > header {
+    gap: 10px 14px;
+    min-height: auto;
+    padding: 12px 16px;
+  }
+
+  body > header > .brand,
+  body > header > .header-inner {
+    flex-basis: 100%;
+    flex-wrap: wrap;
+    gap: 10px 12px;
+  }
+
+  body > header .brand-home {
+    gap: 11px;
+  }
+
+  body > header nav {
+    flex: 1 1 100%;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  body > header nav a,
+  body > header .back-btn,
+  body > header .login-btn {
+    min-height: 38px;
+    padding: 8px 11px;
+    font-size: 0.82rem;
+  }
+}
+
+@media (max-width: 420px) {
+  body > header .logo {
+    width: 48px;
+    height: 48px;
+    border-radius: 13px;
+  }
+
+  body > header h1,
+  body > header .brand-text strong {
+    font-size: 1rem;
+  }
+
+  body > header .brand p,
+  body > header .brand-text > span {
+    font-size: 0.78rem;
+  }
+}
+
+
 </style>
 <link rel="stylesheet" href="/site-theme.css">
+<link rel="icon" type="image/png" href="/assets/logo-gendarmerie.png">
 </head>
 <body>
+<header>
+  <div class="brand">
+    <a class="brand-home" href="/dashboard" aria-label="Retour au tableau de bord">
+      <img src="/assets/logo-gendarmerie.png" class="logo" alt="Logo Gendarmerie">
+      <div><h1>Gendarmerie Nationale</h1><p>Outil Jore</p></div>
+    </a>
+    <nav>
+      <a href="/dashboard">Dashboard</a>
+      <a href="/logout">Déconnexion</a>
+    </nav>
+  </div>
+</header>
+<main class="jore-content">
 <h1>🔒 Jore</h1>
 
 <!-- ===== EMBED ===== -->
@@ -75,6 +290,7 @@ button.red{background:#b91c1c;color:#fff}button.ghost{background:rgba(212,175,55
 </div>
 <div class="card"><h3 style="margin-top:0">Aperçu</h3><div class="dc" id="prev"></div></div>
 </div></div>
+</main>
 
 <script>
 const $=id=>document.getElementById(id);
