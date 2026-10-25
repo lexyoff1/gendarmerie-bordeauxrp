@@ -1,5 +1,7 @@
 const express = require("express");
+const http = require("http");
 const session = require("express-session");
+const { Server: SocketIOServer } = require("socket.io");
 const axios = require("axios");
 const fs = require("fs");
 const multer = require("multer");
@@ -638,17 +640,35 @@ app.get("/favicon.ico", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "assets", "logo-gendarmerie.png"));
 });
 
-app.use(session({
+let redisPublisher = null;
+let redisSubscriber = null;
+let realtimeReady = Promise.resolve();
+let sharedSessionStore = undefined;
+if (process.env.REDIS_URL) {
+    const { createClient } = require("redis");
+    const RedisStore = require("connect-redis").default;
+    redisPublisher = createClient({ url: process.env.REDIS_URL });
+    redisSubscriber = redisPublisher.duplicate();
+    redisPublisher.on("error", error => console.error("Redis principal :", error.message));
+    redisSubscriber.on("error", error => console.error("Redis abonné :", error.message));
+    sharedSessionStore = new RedisStore({ client: redisPublisher, prefix: "mdt:sess:" });
+    realtimeReady = Promise.all([redisPublisher.connect(), redisSubscriber.connect()]);
+}
+const activeSessionStore = sharedSessionStore || new session.MemoryStore();
+
+const sessionMiddleware = session({
     secret: SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
+    store: activeSessionStore,
     cookie: {
         httpOnly: true,
         sameSite: "lax",
         secure: process.env.COOKIE_SECURE === "true" || process.env.NODE_ENV === "production",
         maxAge: 7 * 24 * 60 * 60 * 1000
     }
-}));
+});
+app.use(sessionMiddleware);
 
 function regenerateSession(req) {
     return new Promise((resolve, reject) => {
@@ -933,6 +953,15 @@ function getData() {
     if (!Array.isArray(db.saisies)) db.saisies = [];
     if (!Array.isArray(db.avis)) db.avis = [];
     if (!Array.isArray(db.rapports)) db.rapports = [];
+    if (!Array.isArray(db.interventionPlans)) db.interventionPlans = [];
+    for (const plan of db.interventionPlans) {
+        if (!Array.isArray(plan.annotations)) plan.annotations = [];
+        if (!Array.isArray(plan.collaborators)) plan.collaborators = [];
+        if (!Number.isSafeInteger(plan.revision) || plan.revision < 1) plan.revision = 1;
+        for (const annotation of plan.annotations) {
+            if (!Number.isSafeInteger(annotation._version) || annotation._version < 1) annotation._version = 1;
+        }
+    }
 
     db.users.forEach(user => {
         if (hasNoQualificationJudiciaire(user.grade)) {
@@ -1315,7 +1344,7 @@ Spécialité : ${specialite.nom}
 Informations du candidat :
 • Identité : ${appItem.nomPrenom}
 • Discord : ${appItem.username}
-• Date de dépôt : ${new Date(appItem.createdAt).toLocaleString("fr-FR")}
+• Date de dépôt : ${new Date(appItem.createdAt).toLocaleString("fr-FR", { timeZone: "Europe/Paris" })}
 
 Le dossier est désormais en attente d'examen.
 
@@ -1331,7 +1360,7 @@ Spécialité : ${specialite.nom}
 Informations du candidat :
 • Identité : ${appItem.nomPrenom}
 • Discord : ${appItem.username}
-• Date de dépôt : ${new Date(appItem.createdAt).toLocaleString("fr-FR")}
+• Date de dépôt : ${new Date(appItem.createdAt).toLocaleString("fr-FR", { timeZone: "Europe/Paris" })}
 
 Le dossier est désormais en attente d'examen.
 
@@ -1485,11 +1514,13 @@ async function requireGNMember(req, res, next) {
         const member = await getGuildMember(req.session.user.id);
 
         if (!member.roles.includes(GN_MEMBER_ROLE_ID)) {
+            if (req.originalUrl.startsWith("/api/")) return res.status(403).json({ error: "Accès réservé aux membres autorisés de la Gendarmerie." });
             return res.send(accessDeniedPage());
         }
 
         next();
     } catch {
+        if (req.originalUrl.startsWith("/api/")) return res.status(403).json({ error: "Impossible de vérifier l’accès Gendarmerie." });
         return res.send(accessDeniedPage());
     }
 }
@@ -1529,6 +1560,7 @@ function restrictStagiaire(cleanPath) {
 
 const PAGES_PROTEGEES = [
     ["dashboard", "dashboard.html"],
+    ["plans-intervention", "plans-intervention.html"],
     ["effectifs", "effectifs.html"],
     ["patrouilles", "patrouilles.html"],
     ["renfort", "renfort.html"],
@@ -1688,7 +1720,7 @@ const messageCandidature =
 
 Nom : ${application.nomPrenom}
 Discord : ${application.user} (${application.discordId})
-Date de dépôt : ${new Date(application.createdAt).toLocaleString("fr-FR")}
+Date de dépôt : ${new Date(application.createdAt).toLocaleString("fr-FR", { timeZone: "Europe/Paris" })}
 
 Le dossier est disponible dans le panel administrateur.`;
 
@@ -2232,6 +2264,179 @@ app.get("/api/me", (req, res) => {
         ...req.session.user,
         candidat: true
     });
+});
+
+// Plans d'intervention : les plans sont visibles par les membres GN connectés.
+// Leur auteur peut les modifier ; les administrateurs peuvent gérer tous les plans.
+function validPlanShape(body) {
+    if (!body || typeof body !== "object" || Array.isArray(body)) return false;
+    if (typeof body.name !== "string" || !body.name.trim() || body.name.trim().length > 100) return false;
+    if (!Array.isArray(body.annotations) || body.annotations.length > 2000) return false;
+    // Express's JSON parser defaults to 100 KB; leave headroom for the enclosing request.
+    if (Buffer.byteLength(JSON.stringify(body.annotations), "utf8") > 80_000) return false;
+    const types = new Set(["freehand", "line", "arrow", "rect", "circle", "text", "marker", "zone", "symbol"]);
+    const ids = new Set();
+    return body.annotations.every(item => item && typeof item === "object" &&
+        typeof item.id === "string" && /^[\w-]{1,80}$/.test(item.id) && !ids.has(item.id) && ids.add(item.id) && types.has(item.type) &&
+        Array.isArray(item.points) && item.points.length <= 2000 &&
+        item.points.every(point => point && Number.isFinite(point.x) && Number.isFinite(point.y) &&
+            point.x >= 0 && point.x <= 1600 && point.y >= 0 && point.y <= 1000) &&
+        Number.isFinite(item.width) && item.width >= 1 && item.width <= 14 &&
+        Number.isFinite(item.fontSize) && item.fontSize >= 10 && item.fontSize <= 64 &&
+        Number.isFinite(item.opacity) && item.opacity >= 10 && item.opacity <= 90 &&
+        /^#[0-9a-f]{6}$/i.test(item.color || "") && /^#[0-9a-f]{6}$/i.test(item.fill || "") &&
+        (item.text === undefined || (typeof item.text === "string" && item.text.length <= 500)));
+}
+
+function canManagePlan(req, plan) {
+    return plan.authorId === req.session.user.id || (plan.collaborators || []).includes(req.session.user.id);
+}
+
+async function isPlanAdministrator(req) {
+    return isSuperUser(req) || await isAdmin(req);
+}
+
+async function requirePlanGradeAccess(req, res, next) {
+    if (isSuperUser(req) || await isAdmin(req)) return next();
+    const user = getData().users.find(item => item.id === req.session.user.id);
+    if (user?.grade === STAGIAIRE_GRADE) return res.status(403).json({ error: "Ce module n’est pas accessible avec le grade EGAV." });
+    next();
+}
+
+let plansIo = null;
+
+app.use("/api/intervention-plans", requireLogin, requireGNMember, requirePlanGradeAccess);
+
+app.get("/api/intervention-plans", requireLogin, requireGNMember, async (req, res) => {
+    const db = getData();
+    const admin = await isPlanAdministrator(req);
+    res.json((db.interventionPlans || []).map(plan => ({
+        id: plan.id, name: plan.name, author: plan.author, authorId: plan.authorId,
+        createdAt: plan.createdAt, updatedAt: plan.updatedAt, revision: plan.revision,
+        canEdit: admin || canManagePlan(req, plan),
+        canDelete: admin || plan.authorId === req.session.user.id,
+        canShare: admin || plan.authorId === req.session.user.id
+    })));
+});
+
+app.post("/api/intervention-plans", requireLogin, requireGNMember, (req, res) => {
+    const name = typeof req.body?.name === "string" ? req.body.name.trim() : "";
+    if (!name || name.length > 100) return res.status(400).json({ error: "Le nom doit contenir de 1 à 100 caractères." });
+    const db = getData();
+    const now = new Date().toISOString();
+    const plan = {
+        id: crypto.randomUUID(), name, annotations: [], collaborators: [], authorId: req.session.user.id,
+        author: req.session.user.nomPrenom || req.session.user.username || "Membre GN",
+        createdAt: now, updatedAt: now, revision: 1
+    };
+    db.interventionPlans.unshift(plan);
+    saveData(db);
+    plansIo?.emit("plan:created", { id: plan.id, name: plan.name, author: plan.author, authorId: plan.authorId, createdAt: now, updatedAt: now });
+    res.status(201).json(plan);
+});
+
+app.get("/api/intervention-plans/:id", requireLogin, requireGNMember, (req, res) => {
+    const plan = getData().interventionPlans.find(item => item.id === req.params.id);
+    if (!plan) return res.status(404).json({ error: "Plan introuvable." });
+    res.json(plan);
+});
+
+app.patch("/api/intervention-plans/:id", requireLogin, requireGNMember, async (req, res) => {
+    const db = getData();
+    const plan = db.interventionPlans.find(item => item.id === req.params.id);
+    if (!plan) return res.status(404).json({ error: "Plan introuvable." });
+    if (!canManagePlan(req, plan) && !(await isPlanAdministrator(req))) return res.status(403).json({ error: "Tu ne peux pas modifier ce plan." });
+    const name = typeof req.body?.name === "string" ? req.body.name.trim() : "";
+    if (!name || name.length > 100) return res.status(400).json({ error: "Le nom doit contenir de 1 à 100 caractères." });
+    if (Number(req.body.revision) !== plan.revision) return res.status(409).json({ error: "Ce plan a changé. Recharge-le avant de le renommer.", plan });
+    plan.name = name;
+    plan.updatedAt = new Date().toISOString();
+    plan.revision++;
+    saveData(db);
+    plansIo?.emit("plan:metadata", { id: plan.id, name: plan.name, updatedAt: plan.updatedAt, revision: plan.revision });
+    res.json({ id: plan.id, updatedAt: plan.updatedAt, revision: plan.revision });
+});
+
+app.put("/api/intervention-plans/:id", requireLogin, requireGNMember, async (req, res) => {
+    const db = getData();
+    const plan = db.interventionPlans.find(item => item.id === req.params.id);
+    if (!plan) return res.status(404).json({ error: "Plan introuvable." });
+    if (!canManagePlan(req, plan) && !(await isPlanAdministrator(req))) return res.status(403).json({ error: "Tu ne peux pas modifier ce plan." });
+    if (!validPlanShape(req.body)) return res.status(400).json({ error: "Le contenu du plan est invalide ou trop volumineux." });
+    if (Number(req.body.revision) !== plan.revision) {
+        return res.status(409).json({ error: "Ce plan a été modifié ailleurs. Recharge-le avant de continuer.", revision: plan.revision });
+    }
+    plan.name = req.body.name.trim();
+    const versions = new Map(plan.annotations.map(annotation => [annotation.id, annotation._version || 1]));
+    plan.annotations = req.body.annotations.map(annotation => ({
+        ...annotation,
+        _version: (versions.get(annotation.id) || 0) + 1
+    }));
+    plan.updatedAt = new Date().toISOString();
+    plan.revision += 1;
+    saveData(db);
+    plansIo?.to(`plan:${plan.id}`).emit("plan:state", { plan, revision: plan.revision });
+    res.json({ id: plan.id, updatedAt: plan.updatedAt, revision: plan.revision });
+});
+
+app.post("/api/intervention-plans/:id/duplicate", requireLogin, requireGNMember, (req, res) => {
+    const db = getData();
+    const source = db.interventionPlans.find(item => item.id === req.params.id);
+    if (!source) return res.status(404).json({ error: "Plan introuvable." });
+    const now = new Date().toISOString();
+    const copy = { ...source, id: crypto.randomUUID(), name: `${source.name} — copie`.slice(0, 100), collaborators: [],
+        annotations: JSON.parse(JSON.stringify(source.annotations)), authorId: req.session.user.id,
+        author: req.session.user.nomPrenom || req.session.user.username || "Membre GN",
+        createdAt: now, updatedAt: now, revision: 1 };
+    db.interventionPlans.unshift(copy);
+    saveData(db);
+    plansIo?.emit("plan:created", { id: copy.id, name: copy.name, author: copy.author, authorId: copy.authorId, createdAt: now, updatedAt: now });
+    res.status(201).json(copy);
+});
+
+app.post("/api/intervention-plans/:id/collaborators", requireLogin, requireGNMember, async (req, res) => {
+    const db = getData();
+    const plan = db.interventionPlans.find(item => item.id === req.params.id);
+    if (!plan) return res.status(404).json({ error: "Plan introuvable." });
+    if (plan.authorId !== req.session.user.id && !(await isPlanAdministrator(req))) return res.status(403).json({ error: "Seul l’auteur ou un administrateur peut gérer les accès." });
+    const userId = typeof req.body?.userId === "string" ? req.body.userId.trim() : "";
+    if (!/^\d{17,20}$/.test(userId) || userId === plan.authorId) return res.status(400).json({ error: "Identifiant Discord invalide." });
+    try {
+        const member = await getGuildMember(userId);
+        if (!member.roles.includes(GN_MEMBER_ROLE_ID) && !(await isAdmin({ session: { user: { id: userId } } }))) {
+            return res.status(400).json({ error: "Cette personne n’a pas accès au MDT." });
+        }
+    } catch {
+        return res.status(404).json({ error: "Membre Discord introuvable dans le serveur." });
+    }
+    if (!Array.isArray(plan.collaborators)) plan.collaborators = [];
+    if (!plan.collaborators.includes(userId)) plan.collaborators.push(userId);
+    saveData(db);
+    plansIo?.in(`user:${userId}`).emit("plan:access-changed", { id: plan.id });
+    res.json({ success: true, collaborators: plan.collaborators });
+});
+
+app.delete("/api/intervention-plans/:id/collaborators/:userId", requireLogin, requireGNMember, async (req, res) => {
+    const db = getData();
+    const plan = db.interventionPlans.find(item => item.id === req.params.id);
+    if (!plan) return res.status(404).json({ error: "Plan introuvable." });
+    if (plan.authorId !== req.session.user.id && !(await isPlanAdministrator(req))) return res.status(403).json({ error: "Seul l’auteur ou un administrateur peut gérer les accès." });
+    plan.collaborators = (plan.collaborators || []).filter(id => id !== req.params.userId);
+    saveData(db);
+    plansIo?.in(`user:${req.params.userId}`).emit("plan:access-changed", { id: plan.id });
+    res.json({ success: true, collaborators: plan.collaborators });
+});
+
+app.delete("/api/intervention-plans/:id", requireLogin, requireGNMember, async (req, res) => {
+    const db = getData();
+    const index = db.interventionPlans.findIndex(item => item.id === req.params.id);
+    if (index < 0) return res.status(404).json({ error: "Plan introuvable." });
+    if (db.interventionPlans[index].authorId !== req.session.user.id && !(await isPlanAdministrator(req))) return res.status(403).json({ error: "Tu ne peux pas supprimer ce plan." });
+    db.interventionPlans.splice(index, 1);
+    saveData(db);
+    plansIo?.emit("plan:deleted", { id: req.params.id });
+    plansIo?.in(`plan:${req.params.id}`).socketsLeave(`plan:${req.params.id}`);
+    res.json({ success: true });
 });
 
 app.get("/api/debug-admin", requireAdminAccess, (req, res) => {
@@ -2790,7 +2995,7 @@ Gendarmerie Nationale`
 Candidat : ${appItem.nomPrenom || appItem.user || "Sans nom"}
 Discord : ${appItem.user || appItem.username || "Non renseigné"} (${appItem.discordId || "ID inconnu"})
 Traité par : ${decideur} (${req.session.user?.id || "ID inconnu"})
-Date : ${new Date().toLocaleString("fr-FR")}
+Date : ${new Date().toLocaleString("fr-FR", { timeZone: "Europe/Paris" })}
 Rôle EGAV : ${roleResult.ok ? "attribué ✅" : `ÉCHEC ❌ (${roleResult.error})`}
 Pseudo serveur : ${nickResult.ok ? "modifié ✅" : `ÉCHEC ❌ (${nickResult.error})`}
 MP au candidat : ${dmCandidat ? "envoyé ✅" : "non envoyé ❌ (MP fermés)"}
@@ -2849,7 +3054,7 @@ Gendarmerie Nationale`
 Candidat : ${appItem.nomPrenom || appItem.user || "Sans nom"}
 Discord : ${appItem.user || appItem.username || "Non renseigné"} (${appItem.discordId || "ID inconnu"})
 Traité par : ${decideur} (${req.session.user?.id || "ID inconnu"})
-Date : ${new Date().toLocaleString("fr-FR")}
+Date : ${new Date().toLocaleString("fr-FR", { timeZone: "Europe/Paris" })}
 MP au candidat : ${dmCandidat ? "envoyé ✅" : "non envoyé ❌ (MP fermés)"}
 ${noteRefus ? `Message laissé : ${noteRefus}` : ""}`
     );
@@ -2975,6 +3180,7 @@ app.get("/logout", (req, res) => {
 });
 
 app.post("/logout", (req, res, next) => {
+    if (req.session?.user?.id) plansIo?.in(`user:${req.session.user.id}`).disconnectSockets(true);
     req.session.destroy(error => {
         if (error) return next(error);
         res.clearCookie("connect.sid", {
@@ -3311,7 +3517,7 @@ app.delete("/api/saisies/:id", requireAdminAccess, async (req, res) => {
 `🗑️ SUPPRESSION D'UNE SAISIE
 
 Supprimée par : ${suppresseur} (${req.session.user?.id || "ID inconnu"})
-Date de suppression : ${new Date().toLocaleString("fr-FR")}
+Date de suppression : ${new Date().toLocaleString("fr-FR", { timeZone: "Europe/Paris" })}
 
 ━━━━━━━━━━━━━━━━━━━━━
 
@@ -3323,7 +3529,7 @@ Suspect : ${saisie.suspect || "Non renseigné"}
 Motif : ${saisie.motif}
 Statut au moment de la suppression : ${saisie.statut}
 ${saisie.notes ? `Notes : ${saisie.notes}\n` : ""}Agent ayant déclaré la saisie : ${saisie.agentNom || "Inconnu"}
-Date de déclaration : ${new Date(saisie.createdAt).toLocaleString("fr-FR")}
+Date de déclaration : ${new Date(saisie.createdAt).toLocaleString("fr-FR", { timeZone: "Europe/Paris" })}
 
 Gendarmerie Nationale`;
 
@@ -3408,7 +3614,7 @@ app.delete("/api/avis/:id", requireLogin, requireGNMember, requireOPJ, async (re
 `🗑️ SUPPRESSION D'UN AVIS DE RECHERCHE
 
 Supprimé par : ${suppresseur} (${req.session.user?.id || "ID inconnu"})
-Date de suppression : ${new Date().toLocaleString("fr-FR")}
+Date de suppression : ${new Date().toLocaleString("fr-FR", { timeZone: "Europe/Paris" })}
 
 ━━━━━━━━━━━━━━━━━━━━━
 
@@ -3418,7 +3624,7 @@ Dernier lieu vu : ${avis.lieu || "Non renseigné"}
 Description : ${avis.description || "Non renseignée"}
 Motif : ${avis.motif}
 OPJ responsable de la publication : ${avis.agentNom || "Inconnu"}
-Date de publication : ${new Date(avis.createdAt).toLocaleString("fr-FR")}
+Date de publication : ${new Date(avis.createdAt).toLocaleString("fr-FR", { timeZone: "Europe/Paris" })}
 
 Gendarmerie Nationale`;
 
@@ -3525,7 +3731,7 @@ app.post("/api/rapports/:id/valider", requireLogin, requireGNMember, async (req,
     saveData(db);
 
     const dateRedactionFormatee = rapport.dateRedaction
-        ? new Date(rapport.dateRedaction).toLocaleString("fr-FR", { dateStyle: "short", timeStyle: "short" })
+        ? new Date(rapport.dateRedaction).toLocaleString("fr-FR", { dateStyle: "short", timeStyle: "short", timeZone: "Europe/Paris" })
         : "Non renseignée";
 
     const EMOJI_LOGO = "<:Logo_Brigade:1541635052432007248>";
@@ -3615,8 +3821,271 @@ setupJore({
     saveData
 });
 
+const httpServer = http.createServer(app);
+plansIo = new SocketIOServer(httpServer, {
+    serveClient: true,
+    maxHttpBufferSize: 150_000,
+    allowRequest: (req, callback) => {
+        const origin = req.headers.origin;
+        if (!origin) return callback(null, true);
+        try {
+            callback(null, new URL(origin).host.toLowerCase() === String(req.headers.host || "").toLowerCase());
+        } catch {
+            callback(null, false);
+        }
+    }
+});
+plansIo.engine.use(sessionMiddleware);
+
+function sessionCanUsePlans(userId, systemAdmin = false) {
+    const req = { session: { user: { id: userId }, systemAdmin } };
+    if (isSuperUser(req)) return Promise.resolve(true);
+    const configuredAdmins = (process.env.ADMIN_IDS || "").split(",").map(id => id.trim()).filter(Boolean);
+    if (configuredAdmins.includes(userId)) return Promise.resolve(true);
+    const db = getData();
+    if ((db.admins || []).some(admin => admin.discordId === userId && admin.passwordSet === true)) return Promise.resolve(true);
+    return getGuildMember(userId).then(member =>
+        member.roles.includes(ADMIN_ROLE_ID) ||
+        (db.users.find(user => user.id === userId)?.grade !== STAGIAIRE_GRADE && member.roles.includes(GN_MEMBER_ROLE_ID))
+    ).catch(() => false);
+}
+
+async function getSocketPlan(socket, planId, edit = false) {
+    const userId = socket.data.user?.id;
+    if (!userId || socket.data.planId !== planId || !(await refreshRealtimeSession(socket)) || !(await sessionCanUsePlans(userId, socket.data.systemAdmin))) return null;
+    const db = getData();
+    const plan = db.interventionPlans.find(item => item.id === planId);
+    if (!plan) return null;
+    if (edit && plan.authorId !== userId && !(plan.collaborators || []).includes(userId)) {
+        const member = await getGuildMember(userId).catch(() => null);
+        const isAdminUser = socket.data.systemAdmin || isSuperUser({ session: { user: { id: userId } } }) ||
+            (process.env.ADMIN_IDS || "").split(",").map(id => id.trim()).includes(userId) ||
+            (db.admins || []).some(admin => admin.discordId === userId && admin.passwordSet === true) ||
+            !!member?.roles.includes(ADMIN_ROLE_ID);
+        if (!isAdminUser) return null;
+    }
+    return { db, plan };
+}
+
+function refreshRealtimeSession(socket) {
+    const current = socket.request.session;
+    if (!current?.reload) return Promise.resolve(false);
+    return new Promise(resolve => current.reload(error => {
+        if (!error && socket.request.session?.user?.id === socket.data.user?.id) {
+            socket.data.systemAdmin = socket.request.session.systemAdmin === true;
+            resolve(true);
+        } else resolve(false);
+    }));
+}
+
+async function emitPlanPresence(planId) {
+    if (!plansIo) return;
+    const sockets = await plansIo.in(`plan:${planId}`).fetchSockets();
+    const byUser = new Map();
+    for (const client of sockets) {
+        const user = client.data.user;
+        if (user?.id) byUser.set(user.id, {
+            id: user.id, name: user.nomPrenom || user.username || "Membre MDT",
+            avatar: user.avatar || "", status: client.data.activity || "en ligne"
+        });
+    }
+    plansIo.to(`plan:${planId}`).emit("plan:presence", [...byUser.values()]);
+}
+
+function guardRealtimeHandler(handler) {
+    return (...args) => {
+        const acknowledge = typeof args.at(-1) === "function" ? args.at(-1) : () => {};
+        Promise.resolve().then(() => handler(...args)).catch(error => {
+            console.error("Erreur d’une action collaborative :", error.message);
+            acknowledge({ ok: false, error: "L’action n’a pas pu être enregistrée. Réessaie." });
+        });
+    };
+}
+
+plansIo.use(async (socket, next) => {
+    const user = socket.request.session?.user;
+    if (!user?.id) return next(new Error("Authentification MDT requise."));
+    if (!(await sessionCanUsePlans(user.id, socket.request.session.systemAdmin === true))) return next(new Error("Accès MDT refusé."));
+    const profile = getData().users.find(item => item.id === user.id);
+    socket.data.user = {
+        id: user.id, username: user.username,
+        nomPrenom: profile?.nomPrenom || user.nomPrenom || user.username,
+        avatar: profile?.avatar || user.avatar || ""
+    };
+    socket.data.systemAdmin = socket.request.session.systemAdmin === true;
+    next();
+});
+
+plansIo.on("connection", socket => {
+    socket.join(`user:${socket.data.user.id}`);
+    socket.on("plan:join", guardRealtimeHandler(async (data, ack = () => {}) => {
+        const planId = typeof data?.planId === "string" ? data.planId : "";
+        const authorized = await refreshRealtimeSession(socket) && await sessionCanUsePlans(socket.data.user.id, socket.data.systemAdmin);
+        if (!authorized || !/^[\w-]{1,80}$/.test(planId)) return ack({ ok: false, error: "Accès au plan refusé." });
+        const plan = getData().interventionPlans.find(item => item.id === planId);
+        if (!plan) return ack({ ok: false, error: "Plan introuvable." });
+        if (socket.data.planId && socket.data.planId !== planId) {
+            const previous = socket.data.planId;
+            socket.leave(`plan:${previous}`);
+            socket.data.planId = null;
+            emitPlanPresence(previous);
+        }
+        socket.data.planId = planId;
+        socket.data.activity = "en ligne";
+        await socket.join(`plan:${planId}`);
+        const members = await plansIo.in(`plan:${planId}`).fetchSockets();
+        const presence = new Map();
+        for (const client of members) {
+            const user = client.data.user;
+            if (user?.id) presence.set(user.id, { id: user.id, name: user.nomPrenom || user.username || "Membre MDT", avatar: user.avatar || "", status: client.data.activity || "en ligne" });
+        }
+        ack({ ok: true, plan, presence: [...presence.values()] });
+        await emitPlanPresence(planId);
+    }));
+
+    socket.on("plan:leave", () => {
+        const planId = socket.data.planId;
+        if (!planId) return;
+        socket.leave(`plan:${planId}`);
+        socket.data.planId = null;
+        socket.data.activity = null;
+        emitPlanPresence(planId);
+    });
+
+    socket.on("plan:cursor", guardRealtimeHandler(async data => {
+        const planId = socket.data.planId;
+        if (!planId || Date.now() - (socket.data.lastCursorAt || 0) < 45) return;
+        if (!Number.isFinite(data?.x) || !Number.isFinite(data?.y) || data.x < 0 || data.x > 1600 || data.y < 0 || data.y > 1000) return;
+        if (!(await refreshRealtimeSession(socket))) return socket.disconnect(true);
+        socket.data.lastCursorAt = Date.now();
+        socket.to(`plan:${planId}`).emit("plan:cursor", { userId: socket.data.user.id, name: socket.data.user.nomPrenom || socket.data.user.username, x: data.x, y: data.y });
+    }));
+
+    socket.on("plan:preview", guardRealtimeHandler(async data => {
+        const planId = socket.data.planId;
+        if (!planId || Date.now() - (socket.data.lastPreviewAt || 0) < 80) return;
+        const item = data?.annotation;
+        if (!item || !validPlanShape({ name: "Prévisualisation", annotations: [item] })) return;
+        if (!(await getSocketPlan(socket, planId, true))) return;
+        socket.data.lastPreviewAt = Date.now();
+        const activity = data.status === "modifie" ? "modifie" : "dessine";
+        const activityChanged = socket.data.activity !== activity;
+        socket.data.activity = activity;
+        socket.to(`plan:${planId}`).emit("plan:preview", { userId: socket.data.user.id, name: socket.data.user.nomPrenom || socket.data.user.username, annotation: item, status: activity });
+        if (activityChanged) emitPlanPresence(planId);
+    }));
+
+    socket.on("plan:activity", status => {
+        const planId = socket.data.planId;
+        if (!planId || !["en ligne", "dessine", "modifie"].includes(status)) return;
+        socket.data.activity = status;
+        emitPlanPresence(planId);
+    });
+
+    socket.on("plan:preview:clear", () => {
+        const planId = socket.data.planId;
+        if (!planId) return;
+        socket.data.activity = "en ligne";
+        socket.to(`plan:${planId}`).emit("plan:preview:clear", { userId: socket.data.user.id });
+        emitPlanPresence(planId);
+    });
+
+    socket.on("annotation:upsert", guardRealtimeHandler(async (data, ack = () => {}) => {
+        const planId = socket.data.planId;
+        const access = planId && await getSocketPlan(socket, planId, true);
+        if (!access) return ack({ ok: false, error: "Tu n’es plus autorisé à modifier ce plan." });
+        const { plan, db } = access;
+        const item = data?.annotation;
+        if (!validPlanShape({ name: plan.name, annotations: [item] }) ||
+            !Number.isFinite(item.width) || item.width < 1 || item.width > 14 ||
+            !Number.isFinite(item.fontSize) || item.fontSize < 10 || item.fontSize > 64 ||
+            !Number.isFinite(item.opacity) || item.opacity < 10 || item.opacity > 90 ||
+            !/^#[0-9a-f]{6}$/i.test(item.color || "") || !/^#[0-9a-f]{6}$/i.test(item.fill || "")) {
+            return ack({ ok: false, error: "Annotation invalide." });
+        }
+        const existing = plan.annotations.find(annotation => annotation.id === item.id);
+        if ((existing && Number(data.expectedVersion) !== Number(existing._version)) || (!existing && data.expectedVersion != null)) {
+            return ack({ ok: false, conflict: true, error: "Cette annotation a changé depuis son ouverture.", plan });
+        }
+        const clean = {
+            id: item.id, type: item.type, points: item.points.map(point => ({ x: point.x, y: point.y })),
+            color: item.color, fill: item.fill, width: item.width, opacity: item.opacity, fontSize: item.fontSize,
+            _version: existing ? existing._version + 1 : 1
+        };
+        if (item.text !== undefined) clean.text = item.text;
+        if (existing) plan.annotations[plan.annotations.indexOf(existing)] = clean;
+        else plan.annotations.push(clean);
+        plan.revision = (plan.revision || 0) + 1;
+        plan.updatedAt = new Date().toISOString();
+        saveData(db);
+        const event = { planId, annotation: clean, revision: plan.revision, actor: socket.data.user.id };
+        socket.to(`plan:${planId}`).emit("annotation:upsert", event);
+        socket.to(`plan:${planId}`).emit("plan:preview:clear", { userId: socket.data.user.id });
+        socket.data.activity = "en ligne";
+        await emitPlanPresence(planId);
+        ack({ ok: true, annotation: clean, revision: plan.revision, updatedAt: plan.updatedAt });
+    }));
+
+    socket.on("annotation:delete", guardRealtimeHandler(async (data, ack = () => {}) => {
+        const planId = socket.data.planId;
+        const access = planId && await getSocketPlan(socket, planId, true);
+        if (!access) return ack({ ok: false, error: "Tu n’es plus autorisé à modifier ce plan." });
+        const { plan, db } = access;
+        const index = plan.annotations.findIndex(item => item.id === data?.id);
+        if (index < 0) return ack({ ok: false, error: "Annotation introuvable.", plan });
+        if (Number(data.expectedVersion) !== Number(plan.annotations[index]._version)) return ack({ ok: false, conflict: true, error: "Cette annotation a changé depuis son ouverture.", plan });
+        plan.annotations.splice(index, 1);
+        plan.revision = (plan.revision || 0) + 1;
+        plan.updatedAt = new Date().toISOString();
+        saveData(db);
+        socket.to(`plan:${planId}`).emit("annotation:delete", { planId, id: data.id, revision: plan.revision, actor: socket.data.user.id });
+        ack({ ok: true, revision: plan.revision, updatedAt: plan.updatedAt });
+    }));
+
+    socket.on("plan:replace", guardRealtimeHandler(async (data, ack = () => {}) => {
+        const planId = socket.data.planId;
+        const access = planId && await getSocketPlan(socket, planId, true);
+        if (!access) return ack({ ok: false, error: "Tu n’es plus autorisé à modifier ce plan." });
+        const { plan, db } = access;
+        if (Number(data?.expectedRevision) !== Number(plan.revision)) return ack({ ok: false, conflict: true, error: "Le plan a changé. Recharge l’état courant avant cette action.", plan });
+        if (!validPlanShape({ name: plan.name, annotations: data.annotations })) return ack({ ok: false, error: "Liste d’annotations invalide." });
+        const oldVersions = new Map(plan.annotations.map(item => [item.id, item._version || 1]));
+        const oldById = new Map(plan.annotations.map(item => [item.id, item]));
+        plan.annotations = data.annotations.map(item => {
+            const old = oldById.get(item.id);
+            const oldComparable = old && { ...old };
+            const newComparable = { ...item };
+            if (oldComparable) delete oldComparable._version;
+            delete newComparable._version;
+            const unchanged = oldComparable && JSON.stringify(oldComparable) === JSON.stringify(newComparable);
+            return { ...item, _version: unchanged ? (old._version || 1) : (oldVersions.get(item.id) || 0) + 1 };
+        });
+        plan.revision = (plan.revision || 0) + 1;
+        plan.updatedAt = new Date().toISOString();
+        saveData(db);
+        socket.to(`plan:${planId}`).emit("plan:replace", { planId, annotations: plan.annotations, revision: plan.revision, updatedAt: plan.updatedAt, actor: socket.data.user.id });
+        ack({ ok: true, plan });
+    }));
+
+    socket.on("disconnect", () => {
+        const planId = socket.data.planId;
+        if (planId) setTimeout(() => emitPlanPresence(planId), 0);
+    });
+});
+
+if (process.env.REDIS_URL) {
+    const { createAdapter } = require("@socket.io/redis-adapter");
+    plansIo.adapter(createAdapter(redisPublisher, redisSubscriber));
+}
+
 const PORT = process.env.PORT || 3000;
 
-app.listen(PORT, () => {
-    console.log(`Serveur lancé sur http://localhost:${PORT}`);
+realtimeReady.then(() => {
+    if (process.env.REDIS_URL) console.log("Sessions MDT et diffusion Socket.IO partagées par Redis.");
+    httpServer.listen(PORT, () => console.log(`Serveur lancé sur http://localhost:${PORT}`));
+}).catch(error => {
+    console.error("Le serveur ne démarre pas : Redis est obligatoire quand REDIS_URL est configuré.", error.message);
+    process.exitCode = 1;
 });
+
+module.exports = { app, httpServer, plansIo, sessionStore: activeSessionStore, discordBot, STAGIAIRE_GRADE };
