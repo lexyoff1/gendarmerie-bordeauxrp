@@ -276,14 +276,14 @@ function formatLockDuration(seconds) {
 
 function blockedPageHtml(message, code) {
     const codeBlock = code
-        ? "<p>Envoyez un MP &agrave; lexy_off1 avec ce code pour demander le d&eacute;blocage :</p><div class=\"code\">" + code + "</div>"
+        ? "<p>Communiquez ce code &agrave; un responsable pour demander le d&eacute;blocage :</p><div class=\"code\">" + code + "</div>"
         : "";
     return [
         "<!doctype html><html lang=\"fr\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><meta name=\"theme-color\" content=\"#0a1330\"><title>Acc&egrave;s bloqu&eacute; - Gendarmerie Nationale</title>",
         "<style>*{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;padding:24px;background:radial-gradient(900px 500px at 15% -10%,rgba(40,80,190,.28),transparent 60%),radial-gradient(700px 420px at 100% 0%,rgba(212,175,55,.1),transparent 60%),linear-gradient(180deg,#0a1330 0%,#050a18 100%);color:#f4f6fb;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif}",
-        "main{width:min(520px,100%);padding:clamp(24px,6vw,36px);border:1px solid rgba(212,175,55,.3);border-radius:16px;background:rgba(12,22,52,.88);box-shadow:0 18px 48px rgba(0,0,0,.32);text-align:center}.brand{display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:28px;text-align:left;color:inherit;text-decoration:none;cursor:pointer}.brand:hover{filter:brightness(1.12)}.brand-logo{display:block;width:54px;height:54px;flex:0 0 54px;object-fit:contain;border:2px solid #d4af37;border-radius:50%;background:#0a1330;box-shadow:0 0 20px rgba(212,175,55,.18)}.brand-title{margin:0;color:#e6c866;font-size:1.05rem}.brand-subtitle{margin:4px 0 0;color:#9aa6c4;font-size:.85rem}",
+        "main{width:min(520px,100%);padding:clamp(24px,6vw,36px);border:1px solid rgba(212,175,55,.3);border-radius:16px;background:rgba(12,22,52,.88);box-shadow:0 18px 48px rgba(0,0,0,.32);text-align:center}.brand{display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:28px;text-align:left;color:inherit;text-decoration:none;cursor:pointer}.brand:hover{filter:brightness(1.12)}.brand-mark{display:grid;place-items:center;width:54px;height:54px;border:2px solid #d4af37;border-radius:50%;color:#e6c866;font-weight:800;letter-spacing:.08em;box-shadow:0 0 20px rgba(212,175,55,.18)}.brand-title{margin:0;color:#e6c866;font-size:1.05rem}.brand-subtitle{margin:4px 0 0;color:#9aa6c4;font-size:.85rem}",
         ".status{display:inline-block;margin-bottom:12px;padding:6px 12px;border:1px solid rgba(212,175,55,.32);border-radius:999px;background:rgba(212,175,55,.08);color:#e6c866;font-size:.82rem;font-weight:700}h1{margin:0 0 12px;color:#f4f6fb;font-size:1.6rem}p{color:#b9c3da;line-height:1.65}.code{display:inline-block;margin-top:6px;padding:12px 18px;border:1px dashed #d4af37;border-radius:8px;background:#0a1330;color:#e6c866;font-family:inherit;font-size:1.25rem;font-weight:800;letter-spacing:2px;overflow-wrap:anywhere}@media(max-width:480px){body{padding:16px}main{padding:24px 20px}h1{font-size:1.4rem}}</style></head><body><main>",
-        "<a class=\"brand\" href=\"/dashboard\" aria-label=\"Retour au dashboard\"><img class=\"brand-logo\" src=\"/assets/logo-gendarmerie.png\" alt=\"Logo de la Gendarmerie\"><div><p class=\"brand-title\">Gendarmerie Nationale</p><p class=\"brand-subtitle\">Portail s&eacute;curis&eacute;</p></div></a>",
+        "<a class=\"brand\" href=\"/dashboard\" aria-label=\"Retour au dashboard\"><div class=\"brand-mark\" aria-hidden=\"true\">GN</div><div><p class=\"brand-title\">Gendarmerie Nationale</p><p class=\"brand-subtitle\">Portail s&eacute;curis&eacute;</p></div></a>",
         "<span class=\"status\">Protection du site</span><h1>Acc&egrave;s bloqu&eacute;</h1><p>" + message + "</p>" + codeBlock + "</main></body></html>"
     ].join("");
 }
@@ -480,8 +480,6 @@ app.use((req, res, next) => {
 });
 
 app.use((req, res, next) => {
-    if (req.path.startsWith("/assets/")) return next();
-
     const ip = getClientIp(req);
     const banKey = siteRateLimitKey(ip);
     const remaining = getLockRemainingSeconds(banKey);
@@ -628,7 +626,7 @@ function getImageExtension(buffer) {
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use("/assets", express.static(path.join(__dirname, "public", "assets")));
+app.use("/assets", express.static("public/assets"));
 // Avatars Discord synchronisés par Jore (voir avatar-sync.js)
 app.use("/avatars", express.static(process.env.AVATARS_DIR || path.join(__dirname, "public", "assets", "avatars")));
 app.use("/site-theme.css", express.static(path.join(__dirname, "public", "site-theme.css")));
@@ -907,7 +905,7 @@ const SPECIALITES = [
 ];
 
 const DATA_FILE = process.env.DATA_FILE_PATH || path.join(__dirname, "data.json");
-const DEFAULT_TENUES = require("./tenues-defaults.json");
+const DEFAULT_TENUES_FILE = path.join(__dirname, "tenues-defaults.json");
 
 function getData() {
     if (!fs.existsSync(DATA_FILE)) {
@@ -925,9 +923,11 @@ function getData() {
     if (!Array.isArray(db.applications)) db.applications = [];
     if (!Array.isArray(db.specialiteApplications)) db.specialiteApplications = [];
     if (!Array.isArray(db.tenues)) db.tenues = [];
-    if (db.tenuesDefaultsVersion !== 1) {
-        seedDefaultTenues(db);
-        db.tenuesDefaultsVersion = 1;
+    if (db.tenuesSeedVersion !== 1) {
+        if (db.tenues.length === 0) {
+            db.tenues = JSON.parse(fs.readFileSync(DEFAULT_TENUES_FILE, "utf8"));
+        }
+        db.tenuesSeedVersion = 1;
     }
     if (!Array.isArray(db.ticketsCommandement)) db.ticketsCommandement = [];
     if (!Array.isArray(db.saisies)) db.saisies = [];
@@ -948,36 +948,6 @@ function getData() {
 
     saveData(db);
     return db;
-}
-
-function seedDefaultTenues(db) {
-    const usedIds = new Set(db.tenues.map(tenue => String(tenue.id)));
-    let nextId = db.tenues.reduce((maximum, tenue) => {
-        const id = Number(tenue.id);
-        return Number.isSafeInteger(id) ? Math.max(maximum, id) : maximum;
-    }, 0) + 1;
-
-    for (const defaultTenue of DEFAULT_TENUES) {
-        const alreadyPresent = db.tenues.some(tenue =>
-            String(tenue._defaultTenueId) === String(defaultTenue.id) ||
-            (String(tenue.id) === String(defaultTenue.id) &&
-                tenue.nom === defaultTenue.nom &&
-                tenue.categorie === defaultTenue.categorie &&
-                tenue.image === defaultTenue.image &&
-                tenue.description === defaultTenue.description)
-        );
-        if (alreadyPresent) continue;
-
-        const tenue = { ...defaultTenue };
-        if (usedIds.has(String(tenue.id))) {
-            while (usedIds.has(String(nextId))) nextId++;
-            tenue._defaultTenueId = tenue.id;
-            tenue.id = nextId++;
-        }
-
-        usedIds.add(String(tenue.id));
-        db.tenues.push(tenue);
-    }
 }
 
 function saveData(data) {
@@ -1605,6 +1575,7 @@ app.get("/gn-candidature", (req, res) => {
     if (!req.session.user || String(req.session.user.id).startsWith("systeme")) {
         return res.redirect("/auth/discord?returnTo=/gn-candidature");
     }
+    if (req.session.user.aProfilAutomatique) return res.redirect("/dashboard");
     res.sendFile(path.join(__dirname, "public", "gn-candidature.html"));
 });
 app.get("/gn-candidature.html", (req, res) => res.redirect(301, "/gn-candidature"));
@@ -1613,6 +1584,14 @@ app.post("/api/candidatures", candidatureLimiter, async (req, res) => {
     // Il faut être connecté avec Discord pour candidater
     if (!req.session.user?.id || req.session.user.id.startsWith("systeme")) {
         return res.status(401).json({ error: "Connexion Discord requise." });
+    }
+    try {
+        const member = await getGuildMember(req.session.user.id);
+        if (member.roles.includes(GN_MEMBER_ROLE_ID)) {
+            return res.status(403).json({ error: "Ton rôle Discord te donne déjà accès à un profil Gendarmerie." });
+        }
+    } catch {
+        return res.status(403).json({ error: "Impossible de vérifier tes rôles Discord." });
     }
 
     const body = req.body && typeof req.body === "object" && !Array.isArray(req.body)
@@ -2123,7 +2102,8 @@ app.get("/auth/discord/callback", oauthLimiter, async (req, res) => {
             avatar: userRes.data.avatar,
             nomPrenom,
             estDansServeur: !!member || superUser,
-            dateArriveeServeur: member ? member.joined_at : null
+            dateArriveeServeur: member ? member.joined_at : null,
+            aProfilAutomatique: !!member?.roles.includes(GN_MEMBER_ROLE_ID)
         };
 
         if (!member && !superUser) {
@@ -2144,6 +2124,23 @@ app.get("/auth/discord/callback", oauthLimiter, async (req, res) => {
             user.nomPrenom = nomPrenom;
             user.estDansServeur = true;
             if (member) user.dateArriveeServeur = member.joined_at;
+            saveData(db);
+        } else if (member?.roles.includes(GN_MEMBER_ROLE_ID)) {
+            db.users.push({
+                id: userRes.data.id,
+                username: userRes.data.username,
+                avatar: userRes.data.avatar || "",
+                nomPrenom,
+                dateArriveeServeur: member.joined_at || null,
+                datePremiereConnexion: new Date().toISOString(),
+                estDansServeur: true,
+                grade: STAGIAIRE_GRADE,
+                NIGEND: "",
+                qualificationJudiciaire: getDefaultQualificationJudiciaire(STAGIAIRE_GRADE),
+                unite: "",
+                specialisation: "",
+                statut: "Actif"
+            });
             saveData(db);
         }
 
@@ -2973,7 +2970,11 @@ app.delete("/api/user/:id", requireAdminAccess, async (req, res) => {
     res.json({ success: true });
 });
 
-function destroySessionAndRedirect(req, res, next) {
+app.get("/logout", (req, res) => {
+    res.type("html").send(`<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Déconnexion</title></head><body><main><h1>Déconnexion</h1><p>Confirme ta déconnexion du site.</p><form method="post" action="/logout"><button type="submit">Se déconnecter</button></form><p><a href="/">Annuler</a></p></main></body></html>`);
+});
+
+app.post("/logout", (req, res, next) => {
     req.session.destroy(error => {
         if (error) return next(error);
         res.clearCookie("connect.sid", {
@@ -2981,12 +2982,9 @@ function destroySessionAndRedirect(req, res, next) {
             sameSite: "lax",
             secure: process.env.COOKIE_SECURE === "true" || process.env.NODE_ENV === "production"
         });
-        res.redirect("/index.html");
+        res.redirect("/");
     });
-}
-
-app.get("/logout", destroySessionAndRedirect);
-app.post("/logout", destroySessionAndRedirect);
+});
 
 app.post("/api/tickets-commandement/create", requireLogin, requireGNMember, async (req, res) => {
     const db = getData();
