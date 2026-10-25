@@ -2,347 +2,370 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Tenues</title>
+    <title>Spécialités GN</title>
     <style>
-        @import url("https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap");
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  color: #e0e0e0;
+  line-height: 1.6;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
 
-        body {
-            background: linear-gradient(135deg, #0d1321 0%, #141d2e 100%);
-            color: white;
-            font-family: "Outfit", Arial, sans-serif;
-            line-height: 1.6;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
+header {
+  background: rgba(0, 0, 0, 0.5);
+  border-bottom: 3px solid #d4af37;
+  padding: 2rem;
+  backdrop-filter: blur(10px);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
 
-        header {
-            background: linear-gradient(90deg, #0a0f1a 0%, #111a2e 100%);
-            border-bottom: 3px solid #d4af37;
-            padding: 1.5rem 2rem;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+}
 
-        .brand {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
+.logo {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 8px rgba(212, 175, 55, 0.5));
+}
 
-        .logo {
-            width: 60px;
-            height: 60px;
-            object-fit: contain;
-            filter: drop-shadow(0 0 8px rgba(212, 175, 55, 0.4));
-        }
+.brand h1 {
+  font-size: 2.5rem;
+  color: #d4af37;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+}
 
-        .brand h1 {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: #d4af37;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
+.brand p {
+  font-size: 0.95rem;
+  color: #b0b0b0;
+}
 
-        .brand p {
-            margin-top: 0.25rem;
-            color: #c9d6ff;
-            font-size: 0.85rem;
-        }
+nav {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  max-width: 1200px;
+  margin: 0 auto;
+}
 
-        nav {
-            display: flex;
-            gap: 1rem;
-            flex-wrap: wrap;
-            align-items: center;
-        }
+nav a {
+  color: #d4af37;
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  border: 1px solid #d4af37;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  font-size: 0.9rem;
+}
 
-        nav a {
-            color: #d4af37;
-            text-decoration: none;
-            padding: 0.5rem 1.5rem;
-            border-radius: 4px;
-            transition: all 0.3s ease;
-            font-weight: 600;
-            font-size: 0.9rem;
-            cursor: pointer;
-            border: 1px solid #d4af37;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
+nav a:hover {
+  background: #d4af37;
+  color: #1a1a2e;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+}
 
-        nav a:hover {
-            background: #d4af37;
-            color: #0d1321;
-        }
+section {
+  flex: 1;
+  padding: 3rem 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+}
 
-        section {
-            flex: 1;
-            padding: 2.5rem;
-            max-width: 1400px;
-            margin: 0 auto;
-            width: 100%;
-        }
+section h2 {
+  font-size: 2rem;
+  color: #d4af37;
+  margin-bottom: 2rem;
+  text-align: center;
+  border-bottom: 2px solid #d4af37;
+  padding-bottom: 1rem;
+}
 
-        section > h2 {
-            font-size: 2rem;
-            margin-bottom: 1.5rem;
-            color: #d4af37;
-            border-bottom: 2px solid #d4af37;
-            padding-bottom: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+}
 
-        section > .card:first-of-type {
-            margin-bottom: 2rem;
-        }
+.card {
+  background: rgba(30, 30, 50, 0.8);
+  border: 2px solid #d4af37;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+}
 
-        .card {
-            background: linear-gradient(135deg, #0f1624 0%, #151f36 100%);
-            border-left: 4px solid #d4af37;
-            border-radius: 10px;
-            padding: 1.5rem;
-            margin: 1rem 0;
-            transition: all 0.3s ease;
-        }
+.card:hover {
+  background: rgba(40, 40, 60, 0.9);
+  box-shadow: 0 12px 32px rgba(212, 175, 55, 0.2);
+}
 
-        .card:hover {
-            background: linear-gradient(135deg, #141d2e 0%, #1a2847 100%);
-            box-shadow: 0 6px 16px rgba(212, 175, 55, 0.2);
-        }
+.card h3 {
+  font-size: 1.4rem;
+  color: #d4af37;
+  margin-bottom: 0.8rem;
+  border-bottom: 1px solid #d4af37;
+  padding-bottom: 0.6rem;
+}
 
-        .card h2 {
-            font-size: 1.5rem;
-            margin-bottom: 1rem;
-            color: #d4af37;
-            border-bottom: 1px solid #d4af37;
-            padding-bottom: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
+.card h2 {
+  font-size: 1.8rem;
+  color: #d4af37;
+  margin-bottom: 1.5rem;
+  border-bottom: 2px solid #d4af37;
+  padding-bottom: 1rem;
+  text-align: left;
+}
 
-        .card h3 {
-            font-size: 1.2rem;
-            margin-bottom: 0.5rem;
-            color: #d4af37;
-        }
+.card p {
+  color: #d0d0d0;
+  margin-bottom: 0.8rem;
+  line-height: 1.6;
+}
 
-        .card p {
-            margin-bottom: 0.5rem;
-            color: #d0d8f7;
-        }
+.card p b {
+  color: #fff9e6;
+}
 
-        .muted {
-            color: #c9d6ff;
-            font-size: 0.9rem;
-        }
+.card p:first-of-type {
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
 
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 1.5rem;
-            margin-bottom: 3rem;
-        }
+label {
+  color: #d0d0d0;
+  font-weight: 500;
+  display: block;
+  margin: 1rem 0 0.5rem 0;
+}
 
-        .card.grid-item {
-            display: flex;
-            flex-direction: column;
-            min-height: 360px;
-        }
+.card label {
+  margin-top: 1rem;
+}
 
-        .course-image {
-            width: 100%;
-            height: 200px;
-            object-fit: cover;
-            border-radius: 6px;
-            margin: 1rem 0;
-            flex-grow: 1;
-        }
+textarea,
+input[type="text"],
+input[type="number"] {
+  width: 100%;
+  padding: 0.8rem;
+  background: rgba(20, 20, 40, 0.8);
+  border: 1px solid #d4af37;
+  border-radius: 4px;
+  color: #e0e0e0;
+  font-family: inherit;
+  font-size: 1rem;
+  margin-top: 0.5rem;
+  transition: all 0.3s ease;
+}
 
-        .tenue-admin {
-            margin-top: auto;
-        }
+textarea:focus,
+input[type="text"]:focus,
+input[type="number"]:focus {
+  outline: none;
+  background: rgba(30, 30, 50, 0.9);
+  border-color: #fff9e6;
+  box-shadow: 0 0 8px rgba(212, 175, 55, 0.3);
+}
 
-        hr {
-            border: none;
-            border-top: 1px solid #d4af37;
-            margin: 1rem 0;
-            opacity: 0.5;
-        }
+textarea {
+  resize: vertical;
+  min-height: 80px;
+}
 
-        label {
-            display: block;
-            margin-top: 0.8rem;
-            font-weight: 600;
-            color: #d4af37;
-            font-size: 0.95rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
+.radio-line {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin: 0.8rem 0 0 0;
+}
 
-        input[type="text"],
-        input[type="file"] {
-            width: 100%;
-            padding: 0.6rem;
-            margin-top: 0.4rem;
-            background: #0a0f1a;
-            color: white;
-            border: 1px solid #d4af37;
-            border-radius: 6px;
-            font-family: "Outfit", Arial, sans-serif;
-            font-size: 0.95rem;
-            transition: all 0.3s ease;
-        }
+.radio-line input[type="radio"] {
+  width: auto;
+  margin: 0;
+  accent-color: #d4af37;
+  cursor: pointer;
+}
 
-        input[type="text"]:focus,
-        input[type="file"]:focus {
-            outline: none;
-            border-color: #d4af37;
-            background: #141d2e;
-            box-shadow: 0 0 12px rgba(212, 175, 55, 0.3);
-        }
+.radio-line label {
+  margin: 0;
+  font-weight: normal;
+}
 
-        button {
-            background: #d4af37;
-            color: #0d1321;
-            border: none;
-            padding: 0.7rem 1.25rem;
-            border-radius: 6px;
-            cursor: pointer;
-            margin-top: 0.75rem;
-            font-weight: 700;
-            transition: all 0.3s ease;
-            font-size: 0.95rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
+button {
+  padding: 0.8rem 1.2rem;
+  background: linear-gradient(135deg, #d4af37 0%, #b8941f 100%);
+  color: #1a1a2e;
+  border: none;
+  border-radius: 4px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  margin-top: 0.8rem;
+}
 
-        button:hover {
-            background: #e8c547;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(212, 175, 55, 0.3);
-        }
+button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(212, 175, 55, 0.4);
+}
 
-        button:active {
-            transform: translateY(0);
-        }
+button:active {
+  transform: translateY(0);
+}
 
-        button.danger {
-            background: #ff6b6b;
-            color: white;
-            margin-left: 0.5rem;
-        }
+button.danger {
+  background: linear-gradient(135deg, #d64545 0%, #a83030 100%);
+  color: #fff;
+}
 
-        button.danger:hover {
-            background: #ff8787;
-            box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
-        }
+button.danger:hover {
+  box-shadow: 0 8px 16px rgba(214, 69, 69, 0.4);
+}
 
-        .footer {
-            margin-top: auto;
-            padding: 2rem;
-            text-align: center;
-            background: linear-gradient(90deg, #0a0f1a 0%, #111a2e 100%);
-            border-top: 3px solid #d4af37;
-        }
+hr {
+  border: none;
+  border-top: 1px solid #d4af37;
+  margin: 1rem 0;
+  opacity: 0.3;
+}
 
-        .footer p {
-            margin: 0.5rem 0;
-            color: #c9d6ff;
-            font-size: 0.9rem;
-        }
+footer {
+  background: rgba(0, 0, 0, 0.7);
+  border-top: 2px solid #d4af37;
+  padding: 2rem;
+  text-align: center;
+  color: #b0b0b0;
+  font-size: 0.9rem;
+  margin-top: auto;
+}
 
-        .section-title {
-            font-size: 1.3rem;
-            color: #d4af37;
-            margin: 2rem 0 1rem 0;
-            padding-bottom: 0.5rem;
-            border-bottom: 2px solid #d4af37;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
+footer p {
+  margin: 0.5rem 0;
+}
 
-        @media (max-width: 1200px) {
-            .grid {
-                grid-template-columns: repeat(3, 1fr);
-            }
-        }
+@media (max-width: 1200px) {
+  .grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
 
-        @media (max-width: 900px) {
-            .grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
+@media (max-width: 900px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
 
-        @media (max-width: 768px) {
-            header {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 1rem;
-                padding: 1rem 1.5rem;
-            }
+@media (max-width: 768px) {
+  header {
+    padding: 1.5rem;
+  }
 
-            nav {
-                width: 100%;
-            }
+  .brand {
+    flex-direction: column;
+    text-align: center;
+    margin-bottom: 1rem;
+  }
 
-            nav a {
-                flex: 1;
-                text-align: center;
-                margin: 0;
-            }
+  .brand h1 {
+    font-size: 1.8rem;
+  }
 
-            section {
-                padding: 1.5rem 1rem;
-            }
+  nav {
+    gap: 0.6rem;
+  }
 
-            section > h2 {
-                font-size: 1.5rem;
-            }
+  nav a {
+    font-size: 0.8rem;
+    padding: 0.4rem 0.6rem;
+  }
 
-            .grid {
-                grid-template-columns: 1fr;
-            }
-        }
+  section {
+    padding: 1.5rem 1rem;
+  }
 
-        @media (max-width: 480px) {
-            header {
-                padding: 0.75rem 1rem;
-            }
+  section h2 {
+    font-size: 1.5rem;
+  }
 
-            .brand h1 {
-                font-size: 1.25rem;
-            }
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
 
-            section {
-                padding: 1rem 0.75rem;
-            }
+  .card {
+    padding: 1.2rem;
+  }
 
-            section > h2 {
-                font-size: 1.25rem;
-            }
+  .card h3 {
+    font-size: 1.2rem;
+  }
+}
 
-            button,
-            input {
-                font-size: 16px;
-            }
+@media (max-width: 480px) {
+  header {
+    padding: 1rem;
+  }
 
-            .card {
-                padding: 1rem;
-            }
-        }
+  .brand h1 {
+    font-size: 1.5rem;
+  }
+
+  .brand p {
+    font-size: 0.85rem;
+  }
+
+  nav a {
+    font-size: 0.7rem;
+    padding: 0.3rem 0.5rem;
+  }
+
+  section {
+    padding: 1rem 0.75rem;
+  }
+
+  section h2 {
+    font-size: 1.2rem;
+  }
+
+  .card {
+    padding: 1rem;
+  }
+
+  .card h3 {
+    font-size: 1rem;
+  }
+
+  button,
+  textarea,
+  input {
+    font-size: 16px;
+  }
+}
     
 
 /* En-tete propre a cette page */
@@ -552,55 +575,26 @@ body > header .login-btn:hover {
     <div class="brand">
         <a class="brand-home" href="/dashboard" aria-label="Retour au tableau de bord"><img src="/assets/logo-gendarmerie.png" class="logo" alt="Logo Gendarmerie">
         <div>
-            <h1>Tenues</h1>
-            <p>© 2026 lexy_off1 — Tous droits réservés</p>
+            <h1>Spécialités</h1>
+            <p>Gendarmerie Nationale</p>
         </div></a>
     </div>
 
     <nav>
-        <a href="/dashboard.html">Retour</a>
-        <a onclick="logout()">Déconnexion</a>
+        <a href="/dashboard.html">Dashboard</a>
+        <a href="/cours.html">Cours</a>
+        <a href="/logout">Déconnexion</a>
     </nav>
 </header>
 
 <section>
-    <h2>Tenues réglementaires</h2>
+    <h2>Spécialités disponibles</h2>
+    <div id="specialites" class="grid">Chargement...</div>
+</section>
 
-    <div class="card">
-        <p>Cette page regroupe les tenues autorisées par grade, qualification et spécialité.</p>
-        <p class="muted">Les tenues sont chargées depuis la base de données du site.</p>
-    </div>
-
-    <div id="adminBox" class="card" style="display:none;">
-        <h2>Administration des tenues</h2>
-        <button onclick="toggleAdmin()">Modifier les tenues</button>
-        <button onclick="showAddForm()">Ajouter une tenue</button>
-    </div>
-
-    <div id="addForm" class="card" style="display:none;">
-        <h2>Ajouter une tenue</h2>
-
-        <label for="addNom">Nom</label>
-        <input id="addNom" type="text">
-
-        <label for="addCategorie">Catégorie</label>
-        <input id="addCategorie" type="text" placeholder="GAV, SOB, OPJ, PSIG...">
-
-        <label for="addFile">Uploader une image</label>
-        <input type="file" id="addFile" accept="image/*">
-        <button onclick="uploadAddImage()">Uploader l'image</button>
-
-        <label for="addImage">Image</label>
-        <input id="addImage" type="text" placeholder="/assets/tenues/exemple.png">
-
-        <label for="addDescription">Description</label>
-        <input id="addDescription" type="text">
-
-        <button onclick="addTenue()">Ajouter</button>
-    </div>
-
-    <div id="tenuesContainer">Chargement...</div>
-
+<section id="panel-section" style="display:none;">
+    <h2>Candidatures en attente de traitement</h2>
+    <div id="apps">Chargement...</div>
 </section>
 
 <footer class="footer">
@@ -608,235 +602,252 @@ body > header .login-btn:hover {
 </footer>
 
 <script>
-let tenues = [];
-let isAdmin = false;
-let editMode = false;
+let specialites = [];
 
-const order = [
-    "GAV", "SOB", "SOP", "OFB", "OFS",
-    "OPJ",
-    "GN", "GHV", "OFB+", "FORMATEUR",
-    "PSIG", "ERI", "BDR/PJGN", "PGHM", "GIC", "GIGN/AGIGN", "GM"
-];
+async function loadSpecialites() {
+    let apiSpecialites = [];
 
-const titles = {
-    "GAV": "📂 GAV",
-    "SOB": "📂 SOB",
-    "SOP": "📂 SOP",
-    "OFB": "📂 OFB",
-    "OFS": "📂 OFS",
-    "OPJ": "⚖️ Tenues Judiciaires — OPJ",
-    "GN": "👕 Tenues Générales — GN",
-    "GHV": "👕 Tenues Générales — GHV",
-    "OFB+": "👕 Tenues Générales — OFB+",
-    "FORMATEUR": "👕 Tenue Formateur",
-    "PSIG": "🚔 PSIG",
-    "ERI": "🚔 EDCF / ERI",
-    "BDR/PJGN": "🚔 BDR / PJGN",
-    "PGHM": "🚔 PGHM",
-    "GIC": "🚔 GIC",
-    "GIGN/AGIGN": "🚔 GIGN / AGIGN",
-    "GM": "🚔 Gendarmerie Mobile"
-};
-
-async function checkAdmin() {
     try {
-        const res = await fetch((window.API_BASE || "") + "/api/is-admin");
-        if (!res.ok) throw new Error("Erreur");
-        
-        const data = await res.json();
-        isAdmin = data.isAdmin;
-
-        if (isAdmin) {
-            document.getElementById("adminBox").style.display = "block";
-        }
+        const res = await fetch((window.API_BASE || "") + "/api/specialites");
+        if (!res.ok) throw new Error("Erreur lors du chargement");
+        apiSpecialites = await res.json();
     } catch (error) {
-        console.error("Erreur checkAdmin:", error);
+        console.error("Erreur:", error);
     }
-}
 
-async function loadTenues() {
-    try {
-        const res = await fetch((window.API_BASE || "") + "/api/tenues");
-        if (!res.ok) throw new Error("Erreur");
-        
-        tenues = await res.json();
-        renderTenues();
-    } catch (error) {
-        console.error("Erreur loadTenues:", error);
-        document.getElementById("tenuesContainer").innerHTML = "<p>Erreur de chargement.</p>";
-    }
-}
+    specialites = apiSpecialites;
 
-function renderTenues() {
-    const container = document.getElementById("tenuesContainer");
-    container.innerHTML = "";
+    const box = document.getElementById("specialites");
+    box.innerHTML = "";
 
-    order.forEach(cat => {
-        const items = tenues.filter(t => t.categorie === cat);
-        if (items.length === 0) return;
+    let canManageAny = false;
 
-        const catId = cat.replaceAll("/", "-").replaceAll("+", "plus");
-        container.innerHTML += `<div class="section-title">${titles[cat] || escapeHtml(cat)}</div>`;
-        container.innerHTML += `<div class="grid" id="cat-${catId}"></div>`;
+    specialites.forEach(spe => {
+        if (spe.canManage) canManageAny = true;
 
-        const grid = document.getElementById(`cat-${catId}`);
+        box.innerHTML += `
+            <div class="card">
+                <h3>${escapeHtml(spe.nom)}</h3>
+                <p><b>${escapeHtml(spe.titre)}</b></p>
+                <p>${escapeHtml(spe.description)}</p>
 
-        items.forEach(t => {
-            grid.innerHTML += `
-                <div class="card grid-item">
-                    <h3>${escapeHtml(t.nom)}</h3>
-                    <p>${escapeHtml(t.description || "")}</p>
-                    <img src="${escapeHtml(t.image || "")}" alt="${escapeHtml(t.nom)}" class="course-image">
+                <button onclick="openApply('${spe.id}')">
+                    Déposer une candidature
+                </button>
 
-                    <div class="tenue-admin" style="display:${editMode ? "block" : "none"};">
-                        <hr>
-
-                        <label for="nom-${t.id}">Nom</label>
-                        <input id="nom-${t.id}" type="text" value="${escapeHtml(t.nom)}">
-
-                        <label for="categorie-${t.id}">Catégorie</label>
-                        <input id="categorie-${t.id}" type="text" value="${escapeHtml(t.categorie)}">
-
-                        <label for="image-${t.id}">Image</label>
-                        <input id="image-${t.id}" type="text" value="${escapeHtml(t.image || "")}">
-
-                        <label for="description-${t.id}">Description</label>
-                        <input id="description-${t.id}" type="text" value="${escapeHtml(t.description || "")}">
-
-                        <button onclick="saveTenue(${t.id})">Sauvegarder</button>
-                        <button class="danger" onclick="deleteTenue(${t.id})">Supprimer</button>
-                    </div>
-                </div>
-            `;
-        });
+                ${spe.canManage ? `
+                    <button onclick="loadApplications()">
+                        Voir les candidatures en attente
+                    </button>
+                ` : ""}
+            </div>
+        `;
     });
-}
 
-function toggleAdmin() {
-    editMode = !editMode;
-    renderTenues();
-}
-
-function showAddForm() {
-    const form = document.getElementById("addForm");
-    form.style.display = form.style.display === "none" ? "block" : "none";
-}
-
-async function saveTenue(id) {
-    try {
-        const res = await fetch((window.API_BASE || "") + "/api/tenue/update", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                id,
-                nom: document.getElementById(`nom-${id}`).value,
-                categorie: document.getElementById(`categorie-${id}`).value.toUpperCase(),
-                image: document.getElementById(`image-${id}`).value,
-                description: document.getElementById(`description-${id}`).value
-            })
-        });
-
-        if (!res.ok) throw new Error("Erreur serveur");
-        
-        alert("Tenue sauvegardée.");
-        await loadTenues();
-    } catch (error) {
-        console.error("Erreur saveTenue:", error);
-        alert("Erreur lors de la sauvegarde.");
+    if (canManageAny) {
+        document.getElementById("panel-section").style.display = "block";
     }
 }
 
-async function deleteTenue(id) {
-    if (!confirm("Supprimer cette tenue ?")) return;
+function openApply(id) {
+    const oldForm = document.getElementById("apply-section");
+    if (oldForm) oldForm.remove();
 
-    try {
-        const res = await fetch((window.API_BASE || "") + "/api/tenue/delete", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ id })
-        });
+    const spe = specialites.find(s => s.id === id);
+    if (!spe) return;
 
-        if (!res.ok) throw new Error("Erreur serveur");
-        
-        alert("Tenue supprimée.");
-        await loadTenues();
-    } catch (error) {
-        console.error("Erreur deleteTenue:", error);
-        alert("Erreur lors de la suppression.");
-    }
-}
+    let html = `
+        <section id="apply-section">
+        <div class="card">
+        <h2>Candidature — ${escapeHtml(spe.nom)}</h2>
+        <form id="applyForm">
+        <input type="hidden" id="specialiteId" value="${spe.id}">
+    `;
 
-async function uploadAddImage() {
-    const file = document.getElementById("addFile").files[0];
-
-    if (!file) {
-        alert("Choisis une image.");
-        return;
-    }
-
-    try {
-        const formData = new FormData();
-        formData.append("image", file);
-
-        const res = await fetch((window.API_BASE || "") + "/api/tenue/upload", {
-            method: "POST",
-            body: formData
-        });
-
-        if (!res.ok) throw new Error("Erreur serveur");
-        
-        const data = await res.json();
-
-        if (data.success) {
-            document.getElementById("addImage").value = data.imagePath;
-            alert("Image uploadée avec succès.");
-        } else {
-            alert(data.error || "Erreur lors de l'upload.");
-        }
-    } catch (error) {
-        console.error("Erreur uploadAddImage:", error);
-        alert("Erreur de connexion.");
-    }
-}
-
-async function addTenue() {
-    const nom = document.getElementById("addNom").value.trim();
-    const categorie = document.getElementById("addCategorie").value.trim().toUpperCase();
-    const image = document.getElementById("addImage").value.trim();
-    const description = document.getElementById("addDescription").value.trim();
-
-    if (!nom || !categorie || !image) {
-        alert("Remplis tous les champs obligatoires.");
-        return;
-    }
-
-    try {
-        const res = await fetch((window.API_BASE || "") + "/api/tenue/create", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ nom, categorie, image, description })
-        });
-
-        const data = await res.json();
-
-        if (!res.ok || !data.success) {
-            alert(data.error || "Erreur lors de l'ajout.");
+    spe.questions.forEach((q, index) => {
+        if (typeof q === "string") {
+            html += `
+                <label for="q-${index}">${escapeHtml(q)}</label>
+                <textarea id="q-${index}" required></textarea>
+            `;
             return;
         }
 
-        alert("Tenue ajoutée.");
-        document.getElementById("addForm").style.display = "none";
-        document.getElementById("addNom").value = "";
-        document.getElementById("addCategorie").value = "";
-        document.getElementById("addImage").value = "";
-        document.getElementById("addDescription").value = "";
-        document.getElementById("addFile").value = "";
-        
-        await loadTenues();
+        if (q.type === "radio") {
+            html += `<label>${escapeHtml(q.question)}</label>`;
+
+            q.options.forEach((opt, optIndex) => {
+                html += `
+                    <div class="radio-line">
+                        <input
+                            type="radio"
+                            name="q-${index}"
+                            id="q-${index}-${optIndex}"
+                            value="${escapeHtml(opt)}"
+                            required
+                        >
+                        <label for="q-${index}-${optIndex}">${escapeHtml(opt)}</label>
+                    </div>
+                `;
+            });
+
+            return;
+        }
+
+        if (q.type === "text") {
+            html += `
+                <label for="q-${index}">${escapeHtml(q.question)}</label>
+                <input type="text" id="q-${index}" required>
+            `;
+            return;
+        }
+
+        html += `
+            <label for="q-${index}">${escapeHtml(q.question)}</label>
+            <textarea id="q-${index}" required></textarea>
+        `;
+    });
+
+    html += `
+        <button type="submit">Envoyer la candidature</button>
+        </form>
+        </div>
+        </section>
+    `;
+
+    document.body.insertAdjacentHTML("beforeend", html);
+    document.getElementById("applyForm").addEventListener("submit", submitApply);
+    window.scrollTo(0, document.body.scrollHeight);
+}
+
+async function submitApply(e) {
+    e.preventDefault();
+
+    try {
+        const specialiteId = document.getElementById("specialiteId").value;
+        const spe = specialites.find(s => s.id === specialiteId);
+        if (!spe) return;
+
+        const answers = {};
+
+        spe.questions.forEach((q, index) => {
+            const questionText = typeof q === "string" ? q : q.question;
+
+            if (typeof q === "object" && q.type === "radio") {
+                const selected = document.querySelector(`input[name="q-${index}"]:checked`);
+                answers[questionText] = selected ? selected.value : "";
+            } else {
+                answers[questionText] = document.getElementById(`q-${index}`).value;
+            }
+        });
+
+        const res = await fetch((window.API_BASE || "") + "/api/specialites/apply", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ specialiteId, answers })
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+            alert(data.error || "Erreur lors de l'envoi.");
+            return;
+        }
+
+        alert("Candidature envoyée avec succès.");
+        location.reload();
     } catch (error) {
-        console.error("Erreur addTenue:", error);
+        console.error("Erreur:", error);
         alert("Erreur de connexion.");
+    }
+}
+
+async function loadApplications() {
+    try {
+        const res = await fetch((window.API_BASE || "") + "/api/specialites/applications");
+        if (!res.ok) throw new Error("Erreur");
+        
+        const apps = await res.json();
+        const box = document.getElementById("apps");
+        const pending = apps.filter(a => a.status === "En attente");
+
+        if (pending.length === 0) {
+            box.innerHTML = "<p>Aucune candidature en attente.</p>";
+            return;
+        }
+
+        box.innerHTML = "";
+
+        pending.forEach(app => {
+            let answersHtml = "";
+
+            for (const [q, a] of Object.entries(app.answers)) {
+                answersHtml += `
+                    <p><b>${escapeHtml(q)}</b></p>
+                    <p>${escapeHtml(a)}</p>
+                    <hr>
+                `;
+            }
+
+            box.innerHTML += `
+                <div class="card">
+                    <h3>${escapeHtml(app.specialiteNom)} — ${escapeHtml(app.nomPrenom)}</h3>
+                    <p><b>Discord :</b> ${escapeHtml(app.username)}</p>
+                    <p><b>ID :</b> ${escapeHtml(app.discordId)}</p>
+
+                    ${answersHtml}
+
+                    <label for="msg-${app.id}">Message au candidat</label>
+                    <textarea id="msg-${app.id}" placeholder="Message qui sera envoyé en MP Discord"></textarea>
+
+                    <button onclick="acceptApp(${app.id})">Accepter</button>
+                    <button class="danger" onclick="rejectApp(${app.id})">Refuser</button>
+                </div>
+            `;
+        });
+    } catch (error) {
+        console.error("Erreur:", error);
+        document.getElementById("apps").innerHTML = "<p>Erreur de chargement.</p>";
+    }
+}
+
+async function acceptApp(id) {
+    try {
+        const message = document.getElementById(`msg-${id}`).value;
+
+        const res = await fetch(`${window.API_BASE || ""}/api/specialites/applications/${id}/accept`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ message })
+        });
+
+        if (!res.ok) throw new Error("Erreur");
+
+        alert("Candidature acceptée. MP envoyé si possible.");
+        loadApplications();
+    } catch (error) {
+        console.error("Erreur:", error);
+        alert("Erreur lors du traitement.");
+    }
+}
+
+async function rejectApp(id) {
+    try {
+        const message = document.getElementById(`msg-${id}`).value;
+
+        const res = await fetch(`${window.API_BASE || ""}/api/specialites/applications/${id}/reject`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ message })
+        });
+
+        if (!res.ok) throw new Error("Erreur");
+
+        alert("Candidature refusée. MP envoyé si possible.");
+        loadApplications();
+    } catch (error) {
+        console.error("Erreur:", error);
+        alert("Erreur lors du traitement.");
     }
 }
 
@@ -851,18 +862,7 @@ function escapeHtml(value) {
     return String(value ?? "").replace(/[&<>"']/g, character => map[character]);
 }
 
-function logout() {
-    localStorage.removeItem("adminToken");
-    localStorage.removeItem("adminUserId");
-    window.location.href = "/logout";
-}
-
-async function init() {
-    await checkAdmin();
-    await loadTenues();
-}
-
-init();
+loadSpecialites();
 </script>
 
 </body>
